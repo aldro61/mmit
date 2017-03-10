@@ -32,8 +32,6 @@ private:
     // Minimum pointer functions
     void move_minimum_pointer_left();
     void move_minimum_pointer_right();
-    double get_minimum_position();
-    double get_minimum_value();
 
     // Utility functions
     double get_breakpoint_position(double y, bool is_upper_bound);
@@ -46,6 +44,10 @@ public:
     // Point insertion
     void insert_point(double y, bool is_upper_bound);
     void insert_points();
+
+    // Minimum pointer functions
+    double get_minimum_position();
+    double get_minimum_value();
 };
 
 

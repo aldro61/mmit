@@ -75,17 +75,17 @@ void PiecewiseFunction::insert_point(double y, bool is_upper_bound) {
     }
 
     // Log progress
-    cout << "\n\nINSERTION COMPLETED\n----------------------------" << endl;
-    cout << "Minimum value: " << this->get_minimum_value() << endl;
-    cout << "Minimum position: " << this->get_minimum_position() << endl;
-    cout << "Minimum coefficients: " << this->min_coefficients << endl;
-    cout << "The minimum pointer points to the breakpoint at " << this->min_ptr->first << endl;
-    cout << "Current breakpoints are: [";
-    for(auto b: this->breakpoint_coefficients){
-        cout << b.first << ", ";
-    }
-    cout << "]" << endl;
-    cout << "\n\n" << endl;
+//    cout << "\n\nINSERTION COMPLETED\n----------------------------" << endl;
+//    cout << "Minimum value: " << this->get_minimum_value() << endl;
+//    cout << "Minimum position: " << this->get_minimum_position() << endl;
+//    cout << "Minimum coefficients: " << this->min_coefficients << endl;
+//    cout << "The minimum pointer points to the breakpoint at " << this->min_ptr->first << endl;
+//    cout << "Current breakpoints are: [";
+//    for(auto b: this->breakpoint_coefficients){
+//        cout << b.first << ", ";
+//    }
+//    cout << "]" << endl;
+//    cout << "\n\n" << endl;
 }
 
 
