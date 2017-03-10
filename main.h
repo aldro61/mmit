@@ -4,12 +4,12 @@
 #ifndef MMIT_MAIN_H
 #define MMIT_MAIN_H
 
-typedef std::pair<float, int> bkpnt_t;
+typedef std::pair<double, int> bkpnt_t;
 
-std::pair<float, float> FindOptimalSplit(float x[], float y_lower[], float y_upper[], int size, float epsilon);
+std::pair<double, double> FindOptimalSplit(double x[], double y_lower[], double y_upper[], int size, double epsilon);
 
-std::pair<float, float> MinSlackSolver(float y[], int y_start, int y_end, int weights[], float epsilon,
-                                       std::set<bkpnt_t>& breakpoints, float& optimal_point, float& optimal_cost,
-                                       std::set<bkpnt_t>::iterator& minimum_breakpoint);
+std::pair<double, double> MinSlackSolver(double y[], int y_start, int y_end, int weights[], double epsilon,
+                                       std::set<bkpnt_t>& breakpoints, double& optimal_point, double& optimal_cost,
+                                       std::pair<std::set<bkpnt_t>::iterator, std::set<bkpnt_t>::iterator>& minimum_region);
 
 #endif //MMIT_MAIN_H
