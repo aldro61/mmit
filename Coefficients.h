@@ -10,10 +10,10 @@ public:
 
     Coefficients(){this->a = 0; this->b = 0; this->c = 0;}
     Coefficients(double a, double b, double c){this->a = a; this->b = b; this->c = c;}
-    Coefficients operator+(Coefficients other);
-    void operator+=(Coefficients other);
-    Coefficients operator-(Coefficients other);
-    void operator-=(Coefficients other);
+    Coefficients operator+(Coefficients &other);
+    void operator+=(Coefficients &other);
+    Coefficients operator-(Coefficients &other);
+    void operator-=(Coefficients &other);
     Coefficients operator*(double scalar);
     void operator*=(double scalar);
     Coefficients operator/(double scalar);

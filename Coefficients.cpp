@@ -5,21 +5,21 @@
 using namespace std;
 
 
-Coefficients Coefficients::operator+(Coefficients other) {
+Coefficients Coefficients::operator+(Coefficients &other) {
     return Coefficients(this->a + other.a, this->b + other.b, this->c + other.c);
 }
 
-void Coefficients::operator+=(Coefficients other) {
+void Coefficients::operator+=(Coefficients &other) {
     this->a += other.a;
     this->b += other.b;
     this->c += other.c;
 }
 
-Coefficients Coefficients::operator-(Coefficients other) {
+Coefficients Coefficients::operator-(Coefficients &other) {
     return Coefficients(this->a - other.a, this->b - other.b, this->c - other.c);
 }
 
-void Coefficients::operator-=(Coefficients other) {
+void Coefficients::operator-=(Coefficients &other) {
     this->a -= other.a;
     this->b -= other.b;
     this->c -= other.c;
