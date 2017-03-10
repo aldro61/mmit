@@ -1,19 +1,12 @@
-//
-// Created by Alexandre Drouin on 2017-03-09.
-//
 #ifndef MMIT_PIECEWISE_FUNCTION_H
 #define MMIT_PIECEWISE_FUNCTION_H
 
 #include <map>
 #include <set>
 
-using namespace std;
+#include "Coefficients.h"
 
-struct Coefficients{
-    double a = 0;
-    double b = 0;
-    double c = 0;
-};
+using namespace std;
 
 enum FunctionType{
     hinge,
@@ -27,7 +20,6 @@ private:
     FunctionType function_type;
 
     // Breakpoint and their coefficients
-    set<double> breakpoints;
     map<double, Coefficients> breakpoint_coefficients;
 
     // Minimum solution
