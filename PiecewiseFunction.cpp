@@ -27,10 +27,8 @@ void PiecewiseFunction::insert_point(double y, bool is_upper_bound) {
     double breakpoint_position = this->get_breakpoint_position(y, is_upper_bound);
 
     // Compute the new breakpoint's coefficients
-    Coefficients new_breakpoint_coefficients;
-    new_breakpoint_coefficients.a = 0;
-    new_breakpoint_coefficients.b = 1;
-    new_breakpoint_coefficients.c = -breakpoint_position;
+    // TODO: I use 0 for a for now, but we'll need to patch that for the squared hinge loss
+    Coefficients new_breakpoint_coefficients(0, 1, -breakpoint_position);
 
     // Insert the new breakpoint
     pair<map<double, Coefficients>::iterator, bool> insert = this->breakpoint_coefficients.insert(pair<double, Coefficients>(breakpoint_position, new_breakpoint_coefficients));
