@@ -25,15 +25,15 @@ private:
     // Minimum solution
     Coefficients min_coefficients;
     map<double, Coefficients>::iterator min_ptr = breakpoint_coefficients.end();  // Always on the right of the minimum
-    double min_val;
-    double min_pos;
 
     // Variables that might get moved into a solver class
     double margin;
 
-    // Minimum pointer movement functions
+    // Minimum pointer functions
     void move_minimum_pointer_left();
     void move_minimum_pointer_right();
+    double get_minimum_position();
+    double get_minimum_value();
 
     // Utility functions
     double get_breakpoint_position(double y, bool is_upper_bound);
