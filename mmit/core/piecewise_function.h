@@ -4,7 +4,7 @@
 #include <map>
 #include <set>
 
-#include "Coefficients.h"
+#include "coefficients.h"
 
 using namespace std;
 

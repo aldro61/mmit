@@ -1,6 +1,6 @@
 #include <cmath>
 #include <iostream>
-#include "Coefficients.h"
+#include "coefficients.h"
 
 using namespace std;
 

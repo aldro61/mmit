@@ -2,7 +2,7 @@
 #include <iostream>
 #include <utility>
 
-#include "PiecewiseFunction.h"
+#include "piecewise_function.h"
 
 /*
  * Utility functions

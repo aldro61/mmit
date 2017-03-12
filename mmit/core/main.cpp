@@ -5,7 +5,7 @@
 #include <utility>
 
 #include "main.h"
-#include "PiecewiseFunction.h"
+#include "piecewise_function.h"
 
 int main() {
 
