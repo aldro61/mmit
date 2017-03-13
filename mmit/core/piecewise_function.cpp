@@ -52,7 +52,7 @@ void PiecewiseFunction::insert_point(double y, bool is_upper_bound) {
         if (!breakpoint_was_added)
             breakpoint_ptr->second *= 2;
 
-        if(is_upper_bound && this->min_ptr->first > breakpoint_position){
+        if(is_upper_bound && (this->min_ptr == this->breakpoint_coefficients.end() || this->min_ptr->first > breakpoint_position)){
             // First update the minimum coefficients
             this->min_coefficients += new_breakpoint_coefficients;
 
@@ -80,12 +80,12 @@ void PiecewiseFunction::insert_point(double y, bool is_upper_bound) {
 //    cout << "Minimum position: " << this->get_minimum_position() << endl;
 //    cout << "Minimum coefficients: " << this->min_coefficients << endl;
 //    cout << "The minimum pointer points to the breakpoint at " << this->min_ptr->first << endl;
-//    cout << "Current breakpoints are: [";
-//    for(auto b: this->breakpoint_coefficients){
-//        cout << b.first << ", ";
-//    }
-//    cout << "]" << endl;
-//    cout << "\n\n" << endl;
+    cout << "Current breakpoints are: [";
+    for(auto b: this->breakpoint_coefficients){
+        cout << b.first << ", ";
+    }
+    cout << "]" << endl;
+    cout << "\n\n" << endl;
 }
 
 
@@ -106,8 +106,10 @@ double PiecewiseFunction::get_minimum_position() {
     // Find the position of the minimum segment's minimum
     double theoretical_min = find_function_min(this->min_coefficients);
 
-    // If there is another breakpoint to the right of the minimum pointer, the minimum is the middle point
-    if(this->min_ptr != this->breakpoint_coefficients.begin()){
+    // If the function is not open on any side
+    std::cout << "1) " << (this->min_ptr != this->breakpoint_coefficients.begin()) << std::endl;
+    std::cout << "2) " << (this->min_ptr != this->breakpoint_coefficients.end()) << std::endl;
+    if(this->min_ptr != this->breakpoint_coefficients.begin() && this->min_ptr != this->breakpoint_coefficients.end()){
         return (prev(this->min_ptr)->first + this->min_ptr->first) / 2;
     }
     else

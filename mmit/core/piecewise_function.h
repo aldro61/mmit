@@ -37,8 +37,9 @@ private:
     double get_breakpoint_position(double y, bool is_upper_bound);
 
 public:
-    PiecewiseFunction(double margin){
+    PiecewiseFunction(double margin, int loss){
         this->margin = margin;
+        this->function_type = loss == 0 ? hinge : squared_hinge;
     }
 
     // Point insertion
