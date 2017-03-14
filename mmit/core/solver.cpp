@@ -22,7 +22,7 @@ int compute_optimal_costs(
 ) {
     PiecewiseFunction function(margin, loss == 0 ? hinge : squared_hinge);
 
-    // Compute the optimal predicted values for the left child
+    // Compute the optimal solution for each interval
     for(int i = 0; i < n_data; i++){
         pred_vec[i] = function.get_minimum_position();
         cost_vec[i] = function.get_minimum_value();
