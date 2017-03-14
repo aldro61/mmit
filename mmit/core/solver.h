@@ -5,7 +5,6 @@
 #ifndef MMIT_SOLVER_H
 #define MMIT_SOLVER_H
 
-#include <Python.h>
 #include "piecewise_function.h"
 
 int compute_optimal_costs(
@@ -19,7 +18,6 @@ int compute_optimal_costs(
 // outputs
         int *moves_vec, //array[n_data] of number of pointer moves
         double *pred_vec, //array[n_data] of optimal predicted values
-        double *cost_vec // array[n_data] of optimal cost
-);
+        double *cost_vec); // array[n_data] of optimal cost
 
 #endif //MMIT_SOLVER_H

@@ -1,8 +1,10 @@
 //
 // Created by Alexandre Drouin on 2017-03-09.
 //
+#include <cmath>
 #include <iostream>
 #include "solver.h"
+#include "piecewise_function.h"
 
 // return int is an error status code
 int compute_optimal_costs(
@@ -18,6 +20,23 @@ int compute_optimal_costs(
         double *pred_vec, //array[n_data] of optimal predicted values
         double *cost_vec // array[n_data] of optimal cost
 ) {
-    std::cout << "It works!" << std::endl;
+    PiecewiseFunction function(margin, loss == 0 ? hinge : squared_hinge);
+
+    // Compute the optimal predicted values for the left child
+    for(int i = 0; i < n_data; i++){
+        pred_vec[i] = function.get_minimum_position();
+        cost_vec[i] = function.get_minimum_value();
+
+        moves_vec[i] = 0;
+
+        // Add the upper bound
+        if(lower_vec[i] > -INFINITY)
+            moves_vec[i] += function.insert_point(lower_vec[i], false);
+
+        // Add the lower bound
+        if(upper_vec[i] < INFINITY)
+            moves_vec[i] += function.insert_point(upper_vec[i], true);
+    }
+
     return 0;
 }

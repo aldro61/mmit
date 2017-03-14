@@ -3,9 +3,18 @@
 """
 MMIT
 """
+from platform import system as get_os_name
+
 from setuptools import Extension, find_packages, setup
 from setuptools.command.build_ext import build_ext as _build_ext
 
+# Configure the compiler based on the OS
+if get_os_name().lower() == "darwin":
+    os_compile_flags = ["-mmacosx-version-min=10.9"]
+else:
+    os_compile_flags = []
+
+# Required for the automatic installation of numpy
 class build_ext(_build_ext):
     def finalize_options(self):
         _build_ext.finalize_options(self)
@@ -15,7 +24,9 @@ class build_ext(_build_ext):
         self.include_dirs.append(numpy.get_include())
 
 solver_module = Extension('mmit/core/solver', sources=['mmit/core/solver_python_bindings.cpp',
-                                                       'mmit/core/solver.cpp'])
+                                                       'mmit/core/solver.cpp',
+                                                       'mmit/core/piecewise_function.cpp',
+                                                       'mmit/core/coefficients.cpp'], extra_compile_args=["-std=c++11"] + os_compile_flags)
 
 setup(
     name = "mmit",

@@ -6,8 +6,6 @@
 
 #include "coefficients.h"
 
-using namespace std;
-
 enum FunctionType{
     hinge,
     squared_hinge
@@ -20,11 +18,11 @@ private:
     FunctionType function_type;
 
     // Breakpoint and their coefficients
-    map<double, Coefficients> breakpoint_coefficients;
+    std::map<double, Coefficients> breakpoint_coefficients;
 
     // Minimum solution
     Coefficients min_coefficients;
-    map<double, Coefficients>::iterator min_ptr = breakpoint_coefficients.end();  // Always on the right of the minimum
+    std::map<double, Coefficients>::iterator min_ptr = breakpoint_coefficients.end();  // Always on the right of the minimum
 
     // Variables that might get moved into a solver class
     double margin;
@@ -37,13 +35,13 @@ private:
     double get_breakpoint_position(double y, bool is_upper_bound);
 
 public:
-    PiecewiseFunction(double margin, int loss){
+    PiecewiseFunction(double margin, FunctionType loss){
         this->margin = margin;
-        this->function_type = loss == 0 ? hinge : squared_hinge;
+        this->function_type = loss;
     }
 
     // Point insertion
-    void insert_point(double y, bool is_upper_bound);
+    int insert_point(double y, bool is_upper_bound);
     void insert_points();
 
     // Minimum pointer functions

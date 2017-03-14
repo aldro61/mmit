@@ -1,13 +1,13 @@
 #include <cmath>
 #include <iostream>
-#include <utility>
+#include <iterator>
 
 #include "piecewise_function.h"
 
 /*
  * Utility functions
  */
-ostream& operator<<(ostream &os, Coefficients const &c){
+std::ostream& operator<<(std::ostream &os, Coefficients const &c){
     return os << "a=" << c.a << ", b=" << c.b << ", c=" << c.c;
 }
 
@@ -28,7 +28,8 @@ double PiecewiseFunction::get_breakpoint_position(double y, bool is_upper_bound)
     return y + (is_upper_bound ? -1 : 1) * this->margin;
 }
 
-void PiecewiseFunction::insert_point(double y, bool is_upper_bound) {
+int PiecewiseFunction::insert_point(double y, bool is_upper_bound) {
+    int n_pointer_moves = 0;
 
     // New breakpoint's position
     double breakpoint_position = this->get_breakpoint_position(y, is_upper_bound);
@@ -38,7 +39,7 @@ void PiecewiseFunction::insert_point(double y, bool is_upper_bound) {
     Coefficients new_breakpoint_coefficients(0, 1, -breakpoint_position);
 
     // Insert the new breakpoint
-    pair<map<double, Coefficients>::iterator, bool> insert = this->breakpoint_coefficients.insert(pair<double, Coefficients>(breakpoint_position, new_breakpoint_coefficients));
+    std::pair<std::map<double, Coefficients>::iterator, bool> insert = this->breakpoint_coefficients.insert(std::pair<double, Coefficients>(breakpoint_position, new_breakpoint_coefficients));
     auto breakpoint_ptr = insert.first;
     auto breakpoint_was_added = insert.second;
 
@@ -58,34 +59,42 @@ void PiecewiseFunction::insert_point(double y, bool is_upper_bound) {
 
             // Move the pointer
             while(this->min_ptr != this->breakpoint_coefficients.begin() &&
-                    find_function_min(this->min_coefficients) < prev(this->min_ptr)->first)
+                    find_function_min(this->min_coefficients) < std::prev(this->min_ptr)->first) {
                 this->move_minimum_pointer_left();
-            if(find_function_min(this->min_coefficients) > this->min_ptr->first)
+                n_pointer_moves ++;
+            }
+            if(find_function_min(this->min_coefficients) > this->min_ptr->first) {
                 // We went too far left, go back one
                 this->move_minimum_pointer_right();
+                n_pointer_moves--;
+            }
 
         } else if(!is_upper_bound && this->min_ptr->first <= breakpoint_position){
             // First update the minimum coefficients
             this->min_coefficients -= new_breakpoint_coefficients;
 
             // Move the pointer
-            while(next(this->min_ptr) != this->breakpoint_coefficients.end() && find_function_min(this->min_coefficients) > this->min_ptr->first)
+            while(std::next(this->min_ptr) != this->breakpoint_coefficients.end() && find_function_min(this->min_coefficients) > this->min_ptr->first)
                 this->move_minimum_pointer_right();
+                n_pointer_moves++;
         }
     }
 
-    // Log progress
-//    cout << "\n\nINSERTION COMPLETED\n----------------------------" << endl;
-//    cout << "Minimum value: " << this->get_minimum_value() << endl;
-//    cout << "Minimum position: " << this->get_minimum_position() << endl;
-//    cout << "Minimum coefficients: " << this->min_coefficients << endl;
-//    cout << "The minimum pointer points to the breakpoint at " << this->min_ptr->first << endl;
-    cout << "Current breakpoints are: [";
-    for(auto b: this->breakpoint_coefficients){
-        cout << b.first << ", ";
-    }
-    cout << "]" << endl;
-    cout << "\n\n" << endl;
+//    // Log progress
+//    std::cout << "\n\nINSERTION COMPLETED\n----------------------------" << std::endl;
+//    std::cout << "N pointer moves: " << n_pointer_moves << std::endl;
+//    std::cout << "Minimum value: " << this->get_minimum_value() << std::endl;
+//    std::cout << "Minimum position: " << this->get_minimum_position() << std::endl;
+//    std::cout << "Minimum coefficients: " << this->min_coefficients << std::endl;
+//    std::cout << "The minimum pointer points to the breakpoint at " << ((this->min_ptr != this->breakpoint_coefficients.end()) ? this->min_ptr->first : -9999999) << std::endl;
+//    std::cout << "Current breakpoints are: [";
+//    for(auto b: this->breakpoint_coefficients){
+//        std::cout << b.first << ", ";
+//    }
+//    std::cout << "]" << std::endl;
+//    std::cout << "\n\n" << std::endl;
+
+    return n_pointer_moves;
 }
 
 
@@ -93,13 +102,13 @@ void PiecewiseFunction::insert_point(double y, bool is_upper_bound) {
  * Function global minimum functions
  */
 void PiecewiseFunction::move_minimum_pointer_left() {
-    this->min_ptr = prev(this->min_ptr);
+    this->min_ptr = std::prev(this->min_ptr);
     this->min_coefficients -= this->min_ptr->second;
 }
 
 void PiecewiseFunction::move_minimum_pointer_right() {
-    this->min_ptr = next(this->min_ptr);
     this->min_coefficients += this->min_ptr->second;
+    this->min_ptr = std::next(this->min_ptr);
 }
 
 double PiecewiseFunction::get_minimum_position() {
@@ -107,10 +116,8 @@ double PiecewiseFunction::get_minimum_position() {
     double theoretical_min = find_function_min(this->min_coefficients);
 
     // If the function is not open on any side
-    std::cout << "1) " << (this->min_ptr != this->breakpoint_coefficients.begin()) << std::endl;
-    std::cout << "2) " << (this->min_ptr != this->breakpoint_coefficients.end()) << std::endl;
     if(this->min_ptr != this->breakpoint_coefficients.begin() && this->min_ptr != this->breakpoint_coefficients.end()){
-        return (prev(this->min_ptr)->first + this->min_ptr->first) / 2;
+        return (std::prev(this->min_ptr)->first + this->min_ptr->first) / 2;
     }
     else
         return theoretical_min;

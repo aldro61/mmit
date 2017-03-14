@@ -2,8 +2,6 @@
 #include <iostream>
 #include "coefficients.h"
 
-using namespace std;
-
 
 Coefficients Coefficients::operator+(Coefficients &other) {
     return Coefficients(this->a + other.a, this->b + other.b, this->c + other.c);

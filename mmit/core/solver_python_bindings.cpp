@@ -1,6 +1,7 @@
 #include <Python.h>
 #include <numpy/arrayobject.h>
 
+#include <cmath>
 #include <iostream>
 #include "solver.h"
 
@@ -43,7 +44,7 @@ optimal_costs(PyObject *self, PyObject *args){
     npy_intp n_features = PyArray_DIM(feature_vec,0);
     npy_intp n_lower = PyArray_DIM(lower_vec,0);
     npy_intp n_upper = PyArray_DIM(upper_vec,0);
-    if(!(n_features == n_lower && n_lower == n_features)){
+    if(!(n_features == n_lower && n_lower == n_upper)){
         PyErr_SetString(PyExc_ValueError,
                         "feature_vec, lower_vec and upper_vec must be same length");
         return NULL;

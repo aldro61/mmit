@@ -1,27 +1,34 @@
-#include <algorithm>
 #include <cmath>
 #include <iostream>
-#include <set>
-#include <utility>
 
 #include "main.h"
-#include "piecewise_function.h"
+#include "solver.h"
 
 int main() {
 
-    PiecewiseFunction test(0.1);
-    test.insert_point(1.0, true);
-    test.insert_point(0.0, true);
-    test.insert_point(0.5, false);
+    int n_data = 11;
+    double feature_vec[] = {0, 1, 1, 3, 4, 4, 6, 7, 8, 9, 10};
+    double upper_vec[] = {0, 1, 2, 3, 4, 5, 6, INFINITY, 8, 9, INFINITY};
+    double lower_vec[] = {-1, -1, -2, -INFINITY, -4, -5, -6, -7, -INFINITY, -2, -3};
 
-    for(int i = 0; i < 50000; i++){
-        bool is_upper_bound = ((double) rand() / (RAND_MAX)) < 0.5 ? true : false;
-        int multiplier =  ((double) rand() / (RAND_MAX)) < 0.5 ? -1 : 1;
-        double y = rand() * multiplier;
-        test.insert_point(y, is_upper_bound);
-        cout << "Minimum: " << test.get_minimum_value() << endl;
+    double margin = 0.3;
+    int loss = 1;
+
+    int *moves_vec = new int[n_data];
+    double *pred_vec = new double[n_data];
+    double *cost_vec = new double[n_data];
+
+
+    compute_optimal_costs(n_data, feature_vec, lower_vec, upper_vec, margin, loss, moves_vec, pred_vec, cost_vec);
+
+    for(int i = 0; i < n_data; i++){
+        std::cout << "Cost[" << i << "] = " << cost_vec[i] << std::endl;
     }
-    cout << "Finished" << endl;
+
+    for(int i = 0; i < n_data; i++){
+        std::cout << "Pred[" << i << "] = " << pred_vec[i] << std::endl;
+    }
+
     return 0;
 }
 
