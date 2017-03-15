@@ -38,7 +38,7 @@ private:
 
     // Minimum solution
     Coefficients min_coefficients;
-    std::map<double, Coefficients>::iterator min_ptr = breakpoint_coefficients.end();  // Always on the right of the minimum
+    std::map<double, Coefficients>::iterator min_ptr;  // Always on the right of the minimum
 
     // Minimum pointer functions
     void move_minimum_pointer_left();
@@ -53,12 +53,11 @@ public:
         this->margin = margin;
         this->function_type = loss;
         this->verbose = verbose;
+	this->min_ptr = breakpoint_coefficients.end();
     }
 
     PiecewiseFunction(double margin, FunctionType loss){
-        this->margin = margin;
-        this->function_type = loss;
-        this->verbose = false;
+      PiecewiseFunction(margin, loss, false);
     }
 
     // Point insertion
