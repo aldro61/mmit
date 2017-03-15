@@ -33,19 +33,23 @@ solver_module = Extension('mmit.core.solver',
 
 setup(
     name = "mmit",
-    version = "0.0.1",
+    version = "2017.03.15",
     packages = find_packages(),
 
     cmdclass={'build_ext':build_ext},
     setup_requires = [],
     install_requires = [],
 
-    author = "",
-    author_email = "",
-    description = "",
-    license = "GPLv3",
-    keywords = "",
-    url = "",
+    author = "Toby Dylan Hocking, Alexandre Drouin",
+    author_email = "toby.hocking@r-project.org, aldro61@gmail.com",
+    maintainer="Alexandre Drouin",
+    maintainer_email="aldro61@gmail.com",
+    description="Max Margin Interval Trees",
+    long_description = "Description: Fast O(P N log N) algorithm for learning a regression tree with interval censored "
+                       "output data.",
+    license = "GPL-3",
+    keywords = "machine learning regression tree censored interval data",
+    url = "https://github.com/aldro61/mmit",
 
     ext_modules = [solver_module],
     
