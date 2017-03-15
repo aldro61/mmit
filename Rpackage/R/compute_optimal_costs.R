@@ -48,6 +48,10 @@ compute_optimal_costs <- structure(function
     moves=moves_vec,
     pred=pred_vec,
     cost=cost_vec))
+### data.frame with columns moves (number of times the pointer was
+### moved for each data point, sum of upper and lower limit moves),
+### pred (predicted output value that achieves minimum cost), cost
+### (minimum cost value).
 }, ex=function(){
   library(MMIT)
   target.mat <- rbind(
