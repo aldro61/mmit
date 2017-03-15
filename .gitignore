@@ -1,0 +1,8 @@
+*~
+*.so
+*.o
+symbols.rds
+*.Rcheck
+Rpackage.check
+*.tar.gz
+.Rhistory
