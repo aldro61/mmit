@@ -22,15 +22,15 @@ int compute_optimal_costs(
 ) {
     PiecewiseFunction function(margin, loss == 0 ? hinge : squared_hinge);
 
-    // Compute the optimal predicted values for the left child
+    // Compute the optimal solution for each interval
     for(int i = 0; i < n_data; i++){
         moves_vec[i] = 0;
 
-        // Add the upper bound
+        // Add the lower bound
         if(lower_vec[i] > -INFINITY)
             moves_vec[i] += function.insert_point(lower_vec[i], false);
 
-        // Add the lower bound
+        // Add the upper bound
         if(upper_vec[i] < INFINITY)
             moves_vec[i] += function.insert_point(upper_vec[i], true);
 

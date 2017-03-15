@@ -1,0 +1,9 @@
+Package: MMIT
+Maintainer: Toby Dylan Hocking <toby.hocking@r-project.org>
+Author: Toby Dylan Hocking, Alex Drouin
+Version: 2017.03.15
+License: GPL-3
+Title: Max Margin Interval Trees
+Description: Fast O(P N log N) algorithm for learning a regression tree
+ with interval censored output data.
+Suggests: testthat
