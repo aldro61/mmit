@@ -45,24 +45,21 @@ private:
     void move_minimum_pointer_right();
 
     // Utility vars + functions
+    void construct(double margin, FunctionType loss, bool verbose){this->margin = margin; this->function_type = loss; this->verbose = verbose; this->min_ptr = breakpoint_coefficients.end();}
     double get_breakpoint_position(double y, bool is_upper_bound);
     bool verbose;
 
 public:
     PiecewiseFunction(double margin, FunctionType loss, bool verbose){
-        this->margin = margin;
-        this->function_type = loss;
-        this->verbose = verbose;
-	this->min_ptr = breakpoint_coefficients.end();
+        construct(margin, loss, verbose);
     }
 
     PiecewiseFunction(double margin, FunctionType loss){
-      PiecewiseFunction(margin, loss, false);
+        construct(margin, loss, false);
     }
 
     // Point insertion
     int insert_point(double y, bool is_upper_bound);
-    void insert_points();
 
     // Minimum pointer functions
     double get_minimum_position();
