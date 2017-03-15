@@ -4,41 +4,41 @@
 
 
 Coefficients Coefficients::operator+(Coefficients &other) {
-    return Coefficients(this->a + other.a, this->b + other.b, this->c + other.c);
+    return Coefficients(this->quadratic + other.quadratic, this->linear + other.linear, this->constant + other.constant);
 }
 
 void Coefficients::operator+=(Coefficients &other) {
-    this->a += other.a;
-    this->b += other.b;
-    this->c += other.c;
+    this->quadratic += other.quadratic;
+    this->linear += other.linear;
+    this->constant += other.constant;
 }
 
 Coefficients Coefficients::operator-(Coefficients &other) {
-    return Coefficients(this->a - other.a, this->b - other.b, this->c - other.c);
+    return Coefficients(this->quadratic - other.quadratic, this->linear - other.linear, this->constant - other.constant);
 }
 
 void Coefficients::operator-=(Coefficients &other) {
-    this->a -= other.a;
-    this->b -= other.b;
-    this->c -= other.c;
+    this->quadratic -= other.quadratic;
+    this->linear -= other.linear;
+    this->constant -= other.constant;
 }
 
 Coefficients Coefficients::operator*(double scalar) {
-    return Coefficients(this->a * scalar, this->b * scalar, this->c * scalar);
+    return Coefficients(this->quadratic * scalar, this->linear * scalar, this->constant * scalar);
 }
 
 void Coefficients::operator*=(double scalar) {
-    this->a *= scalar;
-    this->b *= scalar;
-    this->c *= scalar;
+    this->quadratic *= scalar;
+    this->linear *= scalar;
+    this->constant *= scalar;
 }
 
 Coefficients Coefficients::operator/(double scalar) {
-    return Coefficients(this->a / scalar, this->b / scalar, this->c / scalar);
+    return Coefficients(this->quadratic / scalar, this->linear / scalar, this->constant / scalar);
 }
 
 void Coefficients::operator/=(double scalar) {
-    this->a /= scalar;
-    this->b /= scalar;
-    this->c /= scalar;
+    this->quadratic /= scalar;
+    this->linear /= scalar;
+    this->constant /= scalar;
 }

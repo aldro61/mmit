@@ -24,7 +24,7 @@ private:
     Coefficients min_coefficients;
     std::map<double, Coefficients>::iterator min_ptr = breakpoint_coefficients.end();  // Always on the right of the minimum
 
-    // Variables that might get moved into a solver class
+    // Variables that might get moved into quadratic solver class
     double margin;
 
     // Minimum pointer functions

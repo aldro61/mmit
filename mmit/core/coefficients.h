@@ -4,12 +4,12 @@
 
 class Coefficients{
 public:
-    double a = 0;
-    double b = 0;
-    double c = 0;
+    double quadratic = 0;
+    double linear = 0;
+    double constant = 0;
 
-    Coefficients(){this->a = 0; this->b = 0; this->c = 0;}
-    Coefficients(double a, double b, double c){this->a = a; this->b = b; this->c = c;}
+    Coefficients(){this->quadratic = 0; this->linear = 0; this->constant = 0;}
+    Coefficients(double a, double b, double c){this->quadratic = a; this->linear = b; this->constant = c;}
     Coefficients operator+(Coefficients &other);
     void operator+=(Coefficients &other);
     Coefficients operator-(Coefficients &other);

@@ -24,9 +24,6 @@ int compute_optimal_costs(
 
     // Compute the optimal predicted values for the left child
     for(int i = 0; i < n_data; i++){
-        pred_vec[i] = function.get_minimum_position();
-        cost_vec[i] = function.get_minimum_value();
-
         moves_vec[i] = 0;
 
         // Add the upper bound
@@ -36,6 +33,9 @@ int compute_optimal_costs(
         // Add the lower bound
         if(upper_vec[i] < INFINITY)
             moves_vec[i] += function.insert_point(upper_vec[i], true);
+
+        pred_vec[i] = function.get_minimum_position();
+        cost_vec[i] = function.get_minimum_value();
     }
 
     return 0;

@@ -8,16 +8,16 @@
  * Utility functions
  */
 std::ostream& operator<<(std::ostream &os, Coefficients const &c){
-    return os << "a=" << c.a << ", b=" << c.b << ", c=" << c.c;
+    return os << "a=" << c.quadratic << ", b=" << c.linear << ", c=" << c.constant;
 }
 
 double find_function_min(Coefficients coefficients){
-    if(coefficients.a != 0)
-        return -coefficients.b / (2 * coefficients.a);
-    else if(coefficients.a == 0 && coefficients.b == 0 && coefficients.c == 0)
+    if(coefficients.quadratic != 0)
+        return -coefficients.linear / (2 * coefficients.quadratic);
+    else if(coefficients.quadratic == 0 && coefficients.linear == 0 && coefficients.constant == 0)
         return -INFINITY;
     else
-        return -coefficients.b * INFINITY;
+        return -coefficients.linear * INFINITY;
 }
 
 
@@ -35,7 +35,7 @@ int PiecewiseFunction::insert_point(double y, bool is_upper_bound) {
     double breakpoint_position = this->get_breakpoint_position(y, is_upper_bound);
 
     // Compute the new breakpoint's coefficients
-    // TODO: I use 0 for a for now, but we'll need to patch that for the squared hinge loss
+    // TODO: I use 0 for quadratic for now, but we'll need to patch that for the squared hinge loss
     Coefficients new_breakpoint_coefficients(0, 1, -breakpoint_position);
 
     // Insert the new breakpoint
@@ -125,7 +125,8 @@ double PiecewiseFunction::get_minimum_position() {
 
 double PiecewiseFunction::get_minimum_value() {
     double min_pos = this->get_minimum_position();
-    if(pow(min_pos, 2) == INFINITY)  // Unbounded
+    double x_square = min_pos * min_pos;
+    if(x_square == INFINITY)  // Unbounded
         return INFINITY;
-    return this->min_coefficients.a * pow(min_pos, 2) + this->min_coefficients.b * min_pos + this->min_coefficients.c;
+    return this->min_coefficients.quadratic * x_square + this->min_coefficients.linear * min_pos + this->min_coefficients.constant;
 }

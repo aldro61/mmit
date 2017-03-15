@@ -23,10 +23,13 @@ class build_ext(_build_ext):
         import numpy
         self.include_dirs.append(numpy.get_include())
 
-solver_module = Extension('mmit/core/solver', sources=['mmit/core/solver_python_bindings.cpp',
-                                                       'mmit/core/solver.cpp',
-                                                       'mmit/core/piecewise_function.cpp',
-                                                       'mmit/core/coefficients.cpp'], extra_compile_args=["-std=c++11"] + os_compile_flags)
+solver_module = Extension('mmit.core.solver',
+                          language="c++",
+                          sources=['mmit/core/solver_python_bindings.cpp',
+                                   'mmit/core/solver.cpp',
+                                   'mmit/core/piecewise_function.cpp',
+                                   'mmit/core/coefficients.cpp'],
+                          extra_compile_args=["-std=c++11"] + os_compile_flags)
 
 setup(
     name = "mmit",
@@ -44,5 +47,8 @@ setup(
     keywords = "",
     url = "",
 
-    ext_modules = [solver_module]
+    ext_modules = [solver_module],
+    
+    test_suite='nose.collector',
+    tests_require=['nose']
 )
