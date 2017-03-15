@@ -14,8 +14,9 @@ enum FunctionType{
 class PiecewiseFunction {
 
 private:
-    // Function info
+    // Function parameters
     FunctionType function_type;
+    double margin;
 
     // Breakpoint and their coefficients
     std::map<double, Coefficients> breakpoint_coefficients;
@@ -24,20 +25,25 @@ private:
     Coefficients min_coefficients;
     std::map<double, Coefficients>::iterator min_ptr = breakpoint_coefficients.end();  // Always on the right of the minimum
 
-    // Variables that might get moved into quadratic solver class
-    double margin;
-
     // Minimum pointer functions
     void move_minimum_pointer_left();
     void move_minimum_pointer_right();
 
-    // Utility functions
+    // Utility vars + functions
     double get_breakpoint_position(double y, bool is_upper_bound);
+    bool verbose;
 
 public:
+    PiecewiseFunction(double margin, FunctionType loss, bool verbose){
+        this->margin = margin;
+        this->function_type = loss;
+        this->verbose = verbose;
+    }
+
     PiecewiseFunction(double margin, FunctionType loss){
         this->margin = margin;
         this->function_type = loss;
+        this->verbose = false;
     }
 
     // Point insertion

@@ -1,6 +1,3 @@
-//
-// Created by Alexandre Drouin on 2017-03-09.
-//
 #include <cmath>
 #include <iostream>
 #include "solver.h"

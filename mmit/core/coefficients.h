@@ -18,6 +18,7 @@ public:
     void operator*=(double scalar);
     Coefficients operator/(double scalar);
     void operator/=(double scalar);
+    bool operator==(Coefficients &other);
 };
 
 

@@ -42,3 +42,7 @@ void Coefficients::operator/=(double scalar) {
     this->linear /= scalar;
     this->constant /= scalar;
 }
+
+bool Coefficients::operator==(Coefficients &other){
+    return this->quadratic == other.quadratic && this->linear == other.linear && this->constant == other.constant;
+}
