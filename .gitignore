@@ -6,3 +6,7 @@ symbols.rds
 Rpackage.check
 *.tar.gz
 .Rhistory
+*.pyc
+*.egg-info
+build
+dist
