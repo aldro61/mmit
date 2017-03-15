@@ -16,7 +16,7 @@ moved for each data point, sum of upper and lower limit moves),
 pred (predicted output value that achieves minimum cost), cost
 (minimum cost value).}
 
-\author{Toby Dylan Hocking, Alex Drouin}
+\author{Toby Dylan Hocking, Alexandre Drouin}
 
 
 

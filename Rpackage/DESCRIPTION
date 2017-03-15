@@ -1,6 +1,6 @@
 Package: mmit
 Maintainer: Toby Dylan Hocking <toby.hocking@r-project.org>
-Author: Toby Dylan Hocking, Alex Drouin
+Author: Toby Dylan Hocking, Alexandre Drouin
 Version: 2017.03.15
 License: GPL-3
 Title: Max Margin Interval Trees
