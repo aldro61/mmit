@@ -118,5 +118,22 @@ class TrivialTests(TestCase):
         np.testing.assert_allclose(preds, [0, 0, 0, 0, 0, -0.5])
         np.testing.assert_allclose(costs, [0, 0, 0, 1, 2, 3])
 
+    def test_8(self):
+        """
+        solution is independent of the order of the intervals
+        """
+        margin = 0
+        moves, preds, costs = solver.compute_optimal_costs(self.target_lower, self.target_upper, margin, 0)
+        unshuffled_pred = preds[-1]
+        unshuffled_cost = costs[-1]
+        del moves, preds, costs
+
+        for i in xrange(10):
+            shuffler = np.arange(len(self.target_lower))
+            np.random.shuffle(shuffler)
+            moves, preds, costs = solver.compute_optimal_costs(self.target_lower[shuffler], self.target_upper[shuffler], margin, 0)
+            assert preds[-1] == unshuffled_pred
+            assert costs[-1] == unshuffled_cost
+
 if __name__ == "__main__":
     pass
