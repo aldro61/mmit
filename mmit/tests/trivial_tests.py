@@ -30,15 +30,12 @@ class TrivialTests(TestCase):
         self.target_lower = np.array(self.target_lower)
         self.target_upper = np.array(self.target_upper)
 
-
-        self.features = np.array([-2.2, 3, 10])
-
     def test_1(self):
         """
         margin=0 yields total cost 0
         """
         margin = 0.0
-        moves, preds, costs = solver.compute_optimal_costs(self.features, self.target_lower, self.target_upper, margin, 0)
+        moves, preds, costs = solver.compute_optimal_costs(self.target_lower, self.target_upper, margin, 0)
         np.testing.assert_allclose(preds, [inf, 1, 0])
         np.testing.assert_allclose(costs, [0, 0, 0])
 
@@ -47,7 +44,7 @@ class TrivialTests(TestCase):
         margin=0.5 yields total cost 0
         """
         margin = 0.5
-        moves, preds, costs = solver.compute_optimal_costs(self.features, self.target_lower, self.target_upper, margin, 0)
+        moves, preds, costs = solver.compute_optimal_costs(self.target_lower, self.target_upper, margin, 0)
         np.testing.assert_allclose(preds, [inf, 1, 0])
         np.testing.assert_allclose(costs, [0, 0, 0])
 
@@ -56,7 +53,7 @@ class TrivialTests(TestCase):
         margin=1 yields total cost 0
         """
         margin = 1.0
-        moves, preds, costs = solver.compute_optimal_costs(self.features, self.target_lower, self.target_upper, margin, 0)
+        moves, preds, costs = solver.compute_optimal_costs(self.target_lower, self.target_upper, margin, 0)
         np.testing.assert_allclose(preds, [inf, 1, 0])
         np.testing.assert_allclose(costs, [0, 0, 0])
 
@@ -65,7 +62,7 @@ class TrivialTests(TestCase):
         margin=1.5 yields total cost 1
         """
         margin = 1.5
-        moves, preds, costs = solver.compute_optimal_costs(self.features, self.target_lower, self.target_upper, margin, 0)
+        moves, preds, costs = solver.compute_optimal_costs(self.target_lower, self.target_upper, margin, 0)
         np.testing.assert_allclose(preds, [inf, 1, 0])
         np.testing.assert_allclose(costs, [0, 0, 1])
 
@@ -74,7 +71,7 @@ class TrivialTests(TestCase):
         margin=2 yields total cost 2
         """
         margin = 2
-        moves, preds, costs = solver.compute_optimal_costs(self.features, self.target_lower, self.target_upper, margin, 0)
+        moves, preds, costs = solver.compute_optimal_costs(self.target_lower, self.target_upper, margin, 0)
         np.testing.assert_allclose(preds, [inf, 1, 0.5])
         np.testing.assert_allclose(costs, [0, 0, 2])
 
@@ -83,10 +80,9 @@ class TrivialTests(TestCase):
         the zero challenge
         """
         margin = 0
-        features = np.zeros(1)
         target_lower = np.zeros(1)
         target_upper = np.zeros(1)
-        moves, preds, costs = solver.compute_optimal_costs(features, target_lower, target_upper, margin, 0)
+        moves, preds, costs = solver.compute_optimal_costs(target_lower, target_upper, margin, 0)
         np.testing.assert_allclose(preds, [0])
         np.testing.assert_allclose(costs, [0])
 
