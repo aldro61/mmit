@@ -61,7 +61,7 @@ test_that("margin=1 yields cost 0", {
 plotMargin(1.5)
 out1.5 <- compute_optimal_costs(
   input.vec, target.mat, margin=1.5, loss="hinge")
-test_that("margin=1.5 yields cost 0", {
+test_that("margin=1.5 yields cost 0,1", {
   expect_equal(out1.5$pred, c(Inf, 1, 0))
   expect_equal(out1.5$cost, c(0, 0, 1))
 })
@@ -73,8 +73,17 @@ test_that("margin=1.5 yields cost 0", {
 plotMargin(2)
 out2 <- compute_optimal_costs(
   input.vec, target.mat, margin=2, loss="hinge")
-test_that("margin=2 yields cost 0,1", {
+test_that("margin=2 yields cost 0,2", {
   expect_equal(out2$pred, c(Inf, 1, 0.5))
   expect_equal(out2$cost, c(0, 0, 2))
 })
 
+i.rev <- 3:1
+input.rev <- input.vec[i.rev]
+target.rev <- target.mat[i.rev, ]
+test_that("decreasing inputs is an error", {
+  expect_error({
+    compute_optimal_costs(
+      input.rev, target.rev, margin=0, loss="hinge")
+  })
+})
