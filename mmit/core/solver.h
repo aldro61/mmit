@@ -16,15 +16,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #ifndef MMIT_SOLVER_H
 #define MMIT_SOLVER_H
 
-// error codes
-#define ERROR_DECREASING_FEATURES 1
-
 #include "piecewise_function.h"
 
 int compute_optimal_costs(
 //inputs
         int n_data,
-        double *feature_vec, // array[n_data] of sorted input features
         double *lower_vec, // array[n_data] of output lower limits (can be -INFINITY)
         double *upper_vec, // array[n_data] of output upper limits (can be INFINITY)
         double margin,

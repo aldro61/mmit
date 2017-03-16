@@ -24,7 +24,7 @@ plotMargin <- function(margin){
 ##    \_x_/
 plotMargin(0)
 out0 <- compute_optimal_costs(
-  input.vec, target.mat, margin=0, loss="hinge")
+  target.mat, margin=0, loss="hinge")
 test_that("margin=0 yields cost 0", {
   expect_equal(out0$pred, c(Inf, 1, 0))
   expect_equal(out0$cost, c(0, 0, 0))
@@ -36,7 +36,7 @@ test_that("margin=0 yields cost 0", {
 ##     \x/
 plotMargin(0.5)
 out0.5 <- compute_optimal_costs(
-  input.vec, target.mat, margin=0.5, loss="hinge")
+  target.mat, margin=0.5, loss="hinge")
 test_that("margin=0.5 yields cost 0", {
   expect_equal(out0.5$pred, c(Inf, 1, 0))
   expect_equal(out0.5$cost, c(0, 0, 0))
@@ -48,7 +48,7 @@ test_that("margin=0.5 yields cost 0", {
 ##      x
 plotMargin(1)
 out1 <- compute_optimal_costs(
-  input.vec, target.mat, margin=1, loss="hinge")
+  target.mat, margin=1, loss="hinge")
 test_that("margin=1 yields cost 0", {
   expect_equal(out1$pred, c(Inf, 1, 0))
   expect_equal(out1$cost, c(0, 0, 0))
@@ -60,7 +60,7 @@ test_that("margin=1 yields cost 0", {
 ##    \_x_/
 plotMargin(1.5)
 out1.5 <- compute_optimal_costs(
-  input.vec, target.mat, margin=1.5, loss="hinge")
+  target.mat, margin=1.5, loss="hinge")
 test_that("margin=1.5 yields cost 0,1", {
   expect_equal(out1.5$pred, c(Inf, 1, 0))
   expect_equal(out1.5$cost, c(0, 0, 1))
@@ -72,7 +72,7 @@ test_that("margin=1.5 yields cost 0,1", {
 ##      \x/
 plotMargin(2)
 out2 <- compute_optimal_costs(
-  input.vec, target.mat, margin=2, loss="hinge")
+  target.mat, margin=2, loss="hinge")
 test_that("margin=2 yields cost 0,2", {
   expect_equal(out2$pred, c(Inf, 1, 0.5))
   expect_equal(out2$cost, c(0, 0, 2))
@@ -81,17 +81,10 @@ test_that("margin=2 yields cost 0,2", {
 i.rev <- 3:1
 input.rev <- input.vec[i.rev]
 target.rev <- target.mat[i.rev, ]
-test_that("decreasing inputs is an error", {
-  expect_error({
-    compute_optimal_costs(
-      input.rev, target.rev, margin=0, loss="hinge")
-  }, "decreasing feature_vec")
-})
-
 rev0 <- compute_optimal_costs(
-  -input.rev, target.rev, margin=0, loss="hinge")
+  target.rev, margin=0, loss="hinge")
 test_that("reverse inputs with margin=0 yields 0 cost", {
-  expect_equal(rev0$pred, c(0, -0.5, 0))
+  expect_equal(rev0$pred, c(-Inf, -0.5, 0))
   expect_equal(rev0$cost, c(0, 0, 0))
 })
 

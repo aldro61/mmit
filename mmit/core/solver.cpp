@@ -22,7 +22,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 int compute_optimal_costs(
 //inputs
         int n_data,
-        double *feature_vec, // array[n_data] of sorted input features
         double *lower_vec, // array[n_data] of output lower limits (can be -INFINITY)
         double *upper_vec, // array[n_data] of output upper limits (can be INFINITY)
         double margin,
@@ -37,10 +36,6 @@ int compute_optimal_costs(
     // Compute the optimal solution for each interval
     for(int i = 0; i < n_data; i++){
 
-	if(0 < i && feature_vec[i] < feature_vec[i-1]){
-	    return ERROR_DECREASING_FEATURES;
-	}
-	
         moves_vec[i] = 0;
 
         // Add the lower bound
