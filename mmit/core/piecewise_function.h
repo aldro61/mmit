@@ -21,6 +21,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "coefficients.h"
 
+typedef std::map<double, Coefficients> breakpoint_list_t;
+typedef std::pair<double, Coefficients> breakpoint_t;
+
 enum FunctionType{
     hinge,
     squared_hinge

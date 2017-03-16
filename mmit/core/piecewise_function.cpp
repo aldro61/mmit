@@ -53,10 +53,14 @@ int PiecewiseFunction::insert_point(double y, bool is_upper_bound) {
 
     // Compute the new breakpoint's coefficients
     // TODO: I use 0 for quadratic for now, but we'll need to patch that for the squared hinge loss
+    if(this->function_type == squared_hinge){
+        std::cout << "Squared hinge is not supported yet." << std::endl;
+        return 1;
+    }
     Coefficients new_breakpoint_coefficients(0, 1, -breakpoint_position);
 
     // Insert the new breakpoint
-    std::pair<std::map<double, Coefficients>::iterator, bool> insert = this->breakpoint_coefficients.insert(std::pair<double, Coefficients>(breakpoint_position, new_breakpoint_coefficients));
+    std::pair<breakpoint_list_t::iterator, bool> insert = this->breakpoint_coefficients.insert(breakpoint_t(breakpoint_position, new_breakpoint_coefficients));
     auto breakpoint_ptr = insert.first;
     auto breakpoint_was_added = insert.second;
 
