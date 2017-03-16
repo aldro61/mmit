@@ -86,6 +86,37 @@ class TrivialTests(TestCase):
         np.testing.assert_allclose(preds, [0])
         np.testing.assert_allclose(costs, [0])
 
+    def test_7(self):
+        """
+        repeated insertion of the same interval
+        """
+        margin = 0
+        # Create a \x/ with slopes of -3 and +3
+        target_lower = np.array([0, 0, 0], dtype=np.double)
+        target_upper = np.array([0, 0, 0], dtype=np.double)
+        # The optimal cost and prediction should be 0
+        moves, preds, costs = solver.compute_optimal_costs(target_lower, target_upper, margin, 0)
+        np.testing.assert_allclose(preds, [0, 0, 0])
+        np.testing.assert_allclose(costs, [0, 0, 0])
+        # Now add points until the minimum changes. It should take 3 insertions to get a flat minimum region.
+        # First
+        target_lower = np.hstack((target_lower, [-inf]))
+        target_upper = np.hstack((target_upper, [-1]))
+        moves, preds, costs = solver.compute_optimal_costs(target_lower, target_upper, margin, 0)
+        np.testing.assert_allclose(preds, [0, 0, 0, 0])
+        np.testing.assert_allclose(costs, [0, 0, 0, 1])
+        # Second
+        target_lower = np.hstack((target_lower, [-inf]))
+        target_upper = np.hstack((target_upper, [-1]))
+        moves, preds, costs = solver.compute_optimal_costs(target_lower, target_upper, margin, 0)
+        np.testing.assert_allclose(preds, [0, 0, 0, 0, 0])
+        np.testing.assert_allclose(costs, [0, 0, 0, 1, 2])
+        # Third
+        target_lower = np.hstack((target_lower, [-inf]))
+        target_upper = np.hstack((target_upper, [-1]))
+        moves, preds, costs = solver.compute_optimal_costs(target_lower, target_upper, margin, 0)
+        np.testing.assert_allclose(preds, [0, 0, 0, 0, 0, -0.5])
+        np.testing.assert_allclose(costs, [0, 0, 0, 1, 2, 3])
 
 if __name__ == "__main__":
     pass

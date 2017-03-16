@@ -71,9 +71,9 @@ int PiecewiseFunction::insert_point(double y, bool is_upper_bound) {
         }
     }
     else{
-        // If the breakpoint already existed, double all its coefficients
+        // If the breakpoint already exists, increase all its coefficients
         if (!breakpoint_was_added)
-            breakpoint_ptr->second *= 2;
+            breakpoint_ptr->second += new_breakpoint_coefficients;
 
         if(is_upper_bound && (this->min_ptr == this->breakpoint_coefficients.end() || this->min_ptr->first > breakpoint_position)){
             // First update the minimum coefficients
