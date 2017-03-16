@@ -9,7 +9,7 @@ before_install:
   - ./travis-tool.sh install_r devtools
 
 install:
-  - Rscript -e 'devtools::install_deps("Rpackage")'
+  - Rscript -e 'devtools::install_deps("Rpackage", dep=TRUE)' # need dep=TRUE for Suggests
 
 script:
   - make $TEST_SUITE
