@@ -85,5 +85,5 @@ test_that("decreasing inputs is an error", {
   expect_error({
     compute_optimal_costs(
       input.rev, target.rev, margin=0, loss="hinge")
-  })
+  }, "decreasing feature_vec")
 })

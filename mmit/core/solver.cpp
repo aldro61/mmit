@@ -1,4 +1,4 @@
-/*
+/* Dear emacs, please set these variables: -*- c-basic-offset: 4 -*-
 MMIT: Max Margin Interval Trees
 Copyright (C) 2017 Toby Dylan Hocking, Alexandre Drouin
 This program is free software: you can redistribute it and/or modify
@@ -36,6 +36,11 @@ int compute_optimal_costs(
 
     // Compute the optimal solution for each interval
     for(int i = 0; i < n_data; i++){
+
+	if(0 < i && feature_vec[i] < feature_vec[i-1]){
+	    return ERROR_DECREASING_FEATURES;
+	}
+	
         moves_vec[i] = 0;
 
         // Add the lower bound

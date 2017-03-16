@@ -16,6 +16,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #ifndef MMIT_SOLVER_H
 #define MMIT_SOLVER_H
 
+// error codes
+#define ERROR_DECREASING_FEATURES 1
+
 #include "piecewise_function.h"
 
 int compute_optimal_costs(
