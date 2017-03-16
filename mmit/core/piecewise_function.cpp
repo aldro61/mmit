@@ -45,6 +45,7 @@ double PiecewiseFunction::get_breakpoint_position(double y, bool is_upper_bound)
 
 int PiecewiseFunction::insert_point(double y, bool is_upper_bound) {
     int n_pointer_moves = 0;
+    bool is_first_insertion = this->breakpoint_coefficients.empty();
 
     // New breakpoint's position
     double breakpoint_position = this->get_breakpoint_position(y, is_upper_bound);
@@ -64,7 +65,7 @@ int PiecewiseFunction::insert_point(double y, bool is_upper_bound) {
     auto breakpoint_ptr = insert.first;
     auto breakpoint_was_added = insert.second;
 
-    if(this->breakpoint_coefficients.size() == 1) {
+    if(is_first_insertion) {
         if (is_upper_bound) {
             this->min_ptr = breakpoint_ptr;
         }

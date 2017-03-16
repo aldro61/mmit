@@ -78,6 +78,18 @@ class TrivialTests(TestCase):
         np.testing.assert_allclose(preds, [inf, 1, 0.5])
         np.testing.assert_allclose(costs, [0, 0, 2])
 
+    def test_6(self):
+        """
+        the zero challenge
+        """
+        margin = 0
+        features = np.zeros(1)
+        target_lower = np.zeros(1)
+        target_upper = np.zeros(1)
+        moves, preds, costs = solver.compute_optimal_costs(features, target_lower, target_upper, margin, 0)
+        np.testing.assert_allclose(preds, [0])
+        np.testing.assert_allclose(costs, [0])
+
 
 if __name__ == "__main__":
     pass
