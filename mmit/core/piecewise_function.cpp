@@ -45,6 +45,7 @@ double PiecewiseFunction::get_breakpoint_position(double y, bool is_upper_bound)
 
 int PiecewiseFunction::insert_point(double y, bool is_upper_bound) {
     int n_pointer_moves = 0;
+    bool is_first_insertion = this->breakpoint_coefficients.empty();
 
     // New breakpoint's position
     double breakpoint_position = this->get_breakpoint_position(y, is_upper_bound);
@@ -53,22 +54,26 @@ int PiecewiseFunction::insert_point(double y, bool is_upper_bound) {
 
     // Compute the new breakpoint's coefficients
     // TODO: I use 0 for quadratic for now, but we'll need to patch that for the squared hinge loss
+    if(this->function_type == squared_hinge){
+        std::cout << "Squared hinge is not supported yet." << std::endl;
+        return 1;
+    }
     Coefficients new_breakpoint_coefficients(0, 1, -breakpoint_position);
 
     // Insert the new breakpoint
-    std::pair<std::map<double, Coefficients>::iterator, bool> insert = this->breakpoint_coefficients.insert(std::pair<double, Coefficients>(breakpoint_position, new_breakpoint_coefficients));
+    std::pair<breakpoint_list_t::iterator, bool> insert = this->breakpoint_coefficients.insert(breakpoint_t(breakpoint_position, new_breakpoint_coefficients));
     auto breakpoint_ptr = insert.first;
     auto breakpoint_was_added = insert.second;
 
-    if(this->breakpoint_coefficients.size() == 1) {
+    if(is_first_insertion) {
         if (is_upper_bound) {
             this->min_ptr = breakpoint_ptr;
         }
     }
     else{
-        // If the breakpoint already existed, double all its coefficients
+        // If the breakpoint already exists, increase all its coefficients
         if (!breakpoint_was_added)
-            breakpoint_ptr->second *= 2;
+            breakpoint_ptr->second += new_breakpoint_coefficients;
 
         if(is_upper_bound && (this->min_ptr == this->breakpoint_coefficients.end() || this->min_ptr->first > breakpoint_position)){
             // First update the minimum coefficients

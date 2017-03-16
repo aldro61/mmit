@@ -30,15 +30,12 @@ class TrivialTests(TestCase):
         self.target_lower = np.array(self.target_lower)
         self.target_upper = np.array(self.target_upper)
 
-
-        self.features = np.array([-2.2, 3, 10])
-
     def test_1(self):
         """
         margin=0 yields total cost 0
         """
         margin = 0.0
-        moves, preds, costs = solver.compute_optimal_costs(self.features, self.target_lower, self.target_upper, margin, 0)
+        moves, preds, costs = solver.compute_optimal_costs(self.target_lower, self.target_upper, margin, 0)
         np.testing.assert_allclose(preds, [inf, 1, 0])
         np.testing.assert_allclose(costs, [0, 0, 0])
 
@@ -47,7 +44,7 @@ class TrivialTests(TestCase):
         margin=0.5 yields total cost 0
         """
         margin = 0.5
-        moves, preds, costs = solver.compute_optimal_costs(self.features, self.target_lower, self.target_upper, margin, 0)
+        moves, preds, costs = solver.compute_optimal_costs(self.target_lower, self.target_upper, margin, 0)
         np.testing.assert_allclose(preds, [inf, 1, 0])
         np.testing.assert_allclose(costs, [0, 0, 0])
 
@@ -56,7 +53,7 @@ class TrivialTests(TestCase):
         margin=1 yields total cost 0
         """
         margin = 1.0
-        moves, preds, costs = solver.compute_optimal_costs(self.features, self.target_lower, self.target_upper, margin, 0)
+        moves, preds, costs = solver.compute_optimal_costs(self.target_lower, self.target_upper, margin, 0)
         np.testing.assert_allclose(preds, [inf, 1, 0])
         np.testing.assert_allclose(costs, [0, 0, 0])
 
@@ -65,7 +62,7 @@ class TrivialTests(TestCase):
         margin=1.5 yields total cost 1
         """
         margin = 1.5
-        moves, preds, costs = solver.compute_optimal_costs(self.features, self.target_lower, self.target_upper, margin, 0)
+        moves, preds, costs = solver.compute_optimal_costs(self.target_lower, self.target_upper, margin, 0)
         np.testing.assert_allclose(preds, [inf, 1, 0])
         np.testing.assert_allclose(costs, [0, 0, 1])
 
@@ -74,10 +71,69 @@ class TrivialTests(TestCase):
         margin=2 yields total cost 2
         """
         margin = 2
-        moves, preds, costs = solver.compute_optimal_costs(self.features, self.target_lower, self.target_upper, margin, 0)
+        moves, preds, costs = solver.compute_optimal_costs(self.target_lower, self.target_upper, margin, 0)
         np.testing.assert_allclose(preds, [inf, 1, 0.5])
         np.testing.assert_allclose(costs, [0, 0, 2])
 
+    def test_6(self):
+        """
+        the zero challenge
+        """
+        margin = 0
+        target_lower = np.zeros(1)
+        target_upper = np.zeros(1)
+        moves, preds, costs = solver.compute_optimal_costs(target_lower, target_upper, margin, 0)
+        np.testing.assert_allclose(preds, [0])
+        np.testing.assert_allclose(costs, [0])
+
+    def test_7(self):
+        """
+        repeated insertion of the same interval
+        """
+        margin = 0
+        # Create a \x/ with slopes of -3 and +3
+        target_lower = np.array([0, 0, 0], dtype=np.double)
+        target_upper = np.array([0, 0, 0], dtype=np.double)
+        # The optimal cost and prediction should be 0
+        moves, preds, costs = solver.compute_optimal_costs(target_lower, target_upper, margin, 0)
+        np.testing.assert_allclose(preds, [0, 0, 0])
+        np.testing.assert_allclose(costs, [0, 0, 0])
+        # Now add points until the minimum changes. It should take 3 insertions to get a flat minimum region.
+        # First
+        target_lower = np.hstack((target_lower, [-inf]))
+        target_upper = np.hstack((target_upper, [-1]))
+        moves, preds, costs = solver.compute_optimal_costs(target_lower, target_upper, margin, 0)
+        np.testing.assert_allclose(preds, [0, 0, 0, 0])
+        np.testing.assert_allclose(costs, [0, 0, 0, 1])
+        # Second
+        target_lower = np.hstack((target_lower, [-inf]))
+        target_upper = np.hstack((target_upper, [-1]))
+        moves, preds, costs = solver.compute_optimal_costs(target_lower, target_upper, margin, 0)
+        np.testing.assert_allclose(preds, [0, 0, 0, 0, 0])
+        np.testing.assert_allclose(costs, [0, 0, 0, 1, 2])
+        # Third
+        target_lower = np.hstack((target_lower, [-inf]))
+        target_upper = np.hstack((target_upper, [-1]))
+        moves, preds, costs = solver.compute_optimal_costs(target_lower, target_upper, margin, 0)
+        np.testing.assert_allclose(preds, [0, 0, 0, 0, 0, -0.5])
+        np.testing.assert_allclose(costs, [0, 0, 0, 1, 2, 3])
+
+    def test_8(self):
+        """
+        solution is independent of the order of the intervals
+        """
+        margin = 0
+        moves, preds, costs = solver.compute_optimal_costs(self.target_lower, self.target_upper, margin, 0)
+        unshuffled_pred = preds[-1]
+        unshuffled_cost = costs[-1]
+        del moves, preds, costs
+
+        for i in xrange(10):
+            shuffler = np.arange(len(self.target_lower))
+            np.random.shuffle(shuffler)
+            moves, preds, costs = solver.compute_optimal_costs(self.target_lower[shuffler], self.target_upper[shuffler], margin, 0)
+            assert preds[-1] == unshuffled_pred
+            assert costs[-1] == unshuffled_cost
 
 if __name__ == "__main__":
     pass

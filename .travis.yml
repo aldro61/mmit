@@ -1,0 +1,32 @@
+language: c
+
+sudo: required
+
+before_install:
+  - sudo apt-get install -y --no-install-recommends python-numpy-dev texlive texlive-fonts-extra # fonts-extra needed for compiling R package documentation (inconsolata font)
+  - sudo apt-get install texlive-latex-base
+  - curl -OL http://raw.github.com/craigcitro/r-travis/master/scripts/travis-tool.sh
+  - chmod 755 ./travis-tool.sh
+  - ./travis-tool.sh bootstrap
+  - ./travis-tool.sh install_r devtools
+
+install:
+  - Rscript -e 'devtools::install_deps("Rpackage", dep=TRUE)' # need dep=TRUE for Suggests
+
+script:
+  - make $TEST_SUITE
+
+after_failure:
+  - ./travis-tool.sh dump_logs
+
+notifications:
+  email:
+    on_success: change
+    on_failure: change
+
+env:
+  matrix:
+    - TEST_SUITE=test_R.out
+    - TEST_SUITE=test_python.out
+
+    

@@ -40,7 +40,7 @@ solver_module = Extension('mmit.core.solver',
                                    'mmit/core/solver.cpp',
                                    'mmit/core/piecewise_function.cpp',
                                    'mmit/core/coefficients.cpp'],
-                          extra_compile_args=["-std=c++11"] + os_compile_flags)
+                          extra_compile_args=["-std=c++0x"] + os_compile_flags)
 
 setup(
     name = "mmit",

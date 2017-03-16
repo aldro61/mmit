@@ -21,6 +21,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "coefficients.h"
 
+typedef std::map<double, Coefficients> breakpoint_list_t;
+typedef std::pair<double, Coefficients> breakpoint_t;
+
 enum FunctionType{
     hinge,
     squared_hinge
@@ -38,32 +41,28 @@ private:
 
     // Minimum solution
     Coefficients min_coefficients;
-    std::map<double, Coefficients>::iterator min_ptr = breakpoint_coefficients.end();  // Always on the right of the minimum
+    std::map<double, Coefficients>::iterator min_ptr;  // Always on the right of the minimum
 
     // Minimum pointer functions
     void move_minimum_pointer_left();
     void move_minimum_pointer_right();
 
     // Utility vars + functions
+    void construct(double margin, FunctionType loss, bool verbose){this->margin = margin; this->function_type = loss; this->verbose = verbose; this->min_ptr = breakpoint_coefficients.end();}
     double get_breakpoint_position(double y, bool is_upper_bound);
     bool verbose;
 
 public:
     PiecewiseFunction(double margin, FunctionType loss, bool verbose){
-        this->margin = margin;
-        this->function_type = loss;
-        this->verbose = verbose;
+        construct(margin, loss, verbose);
     }
 
     PiecewiseFunction(double margin, FunctionType loss){
-        this->margin = margin;
-        this->function_type = loss;
-        this->verbose = false;
+        construct(margin, loss, false);
     }
 
     // Point insertion
     int insert_point(double y, bool is_upper_bound);
-    void insert_points();
 
     // Minimum pointer functions
     double get_minimum_position();

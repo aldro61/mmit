@@ -1,8 +1,6 @@
 compute_optimal_costs <- structure(function
 ### Compute vector of optimal prediction and cost.
-(feature.vec,
-### n-vector of inputs
- target.mat,
+(target.mat,
 ### n x 2 matrix of limits.
  margin,
 ### numeric scalar, margin size parameter.
@@ -19,22 +17,18 @@ compute_optimal_costs <- structure(function
     is.finite(margin),
     is.numeric(target.mat),
     is.matrix(target.mat),
-    ncol(target.mat)==2,
-    nrow(target.mat)==length(feature.vec),
-    is.numeric(feature.vec),
-    is.finite(feature.vec))
+    ncol(target.mat)==2)
   if(any(is.na(target.mat))){
     stop("target.mat must not contain missing values")
   }
   lower.vec <- target.mat[, 1]
   upper.vec <- target.mat[, 2]
   stopifnot(-Inf < upper.vec, lower.vec < Inf)
-  neg.vec <- rep(-1, length(feature.vec))
-  inf.vec <- rep(Inf, length(feature.vec))
+  neg.vec <- rep(-1, nrow(target.mat))
+  inf.vec <- rep(Inf, nrow(target.mat))
   result.list <- .C(
     "compute_optimal_costs_interface",
-    n_data=length(feature.vec),
-    feature_vec=as.double(feature.vec),
+    n_data=nrow(target.mat),
     lower_vec=as.double(lower.vec),
     upper_vec=as.double(upper.vec),
     margin=as.double(margin),
@@ -43,7 +37,7 @@ compute_optimal_costs <- structure(function
     pred_vec=as.double(inf.vec),
     cost_vec=as.double(inf.vec),
     NAOK=TRUE,
-    PACKAGE="MMIT")
+    PACKAGE="mmit")
   with(result.list, data.frame(
     moves=moves_vec,
     pred=pred_vec,
@@ -53,12 +47,11 @@ compute_optimal_costs <- structure(function
 ### pred (predicted output value that achieves minimum cost), cost
 ### (minimum cost value).
 }, ex=function(){
-  library(MMIT)
+  library(mmit)
   target.mat <- rbind(
     c(-1, Inf),
     c(-2, 3),
     c(-Inf, 1))
-  input.vec <- c(-2.2, 3, 10)
-  compute_optimal_costs(input.vec, target.mat, 0)
-  compute_optimal_costs(input.vec, target.mat, 1.5)
+  compute_optimal_costs(target.mat, 0)
+  compute_optimal_costs(target.mat, 2)
 })
