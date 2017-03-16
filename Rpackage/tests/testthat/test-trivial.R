@@ -87,3 +87,11 @@ test_that("decreasing inputs is an error", {
       input.rev, target.rev, margin=0, loss="hinge")
   }, "decreasing feature_vec")
 })
+
+rev0 <- compute_optimal_costs(
+  -input.rev, target.rev, margin=0, loss="hinge")
+test_that("reverse inputs with margin=0 yields 0 cost", {
+  expect_equal(rev0$pred, c(0, -0.5, 0))
+  expect_equal(rev0$cost, c(0, 0, 0))
+})
+
