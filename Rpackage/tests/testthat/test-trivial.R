@@ -1,6 +1,6 @@
 library(testthat)
 context("trivial")
-library(MMIT)
+library(mmit)
 
 target.mat <- rbind(
   c(-1, Inf),

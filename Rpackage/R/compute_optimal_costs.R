@@ -43,7 +43,7 @@ compute_optimal_costs <- structure(function
     pred_vec=as.double(inf.vec),
     cost_vec=as.double(inf.vec),
     NAOK=TRUE,
-    PACKAGE="MMIT")
+    PACKAGE="mmit")
   with(result.list, data.frame(
     moves=moves_vec,
     pred=pred_vec,
@@ -53,7 +53,7 @@ compute_optimal_costs <- structure(function
 ### pred (predicted output value that achieves minimum cost), cost
 ### (minimum cost value).
 }, ex=function(){
-  library(MMIT)
+  library(mmit)
   target.mat <- rbind(
     c(-1, Inf),
     c(-2, 3),

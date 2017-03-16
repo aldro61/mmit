@@ -1,2 +1,2 @@
 library(testthat)
-test_check("MMIT")
+test_check("mmit")

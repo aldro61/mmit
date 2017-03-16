@@ -22,7 +22,7 @@ pred (predicted output value that achieves minimum cost), cost
 
 
 \examples{
-library(MMIT)
+library(mmit)
 target.mat <- rbind(
   c(-1, Inf),
   c(-2, 3),
