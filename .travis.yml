@@ -16,6 +16,9 @@ install:
 script:
   - make $TEST_SUITE
 
+after_failure:
+  - ./travis-tool.sh dump_logs
+
 notifications:
   email:
     on_success: change
