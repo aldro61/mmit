@@ -65,7 +65,6 @@ class DecisionStump(object):
 
 
 class RegressionTreeNode(object):
-    # TODO: implement memoizing for attributes that require longer computation
     def __init__(self, depth, example_idx, rule=None, parent=None, left_child=None,
                  right_child=None, predicted_value=-1, cost_value=-1):
         self.rule = rule
