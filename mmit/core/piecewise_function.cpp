@@ -83,10 +83,8 @@ int PiecewiseFunction::insert_point(double y, bool is_upper_bound) {
             }
         }
         else{
-            if(this->min_ptr->first <= breakpoint_position){
-                if(this->min_ptr != this->breakpoint_coefficients.end()) {
-                    this->min_coefficients -= new_breakpoint_coefficients;
-                }
+            if(this->min_ptr != this->breakpoint_coefficients.end() && this->min_ptr->first <= breakpoint_position){
+                this->min_coefficients -= new_breakpoint_coefficients;
             }
         }
 
@@ -156,9 +154,6 @@ void PiecewiseFunction::move_minimum_pointer_right() {
 
 double PiecewiseFunction::get_minimum_position() {
     // Find the position of the minimum segment's minimum
-    // double theoretical_min = find_function_min(this->min_coefficients);
-    // std::cout << "Theoretical minimum is " << theoretical_min << std::endl;
-
     if(this->min_coefficients.linear == 0){
         // If only lower bounds, return +inf
         if(this->min_ptr == this->breakpoint_coefficients.end() && Coefficients(0, 0, 0) == this->min_coefficients){
