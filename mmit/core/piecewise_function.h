@@ -44,6 +44,7 @@ private:
     std::map<double, Coefficients>::iterator min_ptr;  // Always on the right of the minimum
 
     // Minimum pointer functions
+    int adjust_pointer_position();
     void move_minimum_pointer_left();
     void move_minimum_pointer_right();
 

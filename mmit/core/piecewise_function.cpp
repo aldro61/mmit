@@ -66,45 +66,39 @@ int PiecewiseFunction::insert_point(double y, bool is_upper_bound) {
     auto breakpoint_was_added = insert.second;
 
     if(is_first_insertion) {
-        if (is_upper_bound) {
+        if(is_upper_bound) {
             this->min_ptr = breakpoint_ptr;
         }
     }
     else{
         // If the breakpoint already exists, increase all its coefficients
-        if (!breakpoint_was_added)
+        if (!breakpoint_was_added){
             breakpoint_ptr->second += new_breakpoint_coefficients;
-
-        if(is_upper_bound && (this->min_ptr == this->breakpoint_coefficients.end() || this->min_ptr->first > breakpoint_position)){
-            // First update the minimum coefficients
-            this->min_coefficients += new_breakpoint_coefficients;
-
-            // Move the pointer
-            while(this->min_ptr != this->breakpoint_coefficients.begin() &&
-                    find_function_min(this->min_coefficients) < std::prev(this->min_ptr)->first) {
-                this->move_minimum_pointer_left();
-                n_pointer_moves ++;
-            }
-            if(find_function_min(this->min_coefficients) > this->min_ptr->first) {
-                // We went too far left, go back one
-                this->move_minimum_pointer_right();
-                n_pointer_moves--;
-            }
-
-        } else if(!is_upper_bound && this->min_ptr != this->breakpoint_coefficients.end() && this->min_ptr->first <= breakpoint_position){
-            // First update the minimum coefficients
-            this->min_coefficients -= new_breakpoint_coefficients;
-
-            // Move the pointer
-            while(std::next(this->min_ptr) != this->breakpoint_coefficients.end() && find_function_min(this->min_coefficients) > this->min_ptr->first)
-                this->move_minimum_pointer_right();
-                n_pointer_moves++;
         }
+
+        // Update the minimum pointer coefficients
+        if(is_upper_bound){
+            if(this->min_ptr == this->breakpoint_coefficients.end() || breakpoint_position < this->min_ptr->first) {
+                this->min_coefficients += new_breakpoint_coefficients;
+            }
+        }
+        else{
+            if(this->min_ptr->first <= breakpoint_position){
+                if(this->min_ptr != this->breakpoint_coefficients.end()) {
+                    this->min_coefficients -= new_breakpoint_coefficients;
+                }
+            }
+        }
+
+        // Adjust the minimum pointer's position
+        n_pointer_moves = adjust_pointer_position();
     }
 
     // Log progress
     if(this->verbose){
         std::cout << "\n\nINSERTION COMPLETED\n----------------------------" << std::endl;
+        std::cout << "Breakpoint position: " << breakpoint_position << std::endl;
+        std::cout << "Bound type: " << (is_upper_bound ? "upper" : "lower") << std::endl;
         std::cout << "N pointer moves: " << n_pointer_moves << std::endl;
         std::cout << "Minimum value: " << this->get_minimum_value() << std::endl;
         std::cout << "Minimum position: " << this->get_minimum_position() << std::endl;
@@ -125,6 +119,27 @@ int PiecewiseFunction::insert_point(double y, bool is_upper_bound) {
 /*
  * Function global minimum functions
  */
+int PiecewiseFunction::adjust_pointer_position() {
+    int n_left = 0;
+    int n_right = 0;
+    bool moved;
+    do{
+        moved = false;
+        while (this->min_ptr != this->breakpoint_coefficients.begin() &&
+               find_function_min(this->min_coefficients) < std::prev(this->min_ptr)->first) {
+            this->move_minimum_pointer_left();
+            moved = true;
+            n_left++;
+        }
+        while (this->min_ptr != this->breakpoint_coefficients.end() &&
+               find_function_min(this->min_coefficients) > this->min_ptr->first) {
+            this->move_minimum_pointer_right();
+            moved = true;
+            n_right++;
+        }
+    }while((n_right == 0 || n_left == 0) && moved);
+    return n_left + n_right;
+}
 void PiecewiseFunction::move_minimum_pointer_left() {
     //std::cout << "LEFT MOVE" << std::endl;
     this->min_ptr = std::prev(this->min_ptr);
@@ -157,6 +172,7 @@ double PiecewiseFunction::get_minimum_position() {
         }
         // Otherwise, we take the center point of the flat region
         else{
+            //std::cout << "---------->CHARLIE " << std::prev(this->min_ptr)->first << " " << this->min_ptr->first << std::endl;
             return (std::prev(this->min_ptr)->first + this->min_ptr->first) / 2;
         }
     }
