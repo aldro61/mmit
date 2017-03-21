@@ -23,9 +23,6 @@ from math import ceil
 from core.solver import compute_optimal_costs
 
 
-UTIL_BLOCK_SIZE = 1000000
-
-
 class BreimanInfo(object):
     # TODO: Adapt this to our label type for pruning
     def __init__(self, node_n_examples_by_class, class_priors, total_n_examples_by_class):
@@ -239,7 +236,7 @@ class MaxMarginIntervalTree(object):
                                                                     self.margin, self.loss)
 
                 # If that fails, something is wrong with the solver
-                if left_costs[-1] != right_costs[-1] or left_preds[-1] != right_preds[-1]:
+                if not np.allclose(left_costs[-1], right_costs[-1]) or not np.allclose(left_preds[-1], right_preds[-1]):
                     raise RuntimeError("MMIT solver error. Please report this to the developers.")
 
                 # Combine the values of duplicate feature values and remove splits where all examples are in one leaf
