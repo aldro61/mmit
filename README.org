@@ -17,4 +17,8 @@ The main function that the package provides is TODO
 
 ** Python package installation and usage
 
-TODO
+The source code of the =mmit= Python package is located in the [[file:mmit]] sub-directory, and can be installed via the following Python commands.
+
+#+BEGIN_SRC
+python setup.py install
+#+END_SRC
