@@ -18,9 +18,21 @@ import numpy as np
 import warnings; warnings.filterwarnings("ignore")  # Disable all warnings
 
 from collections import defaultdict, deque
-from math import ceil
+from sklearn.base import BaseEstimator, RegressorMixin
+from sklearn.model_selection import GridSearchCV
+from sklearn.utils.validation import check_array, check_consistent_length, check_is_fitted
 
-from core.solver import compute_optimal_costs
+from .metrics import *
+from .core.solver import compute_optimal_costs
+
+
+def _check_X_y(X, y):
+    X = check_array(X, force_all_finite=True)
+    y = check_array(y, 'csr', force_all_finite=False, ensure_2d=True, dtype=None)
+    check_consistent_length(X, y)
+    if y.shape[1] != 2:
+        raise ValueError("y must contain lower and upper bounds for each interval.")
+    return X, y
 
 
 class BreimanInfo(object):
@@ -144,7 +156,7 @@ class RegressionTreeNode(object):
             else "Leaf(%.4f)" % self.predicted_value)
 
 
-class MaxMarginIntervalTree(object):
+class MaxMarginIntervalTree(BaseEstimator, RegressorMixin):
     def __init__(self, margin=0.0, loss="hinge", max_depth=np.infty, min_samples_split=0):
         """
         Max margin interval tree
@@ -162,12 +174,9 @@ class MaxMarginIntervalTree(object):
 
         """
         self.margin = margin
-        self.loss = 0 if loss == "hinge" else 1
-        if max_depth < 1:
-            raise ValueError("The maximum tree depth must be greater than 1.")
+        self.loss = loss
         self.max_depth = max_depth
         self.min_samples_split = min_samples_split
-        self.rule_importances = defaultdict(float)
 
     def fit(self, X, y, level_callback=None, split_callback=None):
         """
@@ -177,7 +186,7 @@ class MaxMarginIntervalTree(object):
         -----------
         X: array-like, dtype: float, shape: (n_examples, n_features)
             The feature matrix
-        y: list of tuples
+        y: list of tuples or array-like, dtype: float, shape: (n_examples, 2)
             The (lower, upper) bounds of the intervals associated to each example
         level_callback: func(dict), default: None
             Called each time the tree depth increases
@@ -190,6 +199,11 @@ class MaxMarginIntervalTree(object):
 
         if split_callback is None:
             split_callback = lambda x: None
+
+        # Input validation
+        if self.max_depth < 1:
+            raise ValueError("The maximum tree depth must be greater than 1.")
+        X, y = _check_X_y(X, y)
 
         # Split the intervals into upper and lower bounds
         y_lower, y_upper = zip(*y)
@@ -230,10 +244,10 @@ class MaxMarginIntervalTree(object):
                     continue
 
                 # Get the cost values for each side
-                _, left_preds, left_costs = compute_optimal_costs(lower_sorted, upper_sorted,
-                                                                   self.margin, self.loss)
+                _, left_preds, left_costs = compute_optimal_costs(lower_sorted, upper_sorted, self.margin,
+                                                                  0 if self.loss == "hinge" else 1)
                 _, right_preds, right_costs = compute_optimal_costs(lower_sorted[::-1].copy(), upper_sorted[::-1].copy(),
-                                                                    self.margin, self.loss)
+                                                                    self.margin, 0 if self.loss == "hinge" else 1)
 
                 # If that fails, something is wrong with the solver
                 if not np.allclose(left_costs[-1], right_costs[-1]) or not np.allclose(left_preds[-1], right_preds[-1]):
@@ -244,10 +258,14 @@ class MaxMarginIntervalTree(object):
                 unique_left_costs = left_costs[last_idx_by_value][:-1]
                 unique_right_preds = right_preds[::-1][first_idx_by_value][1:]
                 unique_right_costs = right_costs[::-1][first_idx_by_value][1:]
+                cost_by_split = unique_left_costs + unique_right_costs
+
+                # Cancel all splits that generate leaves that predict infinity or -infinity
+                cost_by_split[np.isinf(np.abs(unique_left_preds))] = np.infty
+                cost_by_split[np.isinf(np.abs(unique_right_preds))] = np.infty
 
                 # Check for optimality of the split
-                if (unique_left_costs + unique_right_costs).min() < node.cost_value:
-                    cost_by_split = unique_left_costs + unique_right_costs
+                if cost_by_split.min() < node.cost_value:
                     min_cost_idx = (unique_left_costs + unique_right_costs).argmin()
 
                     if np.allclose(cost_by_split[min_cost_idx], best_cost):
@@ -289,8 +307,10 @@ class MaxMarginIntervalTree(object):
 
         logging.debug("Training start.")
 
+        self.rule_importances_ = defaultdict(float)
+
         # Define the root node
-        _, preds, costs = compute_optimal_costs(y_lower, y_upper, self.margin, self.loss)
+        _, preds, costs = compute_optimal_costs(y_lower, y_upper, self.margin, 0 if self.loss == "hinge" else 1)
         root = RegressionTreeNode(depth=0, example_idx=np.arange(len(y)), predicted_value=preds[-1], cost_value=costs[-1])
 
         # Initialize the tree building procedure
@@ -340,9 +360,9 @@ class MaxMarginIntervalTree(object):
             split_callback(node)
 
             # Update rule importances (decrease in cost)
-            self.rule_importances[str(node.rule)] += node.cost_value - \
-                                                     node.left_child.cost_value - \
-                                                     node.right_child.cost_value
+            self.rule_importances_[str(node.rule)] += node.cost_value - \
+                                                      node.left_child.cost_value - \
+                                                      node.right_child.cost_value
 
             # Add the children to the splitting queue
             nodes_to_split.append(node.left_child)
@@ -354,22 +374,59 @@ class MaxMarginIntervalTree(object):
         logging.debug("Done building the tree.")
 
         # Save the model
-        self.model = root
+        self.tree_ = root
 
         # Normalize the variable importances
         logging.debug("Normalizing the variable importances.")
-        variable_importance_sum = sum(v for v in self.rule_importances.itervalues())
-        self.rule_importances = dict((r, i / variable_importance_sum) for r, i in self.rule_importances.iteritems())
+        variable_importance_sum = sum(v for v in self.rule_importances_.itervalues())
+        self.rule_importances_ = dict((r, i / variable_importance_sum) for r, i in self.rule_importances_.iteritems())
 
         logging.debug("Training finished.")
 
     def predict(self, X):
-        if not self._is_fitted():
-            raise RuntimeError("The classifier must be fitted before predicting.")
-        return self.model.predict(X)
+        """
+        Estimates the labels of some examples
 
-    def _is_fitted(self):
-        return self.model is not None
+        Parameters:
+        -----------
+        X: array-like, dtype: float, shape: (n_examples, n_features)
+            The feature matrix
+
+        Returns:
+        --------
+        y_pred: array-like, dtype: float, shape: (n_examples,)
+            The predicted labels
+
+        """
+        check_is_fitted(self, ["tree_", "rule_importances_"])
+        X = check_array(X)
+        return self.tree_.predict(X)
+
+    def score(self, X, y):
+        """
+        Measures the accuracy of the estimator on some examples
+
+        Parameters:
+        -----------
+        X: array-like, dtype: float, shape: (n_examples, n_features)
+            The feature matrix
+        y: list of tuples or array-like, dtype: float, shape: (n_examples, 2)
+            The (lower, upper) bounds of the intervals associated to each example
+
+        Returns:
+        --------
+        score: float
+            A score measuring the accuracy of the estimator on the examples
+
+        Notes:
+        ------
+        For compatiblity with Scikit-Learn's model selection methods, the score is the negative mean squared error,
+        where any value predicted inside the target interval leads to no error.
+
+        """
+        check_is_fitted(self, ["tree_", "rule_importances_"])
+        X, y = _check_X_y(X, y)
+        return -mean_squared_error(y_pred=self.predict(X), y_true=y)
 
 
 def _get_tree_leaves(root):
@@ -417,9 +474,13 @@ if __name__ == "__main__":
     print "Training set predictions:"
     print pred.predict(X)
     print
-    print "The tree contains %d rules:" % len(pred.model.rules)
-    print pred.model
+    print "The tree contains %d rules:" % len(pred.tree_.rules)
+    print pred.tree_
     print
     print "The rule importances are:"
-    for k, v in pred.rule_importances.iteritems():
+    for k, v in pred.rule_importances_.iteritems():
         print "%s: %.3f" % (k, v)
+
+
+    print pred
+    print pred.score(X, y)
