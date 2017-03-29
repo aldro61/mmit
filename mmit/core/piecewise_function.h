@@ -43,14 +43,11 @@ private:
     Coefficients min_coefficients;
     std::map<double, Coefficients>::iterator min_ptr;  // Always on the right of the minimum
 
-    // Minimum pointer functions
-    int adjust_pointer_position();
-    void move_minimum_pointer_left();
-    void move_minimum_pointer_right();
-
     // Utility vars + functions
     void construct(double margin, FunctionType loss, bool verbose){this->margin = margin; this->function_type = loss; this->verbose = verbose; this->min_ptr = breakpoint_coefficients.end();}
-    double get_breakpoint_position(double y, bool is_upper_bound);
+    inline double get_breakpoint_position(breakpoint_list_t::iterator b_ptr);
+    inline bool is_end(breakpoint_list_t::iterator b_ptr);
+    inline bool is_begin(breakpoint_list_t::iterator b_ptr);
     bool verbose;
 
 public:
