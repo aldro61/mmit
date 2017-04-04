@@ -17,38 +17,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include <iostream>
 #include <iterator>
 
+#include "double_utils.h"
 #include "piecewise_function.h"
-
-#define TOL 1e-7
-
-/*
- * Double number comparison
- */
-inline bool equal(double x, double y){
-    return fabs(x - y) <= TOL;
-}
-
-inline bool not_equal(double x, double y){
-    return fabs(x - y) > TOL;
-}
-
-inline bool greater(double x, double y){
-    if(fabs(x) == INFINITY || fabs(y) == INFINITY){
-        return x > y;
-    }
-    else{
-        return fabs(x - y) > TOL && x > y;
-    }
-}
-
-inline bool less(double x, double y){
-    if(fabs(x) == INFINITY || fabs(y) == INFINITY){
-        return x < y;
-    }
-    else{
-        return fabs(x - y) > TOL && x < y;
-    }
-}
 
 
 /*
@@ -89,8 +59,8 @@ inline double get_min(Coefficients F){
     }
     else{
         // Flat function: minimum is everywhere
-        std::cout << "Error: Attempted to get the minimum of a flat function." << std::endl;
-        throw;
+        //std::cout << "Error: Attempted to get the minimum of a flat function." << std::endl;
+        return 1;
     }
 }
 
@@ -183,6 +153,18 @@ double PiecewiseFunction::get_minimum_value() {
 /*
  * Solver dynamic programming updates
  */
+bool has_slack_at_position(double b, double s, Coefficients F, double pos){
+    if(s == -1 && less(pos, b)){
+        return true;
+    }
+    else if(s == 1 && greater(pos, b)){
+        return true;
+    }
+    else{
+        return false;
+    }
+}
+
 int PiecewiseFunction::insert_point(double y, bool is_upper_bound) {
     int n_pointer_moves = 0;
 
@@ -234,7 +216,7 @@ int PiecewiseFunction::insert_point(double y, bool is_upper_bound) {
         breakpoint_list_t::iterator g = this->min_ptr;
         //std::cout << "The minimum breakpoint is at position " << min_pos << std::endl;
         //std::cout << "The slack at the min breakpoint is " << eval_func(b, s, F, min_pos) << std::endl;
-        if(greater(eval_func(b, s, F, min_pos), 0) || (equal(b, min_pos) && equal(s, -1))){
+        if(has_slack_at_position(b, s, F, min_pos) || (equal(b, min_pos) && equal(s, -1))){
             G += F;
             //std::cout << "The minimum function was updated to " << G << std::endl;
         }
@@ -250,7 +232,7 @@ int PiecewiseFunction::insert_point(double y, bool is_upper_bound) {
                 G -= g->second;
                 min_pos = get_breakpoint_position(g);
                 n_pointer_moves++;
-                //std::cout << "Moved to " << G << std::endl;
+                //std::cout << "|_____ moved to breakpoint " << min_pos << " (Coefficients: " << G << ")" << std::endl;
             }
         }
         else if(is_decreasing_at(G, min_pos)){
@@ -263,7 +245,7 @@ int PiecewiseFunction::insert_point(double y, bool is_upper_bound) {
                 g = std::next(g);
                 min_pos = get_breakpoint_position(g);
                 n_pointer_moves++;
-                //std::cout << "Moved to " << G << std::endl;
+                //std::cout << "|_____ moved to breakpoint " << min_pos << " (Coefficients: " << G << ")" << std::endl;
             }
         }
         this->min_coefficients = G;
@@ -289,4 +271,6 @@ int PiecewiseFunction::insert_point(double y, bool is_upper_bound) {
         std::cout << "\n\n" << std::endl;
         std::cout << "\n\n" << std::endl;
     }
+
+    return n_pointer_moves;
 }

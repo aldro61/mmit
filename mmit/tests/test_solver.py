@@ -241,5 +241,26 @@ class SolverTests(TestCase):
         moves, preds, costs = solver.compute_optimal_costs(target_lower, target_upper, margin, 1)  # squared hinge
         np.testing.assert_almost_equal(actual=costs[-1], desired=0.8772836396007255)
 
+    def test_real_data_2(self):
+        """
+        Neuroblastoma: Failing case #2
+        """
+        margin = 1.0
+        target_lower = np.array([-inf, -2.5951410258110204])[::-1].copy()
+        target_upper = np.array([3.89204176769069, inf])[::-1].copy()
+
+        moves, preds, costs = solver.compute_optimal_costs(target_lower, target_upper, margin, 1)  # squared hinge
+        np.testing.assert_almost_equal(actual=costs[-1], desired=0.0)
+        np.testing.assert_almost_equal(actual=preds[-1], desired=0.6484503149986267)
+
+        """
+        Lower: [-inf, -2.5951410258110204]
+        Upper: [3.89204176769069, inf]
+        All bounds: [-inf, -2.5951410258110204, 3.89204176769069, inf]
+        All signs: [-1, -1, 1, 1]
+        Costs: [0.0, 0.0] [0.0, 1.7763568394002505e-15]
+        Preds: [-inf, 0.6484503149986267] [inf, 2.89204176769069]
+        """
+
 if __name__ == "__main__":
     pass

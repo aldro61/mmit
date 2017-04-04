@@ -20,8 +20,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include <set>
 
 #include "coefficients.h"
+#include "double_utils.h"
 
-typedef std::map<double, Coefficients> breakpoint_list_t;
+typedef std::map<double, Coefficients, DoubleComparatorLess> breakpoint_list_t;
 typedef std::pair<double, Coefficients> breakpoint_t;
 
 enum FunctionType{
