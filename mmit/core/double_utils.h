@@ -1,6 +1,9 @@
 #ifndef CORE_DOUBLE_UTILS_H
 #define CORE_DOUBLE_UTILS_H
 
+#include <cmath>
+#include <cstdlib>
+
 #define TOL 1e-6
 
 inline bool equal(double x, double y){
