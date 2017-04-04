@@ -254,47 +254,9 @@ class MaxMarginIntervalTree(BaseEstimator, RegressorMixin):
                 _, right_preds, right_costs = compute_optimal_costs(lower_sorted[::-1].copy(), upper_sorted[::-1].copy(),
                                                                     self.margin, 0 if self.loss == "hinge" else 1)
 
-                # If that fails, something is wrong with the solver
+                # XXX: Runtime test case to ensure that the solver is working correctly. The solution for the cases
+                # were the left and right leaves contain all the examples should be exactly the same.
                 if np.abs(left_costs[-1] - right_costs[-1]) > float_tol or np.abs(left_preds[-1] - right_preds[-1]) > float_tol:
-
-                    # Try to isolate a very simple case where the error occurs
-                    # XXX: Watch out, this will be long for large datasets, might want to use a smarter strategy
-                    print "MMIT solver error. Please report this to the developers."
-                    print "Margin:", self.margin
-                    for i in xrange(1, len(lower_sorted)):
-                        for _ in xrange(50):
-                            lower_keep = np.arange(len(lower_sorted))
-                            np.random.shuffle(lower_keep)
-                            lower_keep = lower_keep[: i]
-                            upper_keep = np.arange(len(upper_sorted))
-                            np.random.shuffle(upper_keep)
-                            upper_keep = upper_keep[: i]
-
-                            l = lower_sorted[lower_keep].copy()
-                            u = upper_sorted[upper_keep].copy()
-                            _, lp, lc = compute_optimal_costs(l, u, self.margin, 0 if self.loss == "hinge" else 1)
-                            _, rp, rc = compute_optimal_costs(l[::-1].copy(), u[::-1].copy(), self.margin, 0 if self.loss == "hinge" else 1)
-
-                            if np.abs(lc[-1] - rc[-1]) > float_tol or np.abs(lp[-1] - rp[-1]) > float_tol:
-                                print "** This is a simplified failing case"
-                                print "Lower:", l.tolist()
-                                print "Upper:", u.tolist()
-                                print "All bounds:", l.tolist() + u.tolist()
-                                print "All signs:", [-1] * len(l) + [1] * len(u)
-                                print "Costs:", lc.tolist(), rc.tolist()
-                                print "Preds:", lp.tolist(), rp.tolist()
-                                break
-                        else:
-                            continue
-                        break
-                    else:
-                        print "Lower:", lower_sorted
-                        print "Upper:", upper_sorted
-                        print "All bounds:", lower_sorted.tolist() + upper_sorted.tolist()
-                        print "All signs:", [-1] * len(lower_sorted) + [1] * len(upper_sorted)
-                        print "Costs:", left_costs, right_costs
-                        print "Preds:", left_preds, right_preds
-
                     raise SolverError("MMIT solver error. Please report this to the developers.")
 
                 # Combine the values of duplicate feature values and remove splits where all examples are in one leaf
