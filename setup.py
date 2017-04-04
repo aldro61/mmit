@@ -42,6 +42,15 @@ solver_module = Extension('mmit.core.solver',
                                    'mmit/core/coefficients.cpp'],
                           extra_compile_args=["-std=c++0x"] + os_compile_flags)
 
+modelSelection_module = Extension(
+    'mmit.core.modelSelection',
+    language="c++",
+    sources=[
+        'mmit/core/modelSelection_python_bindings.cpp',
+        'mmit/core/modelSelection.cpp',
+    ],
+    extra_compile_args=["-std=c++0x"] + os_compile_flags)
+
 setup(
     name = "mmit",
     version = "2017.03.15",
@@ -62,7 +71,7 @@ setup(
     keywords = "machine learning regression tree censored interval data",
     url = "https://github.com/aldro61/mmit",
 
-    ext_modules = [solver_module],
+    ext_modules = [solver_module, modelSelection_module],
     
     test_suite='nose.collector',
     tests_require=['nose']

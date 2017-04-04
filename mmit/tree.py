@@ -24,8 +24,7 @@ from sklearn.utils.validation import check_array, check_consistent_length, check
 
 from .metrics import *
 from .core.solver import compute_optimal_costs
-
-
+    
 def _check_X_y(X, y):
     X = check_array(X, force_all_finite=True)
     y = check_array(y, 'csr', force_all_finite=False, ensure_2d=True, dtype=None)
