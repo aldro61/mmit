@@ -80,21 +80,6 @@ inline bool min_in_interval(Coefficients F, double x1, double x2){
     }
 }
 
-inline double eval_func(double b, double s, Coefficients F, double x){
-    if(equal(s, 1) && less(x, b)){
-        // Case: __x__/
-        return 0;
-    }
-    else if(equal(s, -1) && greater(x, b)){
-        // Case: \__x__
-        return 0;
-    }
-    else if(equal(s, 1) && x == INFINITY){
-        return INFINITY;
-    }
-    return F.quadratic * x * x + F.linear * x + F.constant;
-}
-
 
 /*
  * Breakpoint tools
@@ -215,7 +200,6 @@ int PiecewiseFunction::insert_point(double y, bool is_upper_bound) {
         Coefficients G = this->min_coefficients;
         breakpoint_list_t::iterator g = this->min_ptr;
         //std::cout << "The minimum breakpoint is at position " << min_pos << std::endl;
-        //std::cout << "The slack at the min breakpoint is " << eval_func(b, s, F, min_pos) << std::endl;
         if(has_slack_at_position(b, s, F, min_pos) || (equal(b, min_pos) && equal(s, -1))){
             G += F;
             //std::cout << "The minimum function was updated to " << G << std::endl;
