@@ -25,6 +25,7 @@ from sklearn.utils.validation import check_array, check_consistent_length, check
 from .metrics import *
 from .core.solver import compute_optimal_costs
 
+float_tol = 1e-6
 
 def _check_X_y(X, y):
     X = check_array(X, force_all_finite=True)
@@ -33,6 +34,10 @@ def _check_X_y(X, y):
     if y.shape[1] != 2:
         raise ValueError("y must contain lower and upper bounds for each interval.")
     return X, y
+
+
+class SolverError(Exception):
+    pass
 
 
 class BreimanInfo(object):
@@ -249,9 +254,10 @@ class MaxMarginIntervalTree(BaseEstimator, RegressorMixin):
                 _, right_preds, right_costs = compute_optimal_costs(lower_sorted[::-1].copy(), upper_sorted[::-1].copy(),
                                                                     self.margin, 0 if self.loss == "hinge" else 1)
 
-                # If that fails, something is wrong with the solver
-                if not np.allclose(left_costs[-1], right_costs[-1]) or not np.allclose(left_preds[-1], right_preds[-1]):
-                    raise RuntimeError("MMIT solver error. Please report this to the developers.")
+                # XXX: Runtime test case to ensure that the solver is working correctly. The solution for the cases
+                # were the left and right leaves contain all the examples should be exactly the same.
+                if np.abs(left_costs[-1] - right_costs[-1]) > float_tol or np.abs(left_preds[-1] - right_preds[-1]) > float_tol:
+                    raise SolverError("MMIT solver error. Please report this to the developers.")
 
                 # Combine the values of duplicate feature values and remove splits where all examples are in one leaf
                 unique_left_preds = left_preds[last_idx_by_value][:-1]
