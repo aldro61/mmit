@@ -27,6 +27,7 @@ from .core.solver import compute_optimal_costs
 
 float_tol = 1e-6
 
+
 def _check_X_y(X, y):
     X = check_array(X, force_all_finite=True)
     y = check_array(y, 'csr', force_all_finite=False, ensure_2d=True, dtype=None)
@@ -38,22 +39,6 @@ def _check_X_y(X, y):
 
 class SolverError(Exception):
     pass
-
-
-class BreimanInfo(object):
-    # TODO: Adapt this to our label type for pruning
-    def __init__(self, node_n_examples_by_class, class_priors, total_n_examples_by_class):
-        # Eq. 2.2 Probability that an example is in class j and falls into node t
-        self.p_j_t = [pi_j * N_j_t / N_j for pi_j, N_j_t, N_j in zip(class_priors, node_n_examples_by_class,
-                                                                     total_n_examples_by_class)]
-        # Eq. 2.3 Probability that any example falls in node t
-        self.p_t = sum(self.p_j_t)
-        # Eq. 2.4 Probability that an example is in class j given that it falls in node t
-        self.p_j_given_t = [p_j_t / self.p_t for p_j_t in self.p_j_t]
-        # Def. 2.10 Probability of misclassification given that an example falls into node t
-        self.r_t = 1.0 - max(self.p_j_given_t)
-        # Contribution of the node to the tree's overall missclassification rate
-        self.R_t = self.r_t * self.p_t
 
 
 class DecisionStump(object):
@@ -404,7 +389,7 @@ class MaxMarginIntervalTree(BaseEstimator, RegressorMixin):
             The predicted labels
 
         """
-        check_is_fitted(self, ["tree_", "rule_importances_"])
+        self.check_is_fitted()
         X = check_array(X)
         return self.tree_.predict(X)
 
@@ -430,9 +415,12 @@ class MaxMarginIntervalTree(BaseEstimator, RegressorMixin):
         where any value predicted inside the target interval leads to no error.
 
         """
-        check_is_fitted(self, ["tree_", "rule_importances_"])
+        self.check_is_fitted()
         X, y = _check_X_y(X, y)
         return -mean_squared_error(y_pred=self.predict(X), y_true=y)
+
+    def check_is_fitted(self):
+        return check_is_fitted(self, ["tree_", "rule_importances_"])
 
 
 def _get_tree_leaves(root):
@@ -486,7 +474,6 @@ if __name__ == "__main__":
     print "The rule importances are:"
     for k, v in pred.rule_importances_.iteritems():
         print "%s: %.3f" % (k, v)
-
 
     print pred
     print pred.score(X, y)
