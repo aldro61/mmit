@@ -19,7 +19,6 @@ import warnings; warnings.filterwarnings("ignore")  # Disable all warnings
 
 from collections import defaultdict, deque
 from sklearn.base import BaseEstimator, RegressorMixin
-from sklearn.model_selection import GridSearchCV
 from sklearn.utils.validation import check_array, check_consistent_length, check_is_fitted
 
 from .metrics import *
