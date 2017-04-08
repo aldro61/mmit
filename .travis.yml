@@ -1,4 +1,4 @@
-language: c
+language: python
 
 sudo: required
 
@@ -19,8 +19,8 @@ addons:
 
 install:
   - Rscript -e 'devtools::install_deps("Rpackage", dep=TRUE)' # need dep=TRUE for Suggests
-  - sudo pip install -U pip pip-tools
-  - sudo pip install numpy scipy scikit-learn
+  - pip install -U pip pip-tools
+  - pip install numpy scipy scikit-learn
 
 script:
   - make $TEST_SUITE
