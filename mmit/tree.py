@@ -83,7 +83,7 @@ class RegressionTreeNode(object):
 
     @property
     def is_root(self):
-        return self.parent is None and self.left_child is not None and self.right_child is not None
+        return self.parent is None
 
     @property
     def leaves(self):
