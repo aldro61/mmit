@@ -115,7 +115,8 @@ class SolverTests(TestCase):
 
     def test_1(self):
         """
-        margin=0 yields total cost 0
+        Margin=0 yields total cost 0
+
         """
         margin = 0.0
         moves, preds, costs = solver.compute_optimal_costs(self.target_lower, self.target_upper, margin, 0)
@@ -124,7 +125,8 @@ class SolverTests(TestCase):
 
     def test_2(self):
         """
-        margin=0.5 yields total cost 0
+        Margin=0.5 yields total cost 0
+
         """
         margin = 0.5
         moves, preds, costs = solver.compute_optimal_costs(self.target_lower, self.target_upper, margin, 0)
@@ -133,7 +135,8 @@ class SolverTests(TestCase):
 
     def test_3(self):
         """
-        margin=1 yields total cost 0
+        Margin=1 yields total cost 0
+
         """
         margin = 1.0
         moves, preds, costs = solver.compute_optimal_costs(self.target_lower, self.target_upper, margin, 0)
@@ -142,7 +145,8 @@ class SolverTests(TestCase):
 
     def test_4(self):
         """
-        margin=1.5 yields total cost 1
+        Margin=1.5 yields total cost 1
+
         """
         margin = 1.5
         moves, preds, costs = solver.compute_optimal_costs(self.target_lower, self.target_upper, margin, 0)
@@ -151,7 +155,8 @@ class SolverTests(TestCase):
 
     def test_5(self):
         """
-        margin=2 yields total cost 2
+        Margin=2 yields total cost 2
+
         """
         margin = 2
         moves, preds, costs = solver.compute_optimal_costs(self.target_lower, self.target_upper, margin, 0)
@@ -160,7 +165,8 @@ class SolverTests(TestCase):
 
     def test_6(self):
         """
-        the zero challenge
+        The zero challenge
+
         """
         margin = 0
         target_lower = np.zeros(1)
@@ -171,7 +177,8 @@ class SolverTests(TestCase):
 
     def test_7(self):
         """
-        repeated insertion of the same interval
+        Repeated insertion of the same interval
+
         """
         margin = 0
         # Create a \x/ with slopes of -3 and +3
@@ -203,7 +210,8 @@ class SolverTests(TestCase):
 
     def test_8(self):
         """
-        solution is independent of the order of the intervals
+        Solution is independent of the order of the intervals
+
         """
         margin = 0
         moves, preds, costs = solver.compute_optimal_costs(self.target_lower, self.target_upper, margin, 0)
@@ -227,12 +235,14 @@ class SolverTests(TestCase):
     def test_random_squared_hinge(self):
         """
         Random testing with squared hinge loss
+
         """
         _random_testing(loss_degree=2)
 
     def test_real_data_1(self):
         """
         Neuroblastoma: Failing case #1
+
         """
         margin = 1.0
         target_lower = np.array([-1.7261263440487502, -0.528013735027211, -0.33134036358054303, -1.4050923044434198, -2.064918351765, 0.00015573501047014, 0.9155816763487209, -0.326021571684791, 0.6788199124179188])
@@ -244,6 +254,7 @@ class SolverTests(TestCase):
     def test_real_data_2(self):
         """
         Neuroblastoma: Failing case #2
+
         """
         margin = 1.0
         target_lower = np.array([-inf, -2.5951410258110204])[::-1].copy()
