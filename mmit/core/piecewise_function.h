@@ -38,11 +38,11 @@ private:
     double margin;
 
     // Breakpoint and their coefficients
-    std::map<double, Coefficients> breakpoint_coefficients;
+    breakpoint_list_t breakpoint_coefficients;
 
     // Minimum solution
     Coefficients min_coefficients;
-    std::map<double, Coefficients>::iterator min_ptr;  // Always on the right of the minimum
+    breakpoint_list_t::iterator min_ptr;  // Always on the right of the minimum
 
     // Utility vars + functions
     void construct(double margin, FunctionType loss, bool verbose){this->margin = margin; this->function_type = loss; this->verbose = verbose; this->min_ptr = breakpoint_coefficients.end();}
