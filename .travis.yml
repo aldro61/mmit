@@ -19,8 +19,8 @@ addons:
 
 install:
   - Rscript -e 'devtools::install_deps("Rpackage", dep=TRUE)' # need dep=TRUE for Suggests
-  - pip install -U pip pip-tools
-  - pip install numpy scipy scikit-learn
+  - sudo pip install -U pip pip-tools
+  - sudo pip install numpy scipy scikit-learn
 
 script:
   - make $TEST_SUITE
