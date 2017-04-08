@@ -29,31 +29,44 @@ def eprint(*args, **kwargs):
 
 
 class PruningTests(TestCase):
+    def setUp(self):
+        self.estimator = MaxMarginIntervalTree()
+        self.estimator.rule_importances_ = []
+
     def test_requires_fitted_estimator(self):
         """
         Requires fitted estimator
 
         """
-        estimator = MaxMarginIntervalTree()
-        self.assertRaises(_NotFittedError, min_cost_complexity_pruning, estimator)
+        self.assertRaises(_NotFittedError, min_cost_complexity_pruning, self.estimator)
+
+    def test_pruning_a_leaf(self):
+        """
+        Pruning a single leaf
+
+        """
+        root = RegressionTreeNode(0, [], cost_value=10.)
+        self.estimator.tree_ = root
+
+        alphas, pruned_trees = min_cost_complexity_pruning(self.estimator)
+
+        assert len(alphas) == len(pruned_trees) == 1
+        assert pruned_trees[0].tree_.is_leaf and pruned_trees[0].tree_.is_root
+        np.testing.assert_almost_equal(actual=alphas, desired=[0.])
+        np.testing.assert_almost_equal(actual=pruned_trees[0].tree_.cost_value, desired=10.)
+
 
     def test_initial_pruning(self):
         """
         Initial pruning (Tmax -> T1)
 
         """
-        estimator = MaxMarginIntervalTree()
-        estimator.rule_importances_ = []
-
         root = RegressionTreeNode(0, [], rule="rule1", cost_value=10.)
-
-        # Add a split that does not decrease the objective (should be pruned in the initial pruning, i.e., alpha = 0)
         root.left_child = RegressionTreeNode(1, [], cost_value=5, parent=root)
         root.right_child = RegressionTreeNode(1, [], cost_value=5, parent=root)
+        self.estimator.tree_ = root
 
-        estimator.tree_ = root
-
-        alphas, pruned_trees = min_cost_complexity_pruning(estimator)
+        alphas, pruned_trees = min_cost_complexity_pruning(self.estimator)
 
         assert len(alphas) == len(pruned_trees) == 1
         assert pruned_trees[0].tree_.is_leaf and pruned_trees[0].tree_.is_root
@@ -65,21 +78,17 @@ class PruningTests(TestCase):
         Recursive pruning #1
 
         """
-        estimator = MaxMarginIntervalTree()
-        estimator.rule_importances_ = []
-
         root = RegressionTreeNode(0, [], rule="root", cost_value=10.)
-
         root_l = root.left_child = RegressionTreeNode(1, [], rule="root_l", cost_value=5, parent=root)
         root_l_l = root_l.left_child = RegressionTreeNode(2, [], cost_value=0, parent=root_l)
         root_l_r = root_l.right_child = RegressionTreeNode(2, [], cost_value=0, parent=root_l)
-
         root_r = root.right_child = RegressionTreeNode(1, [], rule="root_r", cost_value=3, parent=root)
         root_r_l = root_r.left_child = RegressionTreeNode(2, [], cost_value=0, parent=root_r)
         root_r_r = root_r.right_child = RegressionTreeNode(2, [], cost_value=1, parent=root_r)
+        self.estimator.tree_ = root
 
-        estimator.tree_ = root
-        alphas, pruned_trees = min_cost_complexity_pruning(estimator)
+        alphas, pruned_trees = min_cost_complexity_pruning(self.estimator)
+
         expected_rules = [["root", "root_l", "root_r"],
                           ["root", "root_l"],
                           []]
@@ -93,24 +102,19 @@ class PruningTests(TestCase):
         Recursive pruning #1
 
         """
-        estimator = MaxMarginIntervalTree()
-        estimator.rule_importances_ = []
-
         root = RegressionTreeNode(0, [], rule="root", cost_value=100.)
-
         root_l = root.left_child = RegressionTreeNode(1, [], rule="root_l", cost_value=20, parent=root)
         root_l_l = root_l.left_child = RegressionTreeNode(2, [], cost_value=2, parent=root_l)
         root_l_r = root_l.right_child = RegressionTreeNode(2, [], cost_value=0, parent=root_l)
-
         root_r = root.right_child = RegressionTreeNode(1, [], rule="root_r", cost_value=10, parent=root)
         root_r_l = root_r.left_child = RegressionTreeNode(2, [], rule="root_r_l", cost_value=2, parent=root_r)
         root_r_r = root_r.right_child = RegressionTreeNode(2, [], cost_value=1, parent=root_r)
-
         root_r_l_l = root_r_l.left_child = RegressionTreeNode(3, [], cost_value=0, parent=root_r_l)
         root_r_l_r = root_r_l.right_child = RegressionTreeNode(3, [], cost_value=0, parent=root_r_l)
+        self.estimator.tree_ = root
 
-        estimator.tree_ = root
-        alphas, pruned_trees = min_cost_complexity_pruning(estimator)
+        alphas, pruned_trees = min_cost_complexity_pruning(self.estimator)
+
         expected_rules = [["root", "root_l", "root_r", "root_r_l"],
                           ["root", "root_l", "root_r"],
                           ["root", "root_l"],
@@ -126,25 +130,19 @@ class PruningTests(TestCase):
         Recursive pruning #3
 
         """
-        estimator = MaxMarginIntervalTree()
-        estimator.rule_importances_ = []
-
         root = RegressionTreeNode(0, [], rule="root", cost_value=100.)
-
         root_l = root.left_child = RegressionTreeNode(1, [], rule="root_l", cost_value=20, parent=root)
         root_l_l = root_l.left_child = RegressionTreeNode(2, [], cost_value=2, parent=root_l)
         root_l_r = root_l.right_child = RegressionTreeNode(2, [], cost_value=0, parent=root_l)
-
         root_r = root.right_child = RegressionTreeNode(1, [], rule="root_r", cost_value=10, parent=root)
         root_r_l = root_r.left_child = RegressionTreeNode(2, [], rule="root_r_l", cost_value=2, parent=root_r)
         root_r_r = root_r.right_child = RegressionTreeNode(2, [], cost_value=1, parent=root_r)
-
-        # This is a split that doesnt decrease objective (should be pruned in the initial pruning, i.e., alpha = 0)
         root_r_l_l = root_r_l.left_child = RegressionTreeNode(3, [], cost_value=1, parent=root_r_l)
         root_r_l_r = root_r_l.right_child = RegressionTreeNode(3, [], cost_value=1, parent=root_r_l)
+        self.estimator.tree_ = root
 
-        estimator.tree_ = root
-        alphas, pruned_trees = min_cost_complexity_pruning(estimator)
+        alphas, pruned_trees = min_cost_complexity_pruning(self.estimator)
+
         expected_rules = [["root", "root_l", "root_r"],
                           ["root", "root_l"],
                           ["root"],
