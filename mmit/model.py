@@ -116,6 +116,52 @@ class RegressionTreeNode(object):
             else "Leaf(%.4f)" % self.predicted_value)
 
 
+class TreeExporter(object):
+    def __init__(self, out_fmt="latex"):
+        self.out_fmt = out_fmt
+
+    def __call__(self, model):
+        if self.out_fmt == "latex":
+            _latex_export(model)
+
+
+def _latex_export(model):
+    def _rec_export(node, depth):
+        if not node.is_leaf:
+            indent = "\t" * depth
+            return '\n%s %s[as=%s, nonterminal] -> {%s, %s}' % \
+                   (indent,
+                    str(hash((node.rule, node.parent))),
+                    str(node.rule).replace("<=", "$\leq$").replace("[", "(").replace("]", ")"),
+                    _rec_export(node.left_child, depth + 1),
+                    _rec_export(node.right_child, depth + 1))
+        else:
+            return "%s[as=Ex: $%d$\\\\Cost: $%.3f$\\\\Pred: $%.3f$, terminal]" % (str(hash(node)),
+                                                                   node.n_examples,
+                                                                   node.cost_value,
+                                                                   node.predicted_value)
+    exported = \
+"""
+%% !TeX program = lualatex
+\\documentclass[tikz,border=5]{standalone}
+\\definecolor{nonterminal}{RGB}{230,230,230}
+\\definecolor{terminal}{RGB}{255,51,76}
+\\usetikzlibrary{shapes.misc, positioning}
+\\usetikzlibrary{graphs,graphdrawing,arrows.meta}
+\\usegdlibrary{trees}
+\\begin{document}
+	\\begin{tikzpicture}[>=Stealth,
+                         nonterminal/.style={draw, fill=nonterminal, rounded rectangle, align=center},
+                         terminal/.style={draw, fill=terminal, rectangle, align=left}]
+\\graph[binary tree layout]{
+%s
+};
+\\end{tikzpicture}
+\\end{document}
+""" % _rec_export(model.tree_, 0)
+    print exported
+
+
 def _get_tree_leaves(root):
     def _get_leaves(node):
         leaves = []
