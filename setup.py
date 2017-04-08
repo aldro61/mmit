@@ -48,8 +48,8 @@ setup(
     packages = find_packages(),
 
     cmdclass={'build_ext':build_ext},
-    setup_requires = [],
-    install_requires = [],
+    setup_requires = ["numpy", "scikit-learn"],
+    install_requires = ["numpy", "scikit-learn"],
 
     author = "Toby Dylan Hocking, Alexandre Drouin",
     author_email = "toby.hocking@r-project.org, aldro61@gmail.com",
