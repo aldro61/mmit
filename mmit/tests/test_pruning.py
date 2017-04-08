@@ -20,8 +20,9 @@ import sys
 from sklearn.utils.validation import _NotFittedError
 from unittest import TestCase
 
+from .. import MaxMarginIntervalTree
 from ..pruning import min_cost_complexity_pruning
-from ..tree import MaxMarginIntervalTree, RegressionTreeNode
+from ..model import RegressionTreeNode
 
 
 def eprint(*args, **kwargs):
