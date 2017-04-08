@@ -10,8 +10,17 @@ before_install:
   - ./travis-tool.sh bootstrap
   - ./travis-tool.sh install_r devtools
 
+addons:
+  apt:
+    packages:
+      - libblas-dev
+      - liblapack-dev
+      - gfortran
+
 install:
   - Rscript -e 'devtools::install_deps("Rpackage", dep=TRUE)' # need dep=TRUE for Suggests
+  - pip install -U pip pip-tools
+  - pip install numpy scipy scikit-learn
 
 script:
   - make $TEST_SUITE
