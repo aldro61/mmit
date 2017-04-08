@@ -131,7 +131,7 @@ def min_cost_complexity_pruning(estimator):
             return [(min_gt, root)] + (__sequential_prune(root) if not root.is_leaf else [])
 
         logging.debug("Pruning sequentially until only the root remains (T1 >> ... >> {root}")
-        return [(0, T1)] + (__sequential_prune(T1) if not T1.is_root else [])
+        return [(0, T1)] + (__sequential_prune(T1) if not T1.is_leaf else [])
 
     # Validate that the decision tree has been fitted
     estimator.check_is_fitted()
