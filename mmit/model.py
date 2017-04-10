@@ -123,6 +123,8 @@ class TreeExporter(object):
     def __call__(self, model):
         if self.out_fmt == "latex":
             _latex_export(model)
+        else:
+            raise ValueError("Unknown export format specified")
 
 
 def _latex_export(model):
@@ -150,9 +152,9 @@ def _latex_export(model):
 \\usetikzlibrary{graphs,graphdrawing,arrows.meta}
 \\usegdlibrary{trees}
 \\begin{document}
-	\\begin{tikzpicture}[>=Stealth,
-                         nonterminal/.style={draw, fill=nonterminal, rounded rectangle, align=center},
-                         terminal/.style={draw, fill=terminal, rectangle, align=left}]
+\\begin{tikzpicture}[>=Stealth,
+                     nonterminal/.style={draw, fill=nonterminal, rounded rectangle, align=center},
+                     terminal/.style={draw, fill=terminal, rectangle, align=left}]
 \\graph[binary tree layout]{
 %s
 };
