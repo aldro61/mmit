@@ -24,17 +24,12 @@ from sklearn.utils.validation import check_array, check_consistent_length, check
 from .metrics import *
 from .core.solver import compute_optimal_costs
 from .model import DecisionStump, RegressionTreeNode
+from .utils import check_X_y
 
 float_tol = 1e-6
 
 
-def _check_X_y(X, y):
-    X = check_array(X, force_all_finite=True)
-    y = check_array(y, 'csr', force_all_finite=False, ensure_2d=True, dtype=None)
-    check_consistent_length(X, y)
-    if y.shape[1] != 2:
-        raise ValueError("y must contain lower and upper bounds for each interval.")
-    return X, y
+
 
 
 class SolverError(Exception):
@@ -88,7 +83,7 @@ class MaxMarginIntervalTree(BaseEstimator, RegressorMixin):
         # Input validation
         if self.max_depth < 1:
             raise ValueError("The maximum tree depth must be greater than 1.")
-        X, y = _check_X_y(X, y)
+        X, y = check_X_y(X, y)
 
         # Split the intervals into upper and lower bounds
         y_lower, y_upper = zip(*y)
@@ -311,7 +306,7 @@ class MaxMarginIntervalTree(BaseEstimator, RegressorMixin):
 
         """
         self.check_is_fitted()
-        X, y = _check_X_y(X, y)
+        X, y = check_X_y(X, y)
         return -mean_squared_error(y_pred=self.predict(X), y_true=y)
 
     def check_is_fitted(self):
