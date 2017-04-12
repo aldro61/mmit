@@ -35,7 +35,7 @@ class DecisionStump(object):
         return (X[:, self.feature_idx] <= self.threshold).reshape(-1, )
 
     def __str__(self):
-        return "x[%d] <= %.4f" % (self.feature_idx, self.threshold)
+        return "x[{0:d}] <= {1:.4f}".format(self.feature_idx, self.threshold)
 
 
 class RegressionTreeNode(object):
@@ -111,9 +111,9 @@ class RegressionTreeNode(object):
         return len(_get_tree_rules(self))
 
     def __str__(self):
-        return "%s" % (
-            "Node(%s, %s, %s)" % (self.rule, self.left_child, self.right_child) if not (self.left_child is None)
-            else "Leaf(%.4f)" % self.predicted_value)
+        return "{0!s}".format((
+            "Node({0!s}, {1!s}, {2!s})".format(self.rule, self.left_child, self.right_child) if not (self.left_child is None)
+            else "Leaf({0:.4f})".format(self.predicted_value)))
 
 
 class TreeExporter(object):
@@ -131,36 +131,35 @@ def _latex_export(model):
     def _rec_export(node, depth):
         if not node.is_leaf:
             indent = "\t" * depth
-            return '\n%s %s[as=%s, nonterminal] -> {%s, %s}' % \
-                   (indent,
+            return '\n{0!s} {1!s}[as={2!s}, nonterminal] -> {{{3!s}, {4!s}}}'.format(indent,
                     str(hash((node.rule, node.parent))),
                     str(node.rule).replace("<=", "$\leq$").replace("[", "(").replace("]", ")"),
                     _rec_export(node.left_child, depth + 1),
                     _rec_export(node.right_child, depth + 1))
         else:
-            return "%s[as=Ex: $%d$\\\\Cost: $%.3f$\\\\Pred: $%.3f$, terminal]" % (str(hash(node)),
+            return "{0!s}[as=Ex: ${1:d}$\\\\Cost: ${2:.3f}$\\\\Pred: ${3:.3f}$, terminal]".format(str(hash(node)),
                                                                    node.n_examples,
                                                                    node.cost_value,
                                                                    node.predicted_value)
     exported = \
 """
-%% !TeX program = lualatex
-\\documentclass[tikz,border=5]{standalone}
-\\definecolor{nonterminal}{RGB}{230,230,230}
-\\definecolor{terminal}{RGB}{255,51,76}
-\\usetikzlibrary{shapes.misc, positioning}
-\\usetikzlibrary{graphs,graphdrawing,arrows.meta}
-\\usegdlibrary{trees}
-\\begin{document}
-\\begin{tikzpicture}[>=Stealth,
-                     nonterminal/.style={draw, fill=nonterminal, rounded rectangle, align=center},
-                     terminal/.style={draw, fill=terminal, rectangle, align=left}]
-\\graph[binary tree layout]{
-%s
-};
-\\end{tikzpicture}
-\\end{document}
-""" % _rec_export(model.tree_, 0)
+% !TeX program = lualatex
+\\documentclass[tikz,border=5]{{standalone}}
+\\definecolor{{nonterminal}}{{RGB}}{{230,230,230}}
+\\definecolor{{terminal}}{{RGB}}{{255,51,76}}
+\\usetikzlibrary{{shapes.misc, positioning}}
+\\usetikzlibrary{{graphs,graphdrawing,arrows.meta}}
+\\usegdlibrary{{trees}}
+\\begin{{document}}
+\\begin{{tikzpicture}}[>=Stealth,
+                     nonterminal/.style={{draw, fill=nonterminal, rounded rectangle, align=center}},
+                     terminal/.style={{draw, fill=terminal, rectangle, align=left}}]
+\\graph[binary tree layout]{{
+{0!s}
+}};
+\\end{{tikzpicture}}
+\\end{{document}}
+""".format(_rec_export(model.tree_, 0))
     print exported
 
 
