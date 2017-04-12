@@ -90,15 +90,15 @@ def _random_testing(loss_degree):
             np.testing.assert_almost_equal(costs[-1], estimated_min, decimal=estimator_tol_decimals)
         except AssertionError:
             eprint()
-            eprint("Random test #%d -- Loss degree: %d" % (i + 1, loss_degree))
-            eprint("The margin is: %.4f" % margin)
+            eprint("Random test #{0:d} -- Loss degree: {1:d}".format(i + 1, loss_degree))
+            eprint("The margin is: {0:.4f}".format(margin))
             eprint("The lower and upper bounds are:")
-            eprint("Lower: %s" % target_lower.tolist())
-            eprint("Upper: %s" % target_upper.tolist())
-            eprint("All bounds: %s" % (
-                target_lower[~np.isinf(target_lower)].tolist() + target_upper[~np.isinf(target_upper)].tolist()))
-            eprint("All signs: %s" % ((np.ones((~np.isinf(target_lower)).sum()) * -1).tolist() + (
-            np.ones((~np.isinf(target_upper)).sum()).tolist())))
+            eprint("Lower: {0!s}".format(target_lower.tolist()))
+            eprint("Upper: {0!s}".format(target_upper.tolist()))
+            eprint("All bounds: {0!s}".format((
+                target_lower[~np.isinf(target_lower)].tolist() + target_upper[~np.isinf(target_upper)].tolist())))
+            eprint("All signs: {0!s}".format(((np.ones((~np.isinf(target_lower)).sum()) * -1).tolist() + (
+            np.ones((~np.isinf(target_upper)).sum()).tolist()))))
             eprint("Cost -- expected:", estimated_min, ", actual:", costs[-1])
             eprint("\n\n")
             raise AssertionError()
