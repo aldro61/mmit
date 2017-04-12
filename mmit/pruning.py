@@ -61,7 +61,7 @@ def min_cost_complexity_pruning(estimator):
                 return
             node = parents.pop()
             if np.allclose(node.cost_value, node.left_child.cost_value + node.right_child.cost_value):
-                logging.debug("Converting node %s into a leaf" % node)
+                logging.debug("Converting node {0!s} into a leaf".format(node))
                 del node.rule
                 node.rule = None
                 del node.left_child
@@ -118,7 +118,7 @@ def min_cost_complexity_pruning(estimator):
             min_gt, weakest_links = _find_weakest_links(root)
 
             # Prune the weakest link (and save alpha)
-            logging.debug("Pruning occurs at alpha %.9f" % min_gt)
+            logging.debug("Pruning occurs at alpha {0:.9f}".format(min_gt))
             for n in weakest_links:
                 del n.rule
                 n.rule = None
