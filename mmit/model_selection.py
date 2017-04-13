@@ -96,7 +96,7 @@ def _fit_and_score(estimator, X, y, cv, parameters, scorer=None):
 
 
 class GridSearchCV(BaseEstimator):
-    def __init__(self, estimator, param_grid={}, cv=None, n_jobs=1, pre_dispatch='2*n_jobs', scoring=None):
+    def __init__(self, estimator, param_grid, cv=None, n_jobs=1, pre_dispatch='2*n_jobs', scoring=None):
         """
         Parameters
         ----------

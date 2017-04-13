@@ -22,9 +22,10 @@ class BetweenDict(dict):
     By: Joshua Kugler
     Source: http://joshuakugler.com/archives/30-BetweenDict,-a-Python-dict-for-value-ranges.html
     """
-    def __init__(self, d = {}):
-        for k,v in d.items():
-            self[k] = v
+    def __init__(self, d=None):
+        if d is not None:
+            for k,v in d.items():
+                self[k] = v
 
     def __getitem__(self, key):
         for k, v in self.items():
