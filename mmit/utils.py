@@ -31,7 +31,7 @@ class BetweenDict(dict):
         for k, v in self.items():
             if k[0] <= key < k[1]:
                 return v
-        raise KeyError("Key '%s' is not between any values in the BetweenDict" % key)
+        raise KeyError("Key '{0!s}' is not between any values in the BetweenDict".format(key))
 
     def __setitem__(self, key, value):
         try:
@@ -41,7 +41,7 @@ class BetweenDict(dict):
                 else:
                     raise RuntimeError('First element of a BetweenDict key '
                                        'must be strictly less than the '
-                                       'second element. Got [%.6f, %.6f]' % (key[0], key[1]))
+                                       'second element. Got [{0:.6f}, {1:.6f}]'.format(key[0], key[1]))
             else:
                 raise ValueError('Key of a BetweenDict must be an iterable '
                                  'with length two')

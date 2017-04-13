@@ -49,7 +49,7 @@ def _fit_and_score(estimator, X, y, cv, parameters, scorer=None):
     # For each fold, build an overgrown decision tree
     logging.debug("Growing the cross-validation fold trees")
     for i, (fold_train_idx, _) in enumerate(fold_split_idx):
-        logging.debug("Growing the tree for fold %d" % (i + 1))
+        logging.debug("Growing the tree for fold {0:d}".format(i + 1))
         # Fit the decision tree
         fold_predictors[i].fit(X[fold_train_idx], y[fold_train_idx])
 
@@ -152,7 +152,7 @@ class GridSearchCV(BaseEstimator):
         self.scoring = scoring
 
         if not isinstance(self.estimator, MaxMarginIntervalTree):
-            raise ValueError("The provided estimator is not of type %s." % str(MaxMarginIntervalTree))
+            raise ValueError("The provided estimator is not of type {0!s}.".format(MaxMarginIntervalTree))
 
     def fit(self, X, y, groups=None):
         """Run fit with all sets of parameters.
