@@ -16,11 +16,11 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 
 import logging
-from math import sqrt
-
 import numpy as np
+
 from builtins import range
 from joblib import Parallel, delayed
+from math import sqrt
 from sklearn.base import BaseEstimator, clone
 from sklearn.model_selection import ParameterGrid
 from sklearn.model_selection._search import check_cv, check_scoring, check_is_fitted
@@ -84,13 +84,19 @@ def _fit_and_score(estimator, X, y, cv, parameters, scorer=None):
     # Prune the master tree based on the CV estimates
     min_score = -np.infty
     min_score_tree = None
-    for i in range(len(master_alphas) - 1):
-        geo_mean_alpha_k = sqrt(master_alphas[i] * master_alphas[i + 1])
-        cv_score = np.mean([alpha_path_scores_by_fold[j][geo_mean_alpha_k] for j in range(n_folds)])
-        # Note: assumes that alphas are sorted in increasing order, so simplest solution is always preferred
-        if cv_score >= min_score:
-            min_score = cv_score
-            min_score_tree = master_pruned_trees[i]
+    if len(master_alphas) > 1:
+        for i in range(len(master_alphas) - 1):
+            geo_mean_alpha_k = sqrt(master_alphas[i] * master_alphas[i + 1])
+            cv_score = np.mean([alpha_path_scores_by_fold[j][geo_mean_alpha_k] for j in range(n_folds)])
+            # Note: assumes that alphas are sorted in increasing order, so simplest solution is always preferred
+            if cv_score >= min_score:
+                min_score = cv_score
+                min_score_tree = master_pruned_trees[i]
+    else:
+        # Special case where the master tree is a single leaf (no split)
+        assert np.allclose(0., master_alphas[0])
+        min_score_tree = master_pruned_trees[0]
+        min_score = np.mean([alpha_path_scores_by_fold[j][0.] for j in range(n_folds)])
 
     return {"score": min_score, "estimator": min_score_tree, "params": parameters}
 
