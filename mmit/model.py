@@ -17,25 +17,29 @@ import numpy as np
 
 
 class DecisionStump(object):
-    def __init__(self, feature_idx, threshold):
+    def __init__(self, feature_idx, threshold, feature_name=None):
         """
         A decision stump rule of the form x[feature_idx] <= threshold
 
         Parameters:
         -----------
         feature_idx: int
-            The index of the feature on which the threshold is applied
+            The index of the feature on which the threshold is applied.
         threshold: float
             The threshold below which the rule returns True and over which it returns False.
+        feature_name: str
+            The name of the feature.
         """
         self.feature_idx = feature_idx
+        self.feature_name = feature_name
         self.threshold = threshold
 
     def classify(self, X):
         return (X[:, self.feature_idx] <= self.threshold).reshape(-1, )
 
     def __str__(self):
-        return "x[{0:d}] <= {1:.4f}".format(self.feature_idx, self.threshold)
+        feature_descr = self.feature_name if self.feature_name is not None else "x[{0:d}]".format(self.feature_idx)
+        return "{0!s} <= {1:.4f}".format(feature_descr, self.threshold)
 
 
 class RegressionTreeNode(object):
@@ -113,7 +117,7 @@ class RegressionTreeNode(object):
     def __str__(self):
         return "{0!s}".format((
             "Node({0!s}, {1!s}, {2!s})".format(self.rule, self.left_child, self.right_child) if not (self.left_child is None)
-            else "Leaf({0:.4f})".format(self.predicted_value)))
+            else "Leaf(cost:{0:.4f} pred:{1:.4f})".format(self.cost_value, self.predicted_value)))
 
 
 class TreeExporter(object):
@@ -122,7 +126,9 @@ class TreeExporter(object):
 
     def __call__(self, model):
         if self.out_fmt == "latex":
-            _latex_export(model)
+            return _latex_export(model)
+        elif self.out_fmt == "string":
+            return str(model.tree_)
         else:
             raise ValueError("Unknown export format specified")
 
@@ -133,7 +139,7 @@ def _latex_export(model):
             indent = "\t" * depth
             return '\n{0!s} {1!s}[as={2!s}, nonterminal] -> {{{3!s}, {4!s}}}'.format(indent,
                     str(hash((node.rule, node.parent))),
-                    str(node.rule).replace("<=", "$\leq$").replace("[", "(").replace("]", ")"),
+                    str(node.rule).replace("<=", "$\leq$").replace("[", "(").replace("]", ")").replace("%", ""),
                     _rec_export(node.left_child, depth + 1),
                     _rec_export(node.right_child, depth + 1))
         else:
@@ -160,7 +166,7 @@ def _latex_export(model):
 \\end{{tikzpicture}}
 \\end{{document}}
 """.format(_rec_export(model.tree_, 0))
-    print exported
+    return exported
 
 
 def _get_tree_leaves(root):

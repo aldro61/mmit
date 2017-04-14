@@ -58,16 +58,18 @@ class MaxMarginIntervalTree(BaseEstimator, RegressorMixin):
         self.max_depth = max_depth
         self.min_samples_split = min_samples_split
 
-    def fit(self, X, y, level_callback=None, split_callback=None):
+    def fit(self, X, y, feature_names=None, level_callback=None, split_callback=None):
         """
         Fits the decision tree regressor
 
         Parameters:
         -----------
-        X: array-like, dtype: float, shape: (n_examples, n_features)
+        X: array-like, dtype: float, shape: [n_examples, n_features]
             The feature matrix
-        y: list of tuples or array-like, dtype: float, shape: (n_examples, 2)
+        y: list of tuples or array-like, dtype: float, shape: [n_examples, 2]
             The (lower, upper) bounds of the intervals associated to each example
+        feature_names: array-like, dtype: str, shape: [n_features]
+            The name of each feature
         level_callback: func(dict), default: None
             Called each time the tree depth increases
         split_callback: func(node), default: None
@@ -75,10 +77,14 @@ class MaxMarginIntervalTree(BaseEstimator, RegressorMixin):
 
         """
         if level_callback is None:
-            level_callback = lambda x: None
+            def level_callback(x):
+                pass
 
         if split_callback is None:
-            split_callback = lambda x: None
+            def split_callback(x):
+                pass
+
+        self.feature_names_ = feature_names
 
         # Input validation
         if self.max_depth < 1:
@@ -169,7 +175,8 @@ class MaxMarginIntervalTree(BaseEstimator, RegressorMixin):
             best_split_pred = best_preds[0]
             best_split_leaf_costs = best_leaf_costs[0]
             del best_splits, best_preds, best_leaf_costs
-            best_rule = DecisionStump(best_split[0], best_split[1])
+            best_rule = DecisionStump(best_split[0], best_split[1],
+                                      self.feature_names_[best_split[0]] if self.feature_names_ is not None else None)
 
             # Dispatch the examples to the leaves
             best_rule_classifications = best_rule.classify(X[node.example_idx])

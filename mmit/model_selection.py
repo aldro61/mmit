@@ -31,7 +31,7 @@ from .pruning import min_cost_complexity_pruning
 from .utils import BetweenDict, check_X_y
 
 
-def _fit_and_score(estimator, X, y, cv, parameters, scorer=None):
+def _fit_and_score(estimator, X, y, cv, parameters, feature_names=None, scorer=None):
     """
     Performs cross-validation and pruning for MMIT estimators
 
@@ -51,11 +51,11 @@ def _fit_and_score(estimator, X, y, cv, parameters, scorer=None):
     for i, (fold_train_idx, _) in enumerate(fold_split_idx):
         logging.debug("Growing the tree for fold {0:d}".format(i + 1))
         # Fit the decision tree
-        fold_predictors[i].fit(X[fold_train_idx], y[fold_train_idx])
+        fold_predictors[i].fit(X[fold_train_idx], y[fold_train_idx], feature_names=feature_names)
 
     # Also build an overgrown decision tree on the entire dataset
     logging.debug("Growing the master tree")
-    master_predictor.fit(X, y)
+    master_predictor.fit(X, y, feature_names=feature_names)
 
     # Get the pruned master and cross-validation trees
     master_alphas, master_pruned_trees = min_cost_complexity_pruning(master_predictor)
@@ -160,7 +160,7 @@ class GridSearchCV(BaseEstimator):
         if not isinstance(self.estimator, MaxMarginIntervalTree):
             raise ValueError("The provided estimator is not of type {0!s}.".format(MaxMarginIntervalTree))
 
-    def fit(self, X, y, groups=None):
+    def fit(self, X, y, feature_names=None, groups=None):
         """Run fit with all sets of parameters.
         Parameters
         ----------
@@ -170,6 +170,8 @@ class GridSearchCV(BaseEstimator):
         y : array-like, shape = [n_samples] or [n_samples, n_output], optional
             Target relative to X for classification or regression;
             None for unsupervised learning.
+        feature_names: array-like, dtype: str, shape: [n_features]
+            The name of each feature
         groups : array-like, with shape (n_samples,), optional
             Group labels for the samples used while splitting the dataset into
             train/test set.
@@ -192,7 +194,7 @@ class GridSearchCV(BaseEstimator):
 
         # Score all parameter combinations in parallel
         cv_results = Parallel(n_jobs=self.n_jobs, pre_dispatch=self.pre_dispatch)\
-                (delayed(_fit_and_score)(clone(self.estimator), X, y, cv, parameters, self.scorer_)
+                (delayed(_fit_and_score)(clone(self.estimator), X, y, cv, parameters, feature_names, self.scorer_)
                  for parameters in candidate_params)
 
         # Find the best parameters based on the CV score
