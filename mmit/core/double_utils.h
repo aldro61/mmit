@@ -3,6 +3,7 @@
 
 #include <cmath>
 #include <cstdlib>
+#include <iostream>
 
 #define TOL 1e-6
 
@@ -32,11 +33,12 @@ inline bool less(double x, double y){
     }
 }
 
-struct DoubleComparatorLess
+class DoubleComparatorLess : public std::binary_function<double,double,bool>
 {
-    bool operator()(double a, double b)
+public:
+    bool operator()( const double &left, const double &right  ) const
     {
-        return less(a, b);
+        return less(left, right);
     }
 };
 

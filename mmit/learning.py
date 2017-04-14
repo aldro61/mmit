@@ -206,7 +206,7 @@ class MaxMarginIntervalTree(BaseEstimator, RegressorMixin):
             if node.depth != current_depth:
                 current_depth = node.depth
                 runtime_infos["depth"] = current_depth
-                logging.debug("The tree depth is %d" % current_depth)
+                logging.debug("The tree depth is {0:d}".format(current_depth))
                 if current_depth > 0:
                     level_callback(runtime_infos)
                 if current_depth == self.max_depth:
@@ -234,7 +234,7 @@ class MaxMarginIntervalTree(BaseEstimator, RegressorMixin):
                 continue
 
             # Perform the split
-            logging.debug("Splitting with rule %s." % stump)
+            logging.debug("Splitting with rule {0!s}.".format(stump))
             node.rule = stump
             node.left_child = left_child
             node.right_child = right_child
@@ -335,12 +335,12 @@ if __name__ == "__main__":
     print "Training set predictions:"
     print pred.predict(X)
     print
-    print "The tree contains %d rules:" % len(pred.tree_.rules)
+    print "The tree contains {0:d} rules:".format(len(pred.tree_.rules))
     print pred.tree_
     print
     print "The rule importances are:"
     for k, v in pred.rule_importances_.iteritems():
-        print "%s: %.3f" % (k, v)
+        print "{0!s}: {1:.3f}".format(k, v)
 
     print pred
     print pred.score(X, y)

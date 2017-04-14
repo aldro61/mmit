@@ -90,15 +90,15 @@ def _random_testing(loss_degree):
             np.testing.assert_almost_equal(costs[-1], estimated_min, decimal=estimator_tol_decimals)
         except AssertionError:
             eprint()
-            eprint("Random test #%d -- Loss degree: %d" % (i + 1, loss_degree))
-            eprint("The margin is: %.4f" % margin)
+            eprint("Random test #{0:d} -- Loss degree: {1:d}".format(i + 1, loss_degree))
+            eprint("The margin is: {0:.4f}".format(margin))
             eprint("The lower and upper bounds are:")
-            eprint("Lower: %s" % target_lower.tolist())
-            eprint("Upper: %s" % target_upper.tolist())
-            eprint("All bounds: %s" % (
-                target_lower[~np.isinf(target_lower)].tolist() + target_upper[~np.isinf(target_upper)].tolist()))
-            eprint("All signs: %s" % ((np.ones((~np.isinf(target_lower)).sum()) * -1).tolist() + (
-            np.ones((~np.isinf(target_upper)).sum()).tolist())))
+            eprint("Lower: {0!s}".format(target_lower.tolist()))
+            eprint("Upper: {0!s}".format(target_upper.tolist()))
+            eprint("All bounds: {0!s}".format((
+                target_lower[~np.isinf(target_lower)].tolist() + target_upper[~np.isinf(target_upper)].tolist())))
+            eprint("All signs: {0!s}".format(((np.ones((~np.isinf(target_lower)).sum()) * -1).tolist() + (
+            np.ones((~np.isinf(target_upper)).sum()).tolist()))))
             eprint("Cost -- expected:", estimated_min, ", actual:", costs[-1])
             eprint("\n\n")
             raise AssertionError()
@@ -249,7 +249,7 @@ class SolverTests(TestCase):
         target_upper = np.array([inf, 1.6685363802387199, inf, inf, inf, inf, inf, 2.60996339512829, inf])
 
         moves, preds, costs = solver.compute_optimal_costs(target_lower, target_upper, margin, 1)  # squared hinge
-        np.testing.assert_almost_equal(actual=costs[-1], desired=0.8772836396007255)
+        np.testing.assert_almost_equal(actual=costs[-1], desired=0.8772836396007255, decimal=6)
 
     def test_real_data_2(self):
         """
@@ -261,5 +261,23 @@ class SolverTests(TestCase):
         target_upper = np.array([3.89204176769069, inf])[::-1].copy()
 
         moves, preds, costs = solver.compute_optimal_costs(target_lower, target_upper, margin, 1)  # squared hinge
-        np.testing.assert_almost_equal(actual=costs[-1], desired=0.0)
-        np.testing.assert_almost_equal(actual=preds[-1], desired=0.6484503149986267)
+        np.testing.assert_almost_equal(actual=costs[-1], desired=0.0, decimal=6)
+        np.testing.assert_almost_equal(actual=preds[-1], desired=0.6484503149986267, decimal=6)
+
+    def test_real_data_3(self):
+        """
+        Neuroblastoma: Failing case #3
+
+        """
+        margin = 1.77827941004
+        target_lower = np.array([-2.5332945985918, -3.05095971846127, -1.4283767149598998, -3.14698378261289, -inf, -1.3439328116402098, -0.925521684710516, -2.44906873517344, -0.6702922465439661, -1.5696992592775902, -2.83108828303218, -inf, -2.06720066085223, -0.642426546060613, -2.66253921191746, -4.31207055103816, -inf, -0.523780897279553, -inf, -2.4887060208859397, -3.34992801358554, -2.1639095176731202, -2.82998766093003, -3.2463459566136, -0.925522100513634, -3.75775584278565, -inf, -3.16505292969599, -inf, -2.50332641020796, -1.1425157198608602, -inf])
+        target_upper = np.array([inf, inf, inf, 3.1511999578044505, inf, inf, inf, inf, 2.0420300944892498, inf, inf, 2.48942330405145, inf, inf, inf, inf, inf, inf, 1.59408583560705, inf, inf, 2.5995190021667205, inf, inf, inf, inf, inf, inf, inf, 1.4237738979396901, inf, inf])
+
+        moves, preds, costs = solver.compute_optimal_costs(target_lower, target_upper, margin, 0)  # linear hinge
+        np.testing.assert_almost_equal(actual=costs[-1], desired=3.94641849103, decimal=6)
+        np.testing.assert_almost_equal(actual=preds[-1], desired=0.836998462677, decimal=6)
+
+        moves, preds, costs = solver.compute_optimal_costs(target_lower[::-1].copy(), target_upper[::-1].copy(), margin, 0)  # linear hinge
+        np.testing.assert_almost_equal(actual=costs[-1], desired=3.94641849103, decimal=6)
+        np.testing.assert_almost_equal(actual=preds[-1], desired=0.836998462677, decimal=6)
+
