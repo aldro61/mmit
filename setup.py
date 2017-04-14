@@ -42,14 +42,16 @@ solver_module = Extension('mmit.core.solver',
                                    'mmit/core/coefficients.cpp'],
                           extra_compile_args=["-std=c++0x"] + os_compile_flags)
 
+dependencies = ["joblib", "numpy", "scikit-learn", "six"]
+
 setup(
     name = "mmit",
     version = "2017.03.15",
     packages = find_packages(),
 
     cmdclass={'build_ext':build_ext},
-    setup_requires = ["numpy", "scikit-learn"],
-    install_requires = ["numpy", "scikit-learn"],
+    setup_requires = dependencies,
+    install_requires = dependencies,
 
     author = "Toby Dylan Hocking, Alexandre Drouin",
     author_email = "toby.hocking@r-project.org, aldro61@gmail.com",
