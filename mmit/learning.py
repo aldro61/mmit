@@ -234,7 +234,7 @@ class MaxMarginIntervalTree(BaseEstimator, RegressorMixin):
                 continue
 
             # Perform the split
-            logging.debug("Splitting with rule %s." % node.rule)
+            logging.debug("Splitting with rule %s." % stump)
             node.rule = stump
             node.left_child = left_child
             node.right_child = right_child
