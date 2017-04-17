@@ -20,7 +20,7 @@ import sys
 
 from unittest import TestCase
 
-from ..model import RegressionTreeNode
+from ..model import RegressionTreeNode, DecisionStump
 
 
 def eprint(*args, **kwargs):
@@ -29,8 +29,8 @@ def eprint(*args, **kwargs):
 
 class TreeTests(TestCase):
     def setUp(self):
-        self.root = RegressionTreeNode(0, [1, 2, 3, 4, 5, 6, 7, 8], rule="root", cost_value=10., predicted_value=1.)
-        self.root_left = RegressionTreeNode(1, [1, 2, 3, 4], rule="root-left", cost_value=5., predicted_value=10., parent=self.root)
+        self.root = RegressionTreeNode(0, [1, 2, 3, 4, 5, 6, 7, 8], rule=DecisionStump(0, 5), cost_value=10., predicted_value=1.)
+        self.root_left = RegressionTreeNode(1, [1, 2, 3, 4], rule=DecisionStump(1, 10), cost_value=5., predicted_value=10., parent=self.root)
         self.root_right = RegressionTreeNode(1, [5, 6, 7, 8], cost_value=2., predicted_value=0.1, parent=self.root)
         self.root.left_child = self.root_left
         self.root.right_child = self.root_right
@@ -116,7 +116,7 @@ class TreeTests(TestCase):
         get_rules -- general case
 
         """
-        expected = ["root", "root-left"]
+        expected = [DecisionStump(0, 5), DecisionStump(1, 10)]
         assert len(self.root.rules) == len(expected)
         assert all(actual in expected for actual in self.root.rules)
 
@@ -133,3 +133,29 @@ class TreeTests(TestCase):
 
         """
         assert len(self.root) == 2
+
+    def test_predict(self):
+        """
+        predict
+
+        """
+        X = np.array([[5, 10]])
+        assert np.allclose(self.root.predict(X), self.root_left_left.predicted_value)
+
+        X = np.array([[-999., -1000.]])
+        assert np.allclose(self.root.predict(X), self.root_left_left.predicted_value)
+
+        X = np.array([[5., 10.0001]])
+        assert np.allclose(self.root.predict(X), self.root_left_right.predicted_value)
+
+        X = np.array([[5., 10000.]])
+        assert np.allclose(self.root.predict(X), self.root_left_right.predicted_value)
+
+        X = np.array([[5.0001, 0.]])
+        assert np.allclose(self.root.predict(X), self.root_right.predicted_value)
+
+        X = np.array([[5.0001, 100.]])
+        assert np.allclose(self.root.predict(X), self.root_right.predicted_value)
+
+        X = np.array([[10000., 0.]])
+        assert np.allclose(self.root.predict(X), self.root_right.predicted_value)
