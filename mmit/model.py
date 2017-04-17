@@ -41,6 +41,11 @@ class DecisionStump(object):
         feature_descr = self.feature_name if self.feature_name is not None else "x[{0:d}]".format(self.feature_idx)
         return "{0!s} <= {1:.4f}".format(feature_descr, self.threshold)
 
+    def __eq__(self, other):
+        return self.feature_idx == other.feature_idx and \
+               np.allclose(self.threshold, other.threshold) and \
+               self.feature_name == other.feature_name
+
 
 class RegressionTreeNode(object):
     def __init__(self, depth, example_idx, rule=None, parent=None, left_child=None,
