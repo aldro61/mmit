@@ -70,3 +70,43 @@ def check_X_y(X, y):
     if y.shape[1] != 2:
         raise ValueError("y must contain lower and upper bounds for each interval.")
     return X, y
+
+
+def float_equal(a, b):
+    """
+    Returns True if a == b
+
+    """
+    return np.isclose(a, b)
+
+
+def float_less(a, b):
+    """
+        Returns True if a < b
+
+    """
+    return (not np.isclose(a, b)) and a < b
+
+
+def float_less_equal(a, b):
+    """
+        Returns True if a <= b
+
+    """
+    return float_equal(a, b) or float_less(a, b)
+
+
+def float_greater(a, b):
+    """
+        Returns True if a > b
+
+    """
+    return (not np.isclose(a, b)) and a > b
+
+
+def float_greater_equal(a, b):
+    """
+        Returns True if a >= b
+
+    """
+    return float_equal(a, b) or float_greater(a, b)
