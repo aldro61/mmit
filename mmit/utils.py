@@ -13,14 +13,21 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 """
+import numpy as np
+
 from sklearn.utils.validation import check_array, check_consistent_length
 
 
 class BetweenDict(dict):
     """
-    The BetweenDict
+    The BetweenDict: a dictionary for interval-valued keys (lb <= key < ub)
     By: Joshua Kugler
     Source: http://joshuakugler.com/archives/30-BetweenDict,-a-Python-dict-for-value-ranges.html
+
+    Notes:
+    ------
+    * If multiple ranges match a key, the first one is used.
+
     """
     def __init__(self, d=None):
         if d is not None:
@@ -29,7 +36,7 @@ class BetweenDict(dict):
 
     def __getitem__(self, key):
         for k, v in self.items():
-            if k[0] <= key < k[1]:
+            if k[0] <= key < k[1] or (k[0] <= key and k[1] == np.infty) or (k[0] == -np.infty and key < k[1]):
                 return v
         raise KeyError("Key '{0!s}' is not between any values in the BetweenDict".format(key))
 

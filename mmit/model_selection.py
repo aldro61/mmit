@@ -69,11 +69,9 @@ def _fit_and_score(estimator, X, y, cv, parameters, feature_names=None, scorer=N
     # Compute the test risk for all pruned trees of each fold
     alpha_path_scores_by_fold = []
     for i, (_, fold_test_idx) in enumerate(fold_split_idx):
-        fold_test_scores = []
         alpha_path_scores = BetweenDict()
         for j, t in enumerate(fold_pruned_trees[i]):
             fold_test_score = scorer(t, X[fold_test_idx], y[fold_test_idx])
-            fold_test_scores.append(fold_test_score)
             if j < len(fold_alphas[i]) - 1:
                 key = (fold_alphas[i][j], fold_alphas[i][j + 1])
             else:
@@ -82,23 +80,21 @@ def _fit_and_score(estimator, X, y, cv, parameters, feature_names=None, scorer=N
         alpha_path_scores_by_fold.append(alpha_path_scores)
 
     # Prune the master tree based on the CV estimates
-    min_score = -np.infty
-    min_score_tree = None
-    if len(master_alphas) > 1:
-        for i in range(len(master_alphas) - 1):
+    best_score = -np.infty
+    best_tree = None
+    for i in range(len(master_alphas)):
+        if i < len(master_alphas) - 1:
             geo_mean_alpha_k = sqrt(master_alphas[i] * master_alphas[i + 1])
-            cv_score = np.mean([alpha_path_scores_by_fold[j][geo_mean_alpha_k] for j in range(n_folds)])
-            # Note: assumes that alphas are sorted in increasing order, so simplest solution is always preferred
-            if cv_score >= min_score:
-                min_score = cv_score
-                min_score_tree = master_pruned_trees[i]
-    else:
-        # Special case where the master tree is a single leaf (no split)
-        assert np.allclose(0., master_alphas[0])
-        min_score_tree = master_pruned_trees[0]
-        min_score = np.mean([alpha_path_scores_by_fold[j][0.] for j in range(n_folds)])
+        else:
+            geo_mean_alpha_k = np.infty
+        cv_score = np.mean([alpha_path_scores_by_fold[j][geo_mean_alpha_k] for j in range(n_folds)])
 
-    return {"score": min_score, "estimator": min_score_tree, "params": parameters}
+        # Note: assumes that alphas are sorted in increasing order, so simplest solution is always preferred (>=)
+        if np.greater_equal(cv_score, best_score):
+            best_score = cv_score
+            best_tree = master_pruned_trees[i]
+
+    return {"score": best_score, "estimator": best_tree, "params": parameters}
 
 
 class GridSearchCV(BaseEstimator):
