@@ -24,12 +24,7 @@ from sklearn.utils.validation import check_array, check_consistent_length, check
 from .metrics import *
 from .core.solver import compute_optimal_costs
 from .model import DecisionStump, RegressionTreeNode
-from .utils import check_X_y
-
-float_tol = 1e-6
-
-
-
+from .utils import check_X_y, float_equal, float_less
 
 
 class SolverError(Exception):
@@ -137,7 +132,7 @@ class MaxMarginIntervalTree(BaseEstimator, RegressorMixin):
 
                 # XXX: Runtime test case to ensure that the solver is working correctly. The solution for the cases
                 # were the left and right leaves contain all the examples should be exactly the same.
-                if np.abs(left_costs[-1] - right_costs[-1]) > float_tol or np.abs(left_preds[-1] - right_preds[-1]) > float_tol:
+                if not float_equal(left_costs[-1], right_costs[-1]) or not float_equal(left_preds[-1], right_preds[-1]):
                     raise SolverError("MMIT solver error. Please report this to the developers.")
 
                 # Combine the values of duplicate feature values and remove splits where all examples are in one leaf
@@ -152,14 +147,14 @@ class MaxMarginIntervalTree(BaseEstimator, RegressorMixin):
                 cost_by_split[np.isinf(np.abs(unique_right_preds))] = np.infty
 
                 # Check for optimality of the split
-                if cost_by_split.min() < node.cost_value:
+                if float_less(cost_by_split.min(), node.cost_value):
                     min_cost_idx = (unique_left_costs + unique_right_costs).argmin()
 
-                    if np.allclose(cost_by_split[min_cost_idx], best_cost):
+                    if float_equal(cost_by_split[min_cost_idx], best_cost):
                         best_splits.append((feat_idx, unique_feat_sorted[min_cost_idx]))
                         best_preds.append((unique_left_preds[min_cost_idx], unique_right_preds[min_cost_idx]))
                         best_leaf_costs.append((unique_left_costs[min_cost_idx], unique_right_costs[min_cost_idx]))
-                    elif cost_by_split[min_cost_idx] < best_cost:
+                    elif float_less(cost_by_split[min_cost_idx], best_cost):
                         best_cost = cost_by_split[min_cost_idx]
                         best_splits = [(feat_idx, unique_feat_sorted[min_cost_idx])]
                         best_preds = [(unique_left_preds[min_cost_idx], unique_right_preds[min_cost_idx])]
@@ -266,7 +261,7 @@ class MaxMarginIntervalTree(BaseEstimator, RegressorMixin):
 
         # Normalize the variable importances
         logging.debug("Normalizing the variable importances.")
-        variable_importance_sum = sum(v for v in self.rule_importances_.itervalues())
+        variable_importance_sum = 1.0 * sum(v for v in self.rule_importances_.itervalues())
         self.rule_importances_ = dict((r, i / variable_importance_sum) for r, i in self.rule_importances_.iteritems())
 
         logging.debug("Training finished.")
@@ -318,36 +313,3 @@ class MaxMarginIntervalTree(BaseEstimator, RegressorMixin):
 
     def check_is_fitted(self):
         return check_is_fitted(self, ["tree_", "rule_importances_"])
-
-
-if __name__ == "__main__":
-    # Use this to display verbose messages
-    logging.basicConfig(level=logging.DEBUG,
-                        format="%(asctime)s.%(msecs)d %(levelname)s mmit:%(module)s - %(funcName)s: %(message)s")
-
-    np.random.seed(42)
-    n_examples = 500
-    n_features = 100
-    X = np.random.randint(0, 500, (n_examples, n_features)).astype(np.double)
-    y_upper = np.random.randint(0, 10, n_examples)
-    y_lower = -1 * y_upper + np.random.randint(0, 20, 1)
-    y_lower[y_lower > y_upper] = y_upper[y_lower > y_upper]
-    y = zip(y_lower, y_upper)
-    print "Intervals are:", y
-    print
-
-    pred = MaxMarginIntervalTree(margin=0.5, max_depth=10)
-    pred.fit(X, y)
-    print
-    print "Training set predictions:"
-    print pred.predict(X)
-    print
-    print "The tree contains {0:d} rules:".format(len(pred.tree_.rules))
-    print pred.tree_
-    print
-    print "The rule importances are:"
-    for k, v in pred.rule_importances_.iteritems():
-        print "{0!s}: {1:.3f}".format(k, v)
-
-    print pred
-    print pred.score(X, y)

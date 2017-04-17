@@ -28,7 +28,7 @@ from sklearn.utils.validation import indexable
 
 from .learning import MaxMarginIntervalTree
 from .pruning import min_cost_complexity_pruning
-from .utils import BetweenDict, check_X_y
+from .utils import BetweenDict, check_X_y, float_equal, float_greater, float_greater_equal
 
 
 def _fit_and_score(estimator, X, y, cv, parameters, feature_names=None, scorer=None):
@@ -90,7 +90,7 @@ def _fit_and_score(estimator, X, y, cv, parameters, feature_names=None, scorer=N
         cv_score = np.mean([alpha_path_scores_by_fold[j][geo_mean_alpha_k] for j in range(n_folds)])
 
         # Note: assumes that alphas are sorted in increasing order, so simplest solution is always preferred (>=)
-        if np.greater_equal(cv_score, best_score):
+        if float_greater_equal(cv_score, best_score):
             best_score = cv_score
             best_tree = master_pruned_trees[i]
 
@@ -196,10 +196,10 @@ class GridSearchCV(BaseEstimator):
         # Find the best parameters based on the CV score
         best_result = {"score": -np.infty, "estimator": clone(estimator), "params": {}}
         for result in cv_results:
-            if np.allclose(result["score"], best_result["score"]) and \
+            if float_equal(result["score"], best_result["score"]) and \
                            len(result["estimator"].tree_) < len(best_result["estimator"].tree_):
                 best_result = result
-            elif np.greater(result["score"], best_result["score"]):
+            elif float_greater(result["score"], best_result["score"]):
                 best_result = result
 
         # Save the results
