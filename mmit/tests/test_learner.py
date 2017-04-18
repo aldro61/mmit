@@ -66,7 +66,7 @@ class MMITTests(TestCase):
 
     def test_dummy_dataset_1(self):
         """
-        learning on dummy datasets #1
+        learning on dummy dataset #1
 
         """
         y = np.array([[0, 1]] * 5 + [[2, 3]] * 5)
