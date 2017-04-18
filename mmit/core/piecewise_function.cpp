@@ -102,14 +102,17 @@ inline bool PiecewiseFunction::is_begin(breakpoint_list_t::iterator b_ptr) {
  */
 double PiecewiseFunction::get_minimum_position() {
     // Find the position of the minimum segment's minimum
-    if(equal(this->min_coefficients.quadratic, 0) && equal(this->min_coefficients.linear, 0)){
+    if(this->breakpoint_coefficients.size() == 0){
+        return -INFINITY;
+    }
+    else if(equal(this->min_coefficients.quadratic, 0) && equal(this->min_coefficients.linear, 0)){
         if(is_end(this->min_ptr)){
-            // Case: |___x lower bounds only, return +inf
-            return INFINITY;
+            // Case: \___x lower bounds only
+            return get_breakpoint_position(std::prev(this->min_ptr));
         }
         else if(is_begin(this->min_ptr)){
-            // Case: ___x/ upper bounds only, return -inf
-            return -INFINITY;
+            // Case: ___x/ upper bounds only
+            return get_breakpoint_position(this->min_ptr);
         }
         else{
             // Case: |__x__/
