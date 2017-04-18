@@ -14,9 +14,9 @@
 
 """
 from __future__ import print_function
+
 import numpy as np
 import sys
-
 
 from unittest import TestCase
 
