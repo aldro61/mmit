@@ -142,13 +142,9 @@ class MaxMarginIntervalTree(BaseEstimator, RegressorMixin):
                 unique_right_costs = right_costs[::-1][first_idx_by_value][1:]
                 cost_by_split = unique_left_costs + unique_right_costs
 
-                # Cancel all splits that generate leaves that predict infinity or -infinity
-                cost_by_split[np.isinf(np.abs(unique_left_preds))] = np.infty
-                cost_by_split[np.isinf(np.abs(unique_right_preds))] = np.infty
-
                 # Check for optimality of the split
                 if float_less(cost_by_split.min(), node.cost_value):
-                    min_cost_idx = (unique_left_costs + unique_right_costs).argmin()
+                    min_cost_idx = cost_by_split.argmin()
 
                     if float_equal(cost_by_split[min_cost_idx], best_cost):
                         best_splits.append((feat_idx, unique_feat_sorted[min_cost_idx]))
