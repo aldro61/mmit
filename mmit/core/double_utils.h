@@ -8,11 +8,16 @@
 #define TOL 1e-6
 
 inline bool equal(double x, double y){
-    return std::abs(x - y) <= TOL;
+    if(std::abs(x) == INFINITY || std::abs(y) == INFINITY){
+        return x == y;
+    }
+    else{
+        return std::abs(x - y) <= TOL;
+    }
 }
 
 inline bool not_equal(double x, double y){
-    return std::abs(x - y) > TOL;
+    return !equal(x, y);
 }
 
 inline bool greater(double x, double y){
