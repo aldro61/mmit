@@ -147,14 +147,14 @@ class MaxMarginIntervalTree(BaseEstimator, RegressorMixin):
                     min_cost_idx = cost_by_split.argmin()
 
                     if float_equal(cost_by_split[min_cost_idx], best_cost):
-                        best_splits.append((feat_idx, unique_feat_sorted[min_cost_idx]))
-                        best_preds.append((unique_left_preds[min_cost_idx], unique_right_preds[min_cost_idx]))
-                        best_leaf_costs.append((unique_left_costs[min_cost_idx], unique_right_costs[min_cost_idx]))
+                        best_splits.append(dict(feat_idx=feat_idx, threshold=unique_feat_sorted[min_cost_idx]))
+                        best_preds.append(dict(left=unique_left_preds[min_cost_idx], right=unique_right_preds[min_cost_idx]))
+                        best_leaf_costs.append(dict(left=unique_left_costs[min_cost_idx], right=unique_right_costs[min_cost_idx]))
                     elif float_less(cost_by_split[min_cost_idx], best_cost):
                         best_cost = cost_by_split[min_cost_idx]
-                        best_splits = [(feat_idx, unique_feat_sorted[min_cost_idx])]
-                        best_preds = [(unique_left_preds[min_cost_idx], unique_right_preds[min_cost_idx])]
-                        best_leaf_costs = [(unique_left_costs[min_cost_idx], unique_right_costs[min_cost_idx])]
+                        best_splits = [dict(feat_idx=feat_idx, threshold=unique_feat_sorted[min_cost_idx])]
+                        best_preds = [dict(left=unique_left_preds[min_cost_idx], right=unique_right_preds[min_cost_idx])]
+                        best_leaf_costs = [dict(left=unique_left_costs[min_cost_idx], right=unique_right_costs[min_cost_idx])]
 
             # No split exists that decreases the objective value
             if best_cost == np.infty:
@@ -163,24 +163,25 @@ class MaxMarginIntervalTree(BaseEstimator, RegressorMixin):
             # TODO: we could add a tiebreaker
             logging.debug("There are %d optimal splits with a cost of %.4f", len(best_splits), best_cost)
             best_split = best_splits[0]
-            best_split_pred = best_preds[0]
+            best_split_leaf_preds = best_preds[0]
             best_split_leaf_costs = best_leaf_costs[0]
             del best_splits, best_preds, best_leaf_costs
-            best_rule = DecisionStump(best_split[0], best_split[1],
-                                      self.feature_names_[best_split[0]] if self.feature_names_ is not None else None)
+            best_rule = DecisionStump(best_split["feat_idx"], best_split["threshold"],
+                                      self.feature_names_[best_split["feat_idx"]]
+                                      if self.feature_names_ is not None else None)
 
             # Dispatch the examples to the leaves
             best_rule_classifications = best_rule.classify(X[node.example_idx])
             left_child = RegressionTreeNode(parent=node,
                                             depth=node.depth + 1,
                                             example_idx=node.example_idx[best_rule_classifications],
-                                            predicted_value=best_split_pred[0],
-                                            cost_value=best_split_leaf_costs[0])
+                                            predicted_value=best_split_leaf_preds["left"],
+                                            cost_value=best_split_leaf_costs["left"])
             right_child = RegressionTreeNode(parent=node,
                                              depth=node.depth + 1,
                                              example_idx=node.example_idx[~best_rule_classifications],
-                                             predicted_value=best_split_pred[1],
-                                             cost_value=best_split_leaf_costs[1])
+                                             predicted_value=best_split_leaf_preds["right"],
+                                             cost_value=best_split_leaf_costs["right"])
 
             return best_rule, left_child, right_child
 
@@ -227,7 +228,7 @@ class MaxMarginIntervalTree(BaseEstimator, RegressorMixin):
             stump, left_child, right_child = _optimal_split(node)
 
             # If we were incapable of splitting the node into two non-empty leafs
-            if stump is None:
+            if stump is None and left_child is None and right_child is None:
                 logging.debug("Found no rule to split the node. The node will not be split.")
                 continue
 
