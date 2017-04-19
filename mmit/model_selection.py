@@ -80,6 +80,8 @@ def _fit_and_score(estimator, X, y, cv, parameters, feature_names=None, scorer=N
         alpha_path_scores_by_fold.append(alpha_path_scores)
 
     # Prune the master tree based on the CV estimates
+    alpha_cv_scores = []
+    best_alpha = -1
     best_score = -np.infty
     best_tree = None
     for i in range(len(master_alphas)):
@@ -89,12 +91,28 @@ def _fit_and_score(estimator, X, y, cv, parameters, feature_names=None, scorer=N
             geo_mean_alpha_k = np.infty
         cv_score = np.mean([alpha_path_scores_by_fold[j][geo_mean_alpha_k] for j in range(n_folds)])
 
+        # Log the CV score for this alpha
+        alpha_cv_scores.append((geo_mean_alpha_k, cv_score))
+
+        # Check if this alpha is better than the best alpha
         # Note: assumes that alphas are sorted in increasing order, so simplest solution is always preferred (>=)
         if float_greater_equal(cv_score, best_score):
             best_score = cv_score
+            best_alpha = geo_mean_alpha_k
             best_tree = master_pruned_trees[i]
 
-    return {"score": best_score, "estimator": best_tree, "params": parameters}
+    # Append alpha to the parameters
+    best_params = dict(parameters)
+    best_params["alpha"] = best_alpha
+
+    # Generate a big dictionnary of all HP combinations considered (including alpha) and their CV scores
+    cv_results = []
+    for (alpha, score) in alpha_cv_scores:
+        tmp = dict(parameters)
+        tmp["alpha"] = alpha
+        cv_results.append((tmp, score))
+
+    return {"best_score": best_score, "best_estimator": best_tree, "best_params": best_params, "cv_results": cv_results}
 
 
 class GridSearchCV(BaseEstimator):
@@ -194,19 +212,25 @@ class GridSearchCV(BaseEstimator):
                  for parameters in candidate_params)
 
         # Find the best parameters based on the CV score
-        best_result = {"score": -np.infty, "estimator": clone(estimator), "params": {}}
+        all_cv_results = []
+        best_result = {"best_score": -np.infty, "best_estimator": clone(estimator), "best_params": {}}
         for result in cv_results:
-            if float_equal(result["score"], best_result["score"]) and \
-                           len(result["estimator"].tree_) < len(best_result["estimator"].tree_):
+
+            # Check if this HP combination is better than what we have until now
+            if float_equal(result["best_score"], best_result["best_score"]) and \
+                           len(result["best_estimator"].tree_) < len(best_result["best_estimator"].tree_):
                 best_result = result
-            elif float_greater(result["score"], best_result["score"]):
+            elif float_greater(result["best_score"], best_result["best_score"]):
                 best_result = result
 
+            # Update the list of all HP combinations and their score
+            all_cv_results += result["cv_results"]
+
         # Save the results
-        self.best_estimator_ = best_result["estimator"]
-        self.best_score_ = best_result["score"]
-        self.best_params_ = best_result["params"]
-        self.cv_results_ = cv_results
+        self.best_estimator_ = best_result["best_estimator"]
+        self.best_score_ = best_result["best_score"]
+        self.best_params_ = best_result["best_  params"]
+        self.cv_results_ = all_cv_results
 
         return self
 
