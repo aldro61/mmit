@@ -84,3 +84,22 @@ class MMITTests(TestCase):
         assert estimator.tree_.leaves[0].cost_value == 0.0
         assert estimator.tree_.leaves[1].cost_value == 0.0
         
+    def test_noiseless_dataset_1_squared(self):
+        """
+        learning on noiseless dataset #1 (squared hinge)
+
+        """
+        y = np.array([[0, 1]] * 5 + [[2, 3]] * 5)
+        X = np.hstack((np.ones(len(y)).reshape(-1, 1),  # Bad feature
+                       np.arange(len(y)).reshape(-1, 1),  # Good feature
+                       np.zeros(len(y)).reshape(-1, 1)))  # Bad feature
+
+        estimator = MaxMarginIntervalTree(margin=0.0, loss="squared_hinge")
+        estimator.fit(X, y)
+
+        assert len(estimator.tree_.rules) == 1
+        assert estimator.tree_.rules[0] == DecisionStump(1, 4)
+        assert estimator.tree_.leaves[0].predicted_value == 0.5
+        assert estimator.tree_.leaves[1].predicted_value == 2.5
+        assert estimator.tree_.leaves[0].cost_value == 0.0
+        assert estimator.tree_.leaves[1].cost_value == 0.0
