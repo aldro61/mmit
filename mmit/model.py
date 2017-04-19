@@ -142,16 +142,18 @@ def _latex_export(model):
     def _rec_export(node, depth):
         if not node.is_leaf:
             indent = "\t" * depth
-            return '\n{0!s} {1!s}[as={2!s}, nonterminal] -> {{{3!s}, {4!s}}}'.format(indent,
-                    str(hash((node.rule, node.parent))),
-                    str(node.rule).replace("<=", "$\leq$").replace("[", "(").replace("]", ")").replace("%", ""),
-                    _rec_export(node.left_child, depth + 1),
-                    _rec_export(node.right_child, depth + 1))
+            return '\n{0!s} {1!s}[as={2!s}, nonterminal] -> {{{3!s}, {4!s}}}'\
+                .format(indent,
+                        str(hash((node.rule, node.parent))).replace("-", "1"),
+                        str(node.rule).replace("<=", "$\leq$").replace("[", "(").replace("]", ")").replace("%", ""),
+                        _rec_export(node.left_child, depth + 1),
+                        _rec_export(node.right_child, depth + 1))
         else:
-            return "{0!s}[as=Ex: ${1:d}$\\\\Cost: ${2:.3f}$\\\\Pred: ${3:.3f}$, terminal]".format(str(hash(node)),
-                                                                   node.n_examples,
-                                                                   node.cost_value,
-                                                                   node.predicted_value)
+            return "{0!s}[as=Ex: ${1:d}$\\\\Cost: ${2:.3f}$\\\\Pred: ${3:.3f}$, terminal]"\
+                    .format(str(hash(node)).replace("-", "1"),
+                            node.n_examples,
+                            node.cost_value,
+                            node.predicted_value)
     exported = \
 """
 % !TeX program = lualatex
