@@ -64,9 +64,9 @@ class MMITTests(TestCase):
         assert np.allclose(parameters["max_depth"], 3333)
         assert np.allclose(parameters["min_samples_split"], 2)
 
-    def test_dummy_dataset_1(self):
+    def test_noiseless_dataset_1_linear(self):
         """
-        learning on dummy dataset #1
+        learning on noiseless dataset #1 (linear hinge)
 
         """
         y = np.array([[0, 1]] * 5 + [[2, 3]] * 5)
@@ -83,3 +83,4 @@ class MMITTests(TestCase):
         assert estimator.tree_.leaves[1].predicted_value == 2.5
         assert estimator.tree_.leaves[0].cost_value == 0.0
         assert estimator.tree_.leaves[1].cost_value == 0.0
+        
