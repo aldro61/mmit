@@ -132,7 +132,7 @@ class MaxMarginIntervalTree(BaseEstimator, RegressorMixin):
 
                 # XXX: Runtime test case to ensure that the solver is working correctly. The solution for the cases
                 # were the left and right leaves contain all the examples should be exactly the same.
-                if not float_equal(left_costs[-1], right_costs[-1]) or not float_equal(left_preds[-1], right_preds[-1]):
+                if not float_equal(left_costs[-1], right_costs[-1], 6) or not float_equal(left_preds[-1], right_preds[-1], 6):
                     raise SolverError("MMIT solver error. Please report this to the developers.")
 
                 # Combine the values of duplicate feature values and remove splits where all examples are in one leaf
