@@ -229,7 +229,7 @@ class GridSearchCV(BaseEstimator):
         # Save the results
         self.best_estimator_ = best_result["best_estimator"]
         self.best_score_ = best_result["best_score"]
-        self.best_params_ = best_result["best_  params"]
+        self.best_params_ = best_result["best_params"]
         self.cv_results_ = all_cv_results
 
         return self
