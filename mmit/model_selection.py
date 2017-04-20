@@ -80,19 +80,24 @@ def _fit_and_score(estimator, X, y, cv, parameters, feature_names=None, scorer=N
         alpha_path_scores_by_fold.append(alpha_path_scores)
 
     # Prune the master tree based on the CV estimates
+    alphas = []
     alpha_cv_scores = []
+    alpha_train_scores = []
     best_alpha = -1
     best_score = -np.infty
     best_tree = None
-    for i in range(len(master_alphas)):
+    for i, t in enumerate(master_pruned_trees):
         if i < len(master_alphas) - 1:
             geo_mean_alpha_k = sqrt(master_alphas[i] * master_alphas[i + 1])
         else:
             geo_mean_alpha_k = np.infty
         cv_score = np.mean([alpha_path_scores_by_fold[j][geo_mean_alpha_k] for j in range(n_folds)])
+        train_score = scorer(t, X, y)
 
         # Log the CV score for this alpha
-        alpha_cv_scores.append((geo_mean_alpha_k, cv_score))
+        alphas.append(geo_mean_alpha_k)
+        alpha_cv_scores.append(cv_score)
+        alpha_train_scores.append(train_score)
 
         # Check if this alpha is better than the best alpha
         # Note: assumes that alphas are sorted in increasing order, so simplest solution is always preferred (>=)
@@ -107,10 +112,10 @@ def _fit_and_score(estimator, X, y, cv, parameters, feature_names=None, scorer=N
 
     # Generate a big dictionnary of all HP combinations considered (including alpha) and their CV scores
     cv_results = []
-    for (alpha, score) in alpha_cv_scores:
+    for alpha, cv_score, train_score in zip(alphas, alpha_cv_scores, alpha_train_scores):
         tmp = dict(parameters)
         tmp["alpha"] = alpha
-        cv_results.append((tmp, score))
+        cv_results.append((tmp, {"cv": cv_score, "train": train_score}))
 
     return {"best_score": best_score, "best_estimator": best_tree, "best_params": best_params, "cv_results": cv_results}
 
