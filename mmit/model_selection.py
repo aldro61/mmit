@@ -83,6 +83,7 @@ def _fit_and_score(estimator, X, y, cv, parameters, feature_names=None, scorer=N
     alphas = []
     alpha_cv_scores = []
     alpha_train_scores = []
+    alpha_train_objective_values = []
     best_alpha = -1
     best_score = -np.infty
     best_tree = None
@@ -93,11 +94,13 @@ def _fit_and_score(estimator, X, y, cv, parameters, feature_names=None, scorer=N
             geo_mean_alpha_k = np.infty
         cv_score = np.mean([alpha_path_scores_by_fold[j][geo_mean_alpha_k] for j in range(n_folds)])
         train_score = scorer(t, X, y)
+        train_objective = np.sum([l.cost_value for l in t.tree_.leaves])
 
-        # Log the CV score for this alpha
+        # Log metrics for this alpha value
         alphas.append(geo_mean_alpha_k)
         alpha_cv_scores.append(cv_score)
         alpha_train_scores.append(train_score)
+        alpha_train_objective_values.append(train_objective)
 
         # Check if this alpha is better than the best alpha
         # Note: assumes that alphas are sorted in increasing order, so simplest solution is always preferred (>=)
@@ -112,10 +115,11 @@ def _fit_and_score(estimator, X, y, cv, parameters, feature_names=None, scorer=N
 
     # Generate a big dictionnary of all HP combinations considered (including alpha) and their CV scores
     cv_results = []
-    for alpha, cv_score, train_score in zip(alphas, alpha_cv_scores, alpha_train_scores):
+    for alpha, cv_score, train_score, train_objective in zip(alphas, alpha_cv_scores, alpha_train_scores,
+                                                             alpha_train_objective_values):
         tmp = dict(parameters)
         tmp["alpha"] = alpha
-        cv_results.append((tmp, {"cv": cv_score, "train": train_score}))
+        cv_results.append((tmp, {"cv": cv_score, "train": train_score, "objective": train_objective}))
 
     return {"best_score": best_score, "best_estimator": best_tree, "best_params": best_params, "cv_results": cv_results}
 
@@ -212,7 +216,7 @@ class GridSearchCV(BaseEstimator):
                       .format(n_splits, n_candidates, n_candidates * n_splits))
 
         # Score all parameter combinations in parallel
-        cv_results = Parallel(n_jobs=self.n_jobs, pre_dispatch=self.pre_dispatch)\
+        cv_results = Parallel(n_jobs=self.n_jobs, pre_dispatch=self.pre_dispatch) \
                 (delayed(_fit_and_score)(clone(self.estimator), X, y, cv, parameters, feature_names, self.scorer_)
                  for parameters in candidate_params)
 
