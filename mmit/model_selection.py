@@ -31,7 +31,7 @@ from .pruning import min_cost_complexity_pruning
 from .utils import BetweenDict, check_X_y, float_equal, float_greater, float_greater_equal
 
 
-def _fit_and_score(estimator, X, y, cv, parameters, feature_names=None, scorer=None):
+def _fit_and_score(estimator, X, y, cv, parameters, feature_names=None, scorer=None, pruning=True):
     """
     Performs cross-validation and pruning for MMIT estimators
 
@@ -46,68 +46,93 @@ def _fit_and_score(estimator, X, y, cv, parameters, feature_names=None, scorer=N
     fold_predictors = [clone(estimator).set_params(**parameters) for _ in range(n_folds)]
     master_predictor = clone(estimator).set_params(**parameters)
 
-    # For each fold, build an overgrown decision tree
-    logging.debug("Growing the cross-validation fold trees")
-    for i, (fold_train_idx, _) in enumerate(fold_split_idx):
-        logging.debug("Growing the tree for fold {0:d}".format(i + 1))
-        # Fit the decision tree
-        fold_predictors[i].fit(X[fold_train_idx], y[fold_train_idx], feature_names=feature_names)
+    if pruning:
+        # For each fold, build an overgrown decision tree
+        logging.debug("Growing the cross-validation fold trees")
+        for i, (fold_train_idx, _) in enumerate(fold_split_idx):
+            logging.debug("Growing the tree for fold {0:d}".format(i + 1))
+            # Fit the decision tree
+            fold_predictors[i].fit(X[fold_train_idx], y[fold_train_idx], feature_names=feature_names)
 
-    # Also build an overgrown decision tree on the entire dataset
-    logging.debug("Growing the master tree")
-    master_predictor.fit(X, y, feature_names=feature_names)
+        # Also build an overgrown decision tree on the entire dataset
+        logging.debug("Growing the master tree")
+        master_predictor.fit(X, y, feature_names=feature_names)
 
-    # Get the pruned master and cross-validation trees
-    master_alphas, master_pruned_trees = min_cost_complexity_pruning(master_predictor)
-    fold_alphas = []
-    fold_pruned_trees = []
-    for i in range(n_folds):
-        alphas, trees = min_cost_complexity_pruning(fold_predictors[i])
-        fold_alphas.append(alphas)
-        fold_pruned_trees.append(trees)
+        # Get the pruned master and cross-validation trees
+        master_alphas, master_pruned_trees = min_cost_complexity_pruning(master_predictor)
+        fold_alphas = []
+        fold_pruned_trees = []
+        for i in range(n_folds):
+            alphas, trees = min_cost_complexity_pruning(fold_predictors[i])
+            fold_alphas.append(alphas)
+            fold_pruned_trees.append(trees)
 
-    # Compute the test risk for all pruned trees of each fold
-    alpha_path_scores_by_fold = []
-    for i, (_, fold_test_idx) in enumerate(fold_split_idx):
-        alpha_path_scores = BetweenDict()
-        for j, t in enumerate(fold_pruned_trees[i]):
-            fold_test_score = scorer(t, X[fold_test_idx], y[fold_test_idx])
-            if j < len(fold_alphas[i]) - 1:
-                key = (fold_alphas[i][j], fold_alphas[i][j + 1])
+        # Compute the test risk for all pruned trees of each fold
+        alpha_path_scores_by_fold = []
+        for i, (_, fold_test_idx) in enumerate(fold_split_idx):
+            alpha_path_scores = BetweenDict()
+            for j, t in enumerate(fold_pruned_trees[i]):
+                fold_test_score = scorer(t, X[fold_test_idx], y[fold_test_idx])
+                if j < len(fold_alphas[i]) - 1:
+                    key = (fold_alphas[i][j], fold_alphas[i][j + 1])
+                else:
+                    key = (fold_alphas[i][j], np.infty)
+                alpha_path_scores[key] = fold_test_score
+            alpha_path_scores_by_fold.append(alpha_path_scores)
+
+        # Prune the master tree based on the CV estimates
+        alphas = []
+        alpha_cv_scores = []
+        alpha_train_scores = []
+        alpha_train_objective_values = []
+        best_alpha = -1
+        best_score = -np.infty
+        best_tree = None
+        for i, t in enumerate(master_pruned_trees):
+            if i < len(master_alphas) - 1:
+                geo_mean_alpha_k = sqrt(master_alphas[i] * master_alphas[i + 1])
             else:
-                key = (fold_alphas[i][j], np.infty)
-            alpha_path_scores[key] = fold_test_score
-        alpha_path_scores_by_fold.append(alpha_path_scores)
+                geo_mean_alpha_k = np.infty
+            cv_score = np.mean([alpha_path_scores_by_fold[j][geo_mean_alpha_k] for j in range(n_folds)])
+            train_score = scorer(t, X, y)
+            train_objective = np.sum([l.cost_value for l in t.tree_.leaves])
 
-    # Prune the master tree based on the CV estimates
-    alphas = []
-    alpha_cv_scores = []
-    alpha_train_scores = []
-    alpha_train_objective_values = []
-    best_alpha = -1
-    best_score = -np.infty
-    best_tree = None
-    for i, t in enumerate(master_pruned_trees):
-        if i < len(master_alphas) - 1:
-            geo_mean_alpha_k = sqrt(master_alphas[i] * master_alphas[i + 1])
-        else:
-            geo_mean_alpha_k = np.infty
-        cv_score = np.mean([alpha_path_scores_by_fold[j][geo_mean_alpha_k] for j in range(n_folds)])
-        train_score = scorer(t, X, y)
-        train_objective = np.sum([l.cost_value for l in t.tree_.leaves])
+            # Log metrics for this alpha value
+            alphas.append(geo_mean_alpha_k)
+            alpha_cv_scores.append(cv_score)
+            alpha_train_scores.append(train_score)
+            alpha_train_objective_values.append(train_objective)
 
-        # Log metrics for this alpha value
-        alphas.append(geo_mean_alpha_k)
-        alpha_cv_scores.append(cv_score)
-        alpha_train_scores.append(train_score)
-        alpha_train_objective_values.append(train_objective)
+            # Check if this alpha is better than the best alpha
+            # Note: assumes that alphas are sorted in increasing order, so simplest solution is always preferred (>=)
+            if float_greater_equal(cv_score, best_score):
+                best_score = cv_score
+                best_alpha = geo_mean_alpha_k
+                best_tree = master_pruned_trees[i]
+    else:
+        # TODO: use the tree callback to calculate the CV score each time a new depth is reached.
+        #       this avoids having to try multiple values for the tree depth.
 
-        # Check if this alpha is better than the best alpha
-        # Note: assumes that alphas are sorted in increasing order, so simplest solution is always preferred (>=)
-        if float_greater_equal(cv_score, best_score):
-            best_score = cv_score
-            best_alpha = geo_mean_alpha_k
-            best_tree = master_pruned_trees[i]
+        # For each fold, build a decision tree
+        logging.debug("Growing the cross-validation fold trees")
+        fold_test_scores = []
+        for i, (fold_train_idx, fold_test_idx) in enumerate(fold_split_idx):
+            logging.debug("Growing the tree for fold {0:d}".format(i + 1))
+            # Fit the decision tree
+            fold_predictors[i].fit(X[fold_train_idx], y[fold_train_idx], feature_names=feature_names)
+            fold_test_scores.append(scorer(fold_predictors[i], X[fold_test_idx], y[fold_test_idx]))
+
+        # Also build a decision tree on the entire dataset
+        logging.debug("Growing the master tree")
+        master_predictor.fit(X, y, feature_names=feature_names)
+
+        best_alpha = 0.
+        best_score = np.mean(fold_test_scores)
+        best_tree = master_predictor
+        alphas = [0.]
+        alpha_cv_scores = [best_score]
+        alpha_train_scores = [scorer(master_predictor, X, y)]
+        alpha_train_objective_values = [l.cost_value for l in master_predictor.tree_.leaves]
 
     # Append alpha to the parameters
     best_params = dict(parameters)
@@ -125,7 +150,7 @@ def _fit_and_score(estimator, X, y, cv, parameters, feature_names=None, scorer=N
 
 
 class GridSearchCV(BaseEstimator):
-    def __init__(self, estimator, param_grid, cv=None, n_jobs=1, pre_dispatch='2*n_jobs', scoring=None):
+    def __init__(self, estimator, param_grid, cv=None, n_jobs=1, pre_dispatch='2*n_jobs', scoring=None, pruning=True):
         """
         Parameters
         ----------
@@ -171,6 +196,8 @@ class GridSearchCV(BaseEstimator):
             other cases, :class:`KFold` is used.
             Refer :ref:`User Guide <cross_validation>` for the various
             cross-validation strategies that can be used here.
+        pruning: bool, optional
+            Whether or not to prune the tree using minimum cost-complexity pruning
 
         """
         self.estimator = estimator
@@ -179,6 +206,7 @@ class GridSearchCV(BaseEstimator):
         self.param_grid = param_grid
         self.pre_dispatch = pre_dispatch
         self.scoring = scoring
+        self.pruning = pruning
 
         if not isinstance(self.estimator, MaxMarginIntervalTree):
             raise ValueError("The provided estimator is not of type {0!s}.".format(MaxMarginIntervalTree))
@@ -217,7 +245,8 @@ class GridSearchCV(BaseEstimator):
 
         # Score all parameter combinations in parallel
         cv_results = Parallel(n_jobs=self.n_jobs, pre_dispatch=self.pre_dispatch) \
-                (delayed(_fit_and_score)(clone(self.estimator), X, y, cv, parameters, feature_names, self.scorer_)
+                (delayed(_fit_and_score)(clone(self.estimator), X, y, cv, parameters, feature_names, self.scorer_,
+                                         self.pruning)
                  for parameters in candidate_params)
 
         # Find the best parameters based on the CV score
