@@ -42,7 +42,7 @@ def _random_testing(loss_degree):
     n_points = 100
     n_decimals = 2
     estimator_sample_size = 10000
-    estimator_tol_decimals = 5
+    estimator_tol_decimals = 6
 
     for i in xrange(n_tests):
         # Random test case generation
@@ -280,4 +280,23 @@ class SolverTests(TestCase):
         moves, preds, costs = solver.compute_optimal_costs(target_lower[::-1].copy(), target_upper[::-1].copy(), margin, 0)  # linear hinge
         np.testing.assert_almost_equal(actual=costs[-1], desired=3.94641849103, decimal=6)
         np.testing.assert_almost_equal(actual=preds[-1], desired=0.836998462677, decimal=6)
+
+    def test_real_data_4(self):
+        """
+        Olympics linear: Failing case #1
+
+        """
+        margin = 0.000001
+        target_lower = np.array([-inf, 54.578355, 54.037488])
+        target_upper = np.array([54.6099, 55.178355, 54.637488])
+
+        moves, preds, costs = solver.compute_optimal_costs(target_lower, target_upper, margin, 1)  # squared hinge
+        np.testing.assert_almost_equal(actual=costs[-1], desired=0., decimal=6)
+        np.testing.assert_almost_equal(actual=preds[-1], desired=54.5941275, decimal=6)
+
+        moves, preds, costs = solver.compute_optimal_costs(target_lower[::-1].copy(), target_upper[::-1].copy(), margin,
+                                                           1)  # squared hinge
+        np.testing.assert_almost_equal(actual=costs[-1], desired=0., decimal=6)
+        np.testing.assert_almost_equal(actual=preds[-1], desired=54.5941275, decimal=6)
+
 
