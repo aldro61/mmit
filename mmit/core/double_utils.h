@@ -8,7 +8,7 @@
 #define TOL 1e-9
 
 inline bool equal(double x, double y){
-    if(std::abs(x) == INFINITY || std::abs(y) == INFINITY){
+    if(isinf(x) || isinf(y)){
         return x == y;
     }
     else{
@@ -21,7 +21,7 @@ inline bool not_equal(double x, double y){
 }
 
 inline bool greater(double x, double y){
-    if(std::abs(x) == INFINITY || std::abs(y) == INFINITY){
+    if(isinf(x) || isinf(y)){
         return x > y;
     }
     else{
@@ -30,7 +30,7 @@ inline bool greater(double x, double y){
 }
 
 inline bool less(double x, double y){
-    if(std::abs(x) == INFINITY || std::abs(y) == INFINITY){
+    if(isinf(x) || isinf(y)){
         return x < y;
     }
     else{
