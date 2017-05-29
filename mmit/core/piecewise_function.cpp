@@ -101,11 +101,7 @@ double PiecewiseFunction::get_minimum_position() {
     else if(equal(this->min_coefficients.quadratic, 0) && equal(this->min_coefficients.linear, 0)){
         if(is_end(this->min_ptr)){
             // Case: \___x lower bounds only
-            /* TODO: I don't think this is correct. The position of the previous breakpoint is not in the min
-             * segment. So by returning that value, we are not returning a true function minimum. We should return
-             * that value + some offset.
-             * */
-            return get_breakpoint_position(std::prev(this->min_ptr));
+            return get_breakpoint_position(std::prev(this->min_ptr)) + 1e-4;  // Add a small value because the previous breakpoint is not included in the minimum segment ]lower, upper]
         }
         else if(is_begin(this->min_ptr)){
             // Case: ___x/ upper bounds only
