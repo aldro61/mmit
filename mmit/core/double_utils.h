@@ -25,7 +25,7 @@ inline bool greater(double x, double y){
         return x > y;
     }
     else{
-        return std::abs(x - y) > TOL && x > y;
+        return !equal(x, y) && x > y;
     }
 }
 
@@ -34,7 +34,7 @@ inline bool less(double x, double y){
         return x < y;
     }
     else{
-        return std::abs(x - y) > TOL && x < y;
+        return !equal(x, y) && x < y;
     }
 }
 
