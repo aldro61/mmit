@@ -33,50 +33,38 @@ std::ostream& operator<<(std::ostream &os, Coefficients const &c){
  * Function polling
  */
 inline double gradient_at(Coefficients F, double x){
-    if(F.quadratic != 0){
-        //std::cout << "The gradient of " << F << " at is " << 2 * F.quadratic * x + F.linear << " at " << x << std::endl;
-        return 2 * F.quadratic * x + F.linear;
-    }
-    else{
-        return F.linear;
-    }
+    return 2 * F.quadratic * x + F.linear;
 }
 
 inline bool is_increasing_at(Coefficients F, double x){
-    return gradient_at(F, x) > 0;
+    return greater(gradient_at(F, x), 0);
 }
 
 inline bool is_decreasing_at(Coefficients F, double x){
-    return gradient_at(F, x) < 0;
+    return less(gradient_at(F, x), 0);
 }
 
 inline double get_min(Coefficients F){
-    if(not_equal(F.quadratic, 0)){
+    if(!equal(F.quadratic, 0)){
         return -F.linear / (2 * F.quadratic);
     }
-    else if(not_equal(F.linear, 0)){
+    else if(!equal(F.linear, 0)){
         return F.linear * -INFINITY;
     }
     else{
         // Flat function: minimum is everywhere
-        //std::cout << "Error: Attempted to get the minimum of a flat function." << std::endl;
         return 1;
     }
 }
 
 inline bool min_in_interval(Coefficients F, double x1, double x2){
     // Note: the interval is ]x1, x2]
-    if(not_equal(F.quadratic, 0)){
-        double min = -F.linear / (2 * F.quadratic);
-        //std::cout << "**** Min in interval? " << min << " ]" << x1 << ", " << x2 << "]" << std::endl;
-        return less(x1, min) && (less(min, x2) || equal(x2, min));
-    }
-    else if(not_equal(F.linear, 0)){
-        return false; // Will never be, since min is either INF or -INF
+    if(equal(F.quadratic, 0) && equal(F.linear, 0)){
+        return true;       
     }
     else{
-        // Flat function, so min is in any interval
-        return true;
+        double min = get_min(F);
+        return less(x1, min) && (less(min, x2) || equal(x2, min));  
     }
 }
 
