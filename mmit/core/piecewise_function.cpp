@@ -33,7 +33,12 @@ std::ostream& operator<<(std::ostream &os, Coefficients const &c){
  * Function polling
  */
 inline double gradient_at(Coefficients F, double x){
-    return 2 * F.quadratic * x + F.linear;
+    if(greater(F.quadratic, 0)){
+        return 2 * F.quadratic * x + F.linear;
+    }
+    else{
+        return F.linear;
+    }
 }
 
 inline bool is_increasing_at(Coefficients F, double x){
@@ -60,11 +65,11 @@ inline double get_min(Coefficients F){
 inline bool min_in_interval(Coefficients F, double x1, double x2){
     // Note: the interval is ]x1, x2]
     if(equal(F.quadratic, 0) && equal(F.linear, 0)){
-        return true;       
+        return true;
     }
     else{
         double min = get_min(F);
-        return less(x1, min) && (less(min, x2) || equal(x2, min));  
+        return less(x1, min) && (less(min, x2) || equal(x2, min));
     }
 }
 
@@ -96,6 +101,10 @@ double PiecewiseFunction::get_minimum_position() {
     else if(equal(this->min_coefficients.quadratic, 0) && equal(this->min_coefficients.linear, 0)){
         if(is_end(this->min_ptr)){
             // Case: \___x lower bounds only
+            /* TODO: I don't think this is correct. The position of the previous breakpoint is not in the min
+             * segment. So by returning that value, we are not returning a true function minimum. We should return
+             * that value + some offset.
+             * */
             return get_breakpoint_position(std::prev(this->min_ptr));
         }
         else if(is_begin(this->min_ptr)){
@@ -103,7 +112,7 @@ double PiecewiseFunction::get_minimum_position() {
             return get_breakpoint_position(this->min_ptr);
         }
         else{
-            // Case: |__x__/
+            // Case: \__x__/
             return (get_breakpoint_position(std::prev(this->min_ptr)) + get_breakpoint_position(this->min_ptr)) / 2;
         }
     }
@@ -112,28 +121,28 @@ double PiecewiseFunction::get_minimum_position() {
         return get_breakpoint_position(this->min_ptr);
     }
     else{
-        // Case: Minimum is in the segment to the left of the breakpoint
+        // Case: there exists a single minimum and it is in the minimum segment
         return get_min(this->min_coefficients);
     }
 }
 
 double PiecewiseFunction::get_minimum_value() {
     double min_pos = this->get_minimum_position();
-    double x_square = min_pos * min_pos;
-    if(x_square == INFINITY)  // Unbounded
+    if(isinf(min_pos)) {  // Only happens when there are no breakpoints in the function
         return 0;
-    return this->min_coefficients.quadratic * x_square + this->min_coefficients.linear * min_pos + this->min_coefficients.constant;
+    }
+    return this->min_coefficients.quadratic * min_pos * min_pos + this->min_coefficients.linear * min_pos + this->min_coefficients.constant;
 }
 
 
 /*
  * Solver dynamic programming updates
  */
-bool has_slack_at_position(double b, double s, Coefficients F, double pos){
-    if(s == -1 && less(pos, b)){
+bool has_slack_at_position(double func_breakpoint_pos, double func_sign, Coefficients F, double pos){
+    if(func_sign == -1 && less(pos, func_breakpoint_pos)){
         return true;
     }
-    else if(s == 1 && greater(pos, b)){
+    else if(func_sign == 1 && greater(pos, func_breakpoint_pos)){
         return true;
     }
     else{
