@@ -8,13 +8,13 @@ Decision trees for interval-valued outputs
 
 ## Python package installation and usage
 
-The source code of the `mmit` Python package is located in the [mmit](mmit) sub-directory, and can be installed via the following Python commands.
+The source code of the `mmit` Python package is located in the [mmit](mmit) sub-directory, and can be installed via the following command.
 
 ```
 python setup.py install
 ```
 
-The Python provides a [scikit-learn style class](https://github.com/aldro61/mmit/blob/master/mmit/learning.py#L35) to learn Maximum Margin Interval Trees.
+The package includes a [scikit-learn style class](https://github.com/aldro61/mmit/blob/master/mmit/learning.py#L35) to learn Maximum Margin Interval Trees.
 
 ## R package installation and usage
 
