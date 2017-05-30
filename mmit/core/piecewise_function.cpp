@@ -164,7 +164,7 @@ int PiecewiseFunction::insert_point(double y, bool is_upper_bound) {
         F = Coefficients(0, s, this->margin - s * y);
     }
     else if(this->function_type == squared_hinge){
-        F = Coefficients(1, 2 * this->margin * s - 2 * y, -2 * this->margin * s * y + y * y + this->margin * this->margin);  // TODO: check if this is ok
+        F = Coefficients(1, 2 * this->margin * s - 2 * y, -2 * this->margin * s * y + y * y + this->margin * this->margin);
     }
     Fs = F * s;
 
