@@ -35,7 +35,7 @@ class DecisionStump(object):
         self.threshold = threshold
 
     def classify(self, X):
-        return (X[:, self.feature_idx] <= self.threshold).reshape(-1, )
+        return (X[:, self.feature_idx] <= self.threshold).reshape(-1,)
 
     def __str__(self):
         feature_descr = self.feature_name if self.feature_name is not None else "x[{0:d}]".format(self.feature_idx)
