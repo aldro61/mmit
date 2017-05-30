@@ -85,7 +85,7 @@ def float_less(a, b, dec=6):
         Returns True if a < b
 
     """
-    return (not float_equal(a, b, dec)) and a < b
+    return not float_equal(a, b, dec) and a < b
 
 
 def float_less_equal(a, b, dec=6):
@@ -101,7 +101,7 @@ def float_greater(a, b, dec=6):
         Returns True if a > b
 
     """
-    return (not float_equal(a, b, dec)) and a > b
+    return not float_equal(a, b, dec) and a > b
 
 
 def float_greater_equal(a, b, dec=6):
