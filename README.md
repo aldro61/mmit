@@ -6,7 +6,7 @@
 
 Decision trees for interval-valued outputs
 
-> Drouin, A., Hocking, T. D. & Laviolette, F. (2017). Maximum Margin Interval Trees. Under review.
+Drouin, A., Hocking, T. D. & Laviolette, F. (2017). Maximum Margin Interval Trees. Under review.
 
 ## Python package installation and usage
 
