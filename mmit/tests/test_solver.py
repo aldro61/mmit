@@ -120,7 +120,7 @@ class SolverTests(TestCase):
         """
         margin = 0.0
         moves, preds, costs = solver.compute_optimal_costs(self.target_lower, self.target_upper, margin, 0)
-        np.testing.assert_allclose(preds, [-0.9999, 1, 0])  # solver uses an offset of 1e-4 in the \_ case
+        np.testing.assert_allclose(preds, [-1, 1, 0])
         np.testing.assert_allclose(costs, [0, 0, 0])
 
     def test_2(self):
@@ -130,7 +130,7 @@ class SolverTests(TestCase):
         """
         margin = 0.5
         moves, preds, costs = solver.compute_optimal_costs(self.target_lower, self.target_upper, margin, 0)
-        np.testing.assert_allclose(preds, [-0.4999, 1, 0])  # solver uses an offset of 1e-4 in the \_ case
+        np.testing.assert_allclose(preds, [-0.5, 1, 0])
         np.testing.assert_allclose(costs, [0, 0, 0])
 
     def test_3(self):
@@ -140,7 +140,7 @@ class SolverTests(TestCase):
         """
         margin = 1.0
         moves, preds, costs = solver.compute_optimal_costs(self.target_lower, self.target_upper, margin, 0)
-        np.testing.assert_allclose(preds, [1e-04, 1, 0])  # solver uses an offset of 1e-4 in the \_ case
+        np.testing.assert_allclose(preds, [0, 1, 0])
         np.testing.assert_allclose(costs, [0, 0, 0])
 
     def test_4(self):
@@ -150,7 +150,7 @@ class SolverTests(TestCase):
         """
         margin = 1.5
         moves, preds, costs = solver.compute_optimal_costs(self.target_lower, self.target_upper, margin, 0)
-        np.testing.assert_allclose(preds, [0.5001, 1, 0])  # solver uses an offset of 1e-4 in the \_ case
+        np.testing.assert_allclose(preds, [0.5, 1, 0])
         np.testing.assert_allclose(costs, [0, 0, 1])
 
     def test_5(self):
@@ -160,7 +160,7 @@ class SolverTests(TestCase):
         """
         margin = 2
         moves, preds, costs = solver.compute_optimal_costs(self.target_lower, self.target_upper, margin, 0)
-        np.testing.assert_allclose(preds, [1.0001, 1, 0.5])  # solver uses an offset of 1e-4 in the \_ case
+        np.testing.assert_allclose(preds, [1, 1, 0.5])
         np.testing.assert_allclose(costs, [0, 0, 2])
 
     def test_6(self):
