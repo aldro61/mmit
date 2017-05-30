@@ -74,7 +74,7 @@ class MMITTests(TestCase):
                        np.arange(len(y)).reshape(-1, 1),  # Good feature
                        np.zeros(len(y)).reshape(-1, 1)))  # Bad feature
 
-        estimator = MaxMarginIntervalTree(margin=0.0, loss="hinge")
+        estimator = MaxMarginIntervalTree(margin=0.0, loss="linear_hinge")
         estimator.fit(X, y)
 
         assert len(estimator.tree_.rules) == 1
