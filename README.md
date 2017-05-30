@@ -6,6 +6,8 @@
 
 Decision trees for interval-valued outputs
 
+> Drouin, A., Hocking, T. D. & Laviolette, F. (2017). Maximum Margin Interval Trees. Under review.
+
 ## Python package installation and usage
 
 The source code of the `mmit` Python package is located in the [mmit](mmit) sub-directory, and can be installed via the following command.
