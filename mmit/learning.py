@@ -19,6 +19,7 @@ import warnings; warnings.filterwarnings("ignore")  # Disable all warnings
 
 from collections import defaultdict, deque
 from sklearn.base import BaseEstimator, RegressorMixin
+from sklearn.utils import check_random_state
 from sklearn.utils.validation import check_array, check_consistent_length, check_is_fitted
 
 from .metrics import *
@@ -32,7 +33,7 @@ class SolverError(Exception):
 
 
 class MaxMarginIntervalTree(BaseEstimator, RegressorMixin):
-    def __init__(self, margin=0.0, loss="hinge", max_depth=np.infty, min_samples_split=0):
+    def __init__(self, margin=0.0, loss="linear", max_depth=np.infty, min_samples_split=0, random_state=None):
         """
         Max margin interval tree
 
@@ -40,18 +41,23 @@ class MaxMarginIntervalTree(BaseEstimator, RegressorMixin):
         ----------
         margin: float, default: 0
             The margin on each side of the predicted value
-        loss: string, default="hinge"
-            The loss function to use (hinge, squared_hinge)
+        loss: string, default="linear"
+            The loss function to use (linear, squared)
         max_depth: int, default: infinity
             The maximum depth of the tree
         min_samples_split: int, default: 0
             The minimum number of examples required to split a node
+        random_state: int, RandomState instance or None, optional (default=None)
+            If int, random_state is the seed used by the random number generator; If RandomState instance, random_state
+            is the random number generator; If None, the random number generator is the RandomState instance used by
+            np.random. The random state is used for tiebreaking in the recursive partitioning.
 
         """
         self.margin = margin
         self.loss = loss
         self.max_depth = max_depth
         self.min_samples_split = min_samples_split
+        self.random_state = check_random_state(random_state)
 
     def fit(self, X, y, feature_names=None, level_callback=None, split_callback=None):
         """
@@ -126,9 +132,9 @@ class MaxMarginIntervalTree(BaseEstimator, RegressorMixin):
 
                 # Get the cost values for each side
                 _, left_preds, left_costs = compute_optimal_costs(lower_sorted, upper_sorted, self.margin,
-                                                                  0 if self.loss == "hinge" else 1)
+                                                                  0 if self.loss == "linear" else 1)
                 _, right_preds, right_costs = compute_optimal_costs(lower_sorted[::-1].copy(), upper_sorted[::-1].copy(),
-                                                                    self.margin, 0 if self.loss == "hinge" else 1)
+                                                                    self.margin, 0 if self.loss == "linear" else 1)
 
                 # XXX: Runtime test case to ensure that the solver is working correctly. The solution for the cases
                 # were the left and right leaves contain all the examples should be exactly the same.
@@ -180,14 +186,14 @@ END
                         best_leaf_costs = [dict(left=unique_left_costs[min_cost_idx], right=unique_right_costs[min_cost_idx])]
 
             # No split exists that decreases the objective value
-            if best_cost == np.infty:
+            if np.isinf(best_cost):
                 return None, None, None
 
-            # TODO: we could add a tiebreaker
             logging.debug("There are %d optimal splits with a cost of %.4f", len(best_splits), best_cost)
-            best_split = best_splits[0]
-            best_split_leaf_preds = best_preds[0]
-            best_split_leaf_costs = best_leaf_costs[0]
+            keep_idx = self.random_state.randint(0, len(best_splits))
+            best_split = best_splits[keep_idx]
+            best_split_leaf_preds = best_preds[keep_idx]
+            best_split_leaf_costs = best_leaf_costs[keep_idx]
             del best_splits, best_preds, best_leaf_costs
             best_rule = DecisionStump(best_split["feat_idx"], best_split["threshold"],
                                       self.feature_names_[best_split["feat_idx"]]
@@ -213,7 +219,7 @@ END
         self.rule_importances_ = defaultdict(float)
 
         # Define the root node
-        _, preds, costs = compute_optimal_costs(y_lower, y_upper, self.margin, 0 if self.loss == "hinge" else 1)
+        _, preds, costs = compute_optimal_costs(y_lower, y_upper, self.margin, 0 if self.loss == "linear" else 1)
         root = RegressionTreeNode(depth=0, example_idx=np.arange(len(y)), predicted_value=preds[-1], cost_value=costs[-1])
 
         # Initialize the tree building procedure
@@ -250,7 +256,7 @@ END
             # Find the best rule to split the node
             stump, left_child, right_child = _optimal_split(node)
 
-            # If we were incapable of splitting the node into two non-empty leafs
+            # If we were incapable of splitting the node into two non-empty leaves
             if stump is None and left_child is None and right_child is None:
                 logging.debug("Found no rule to split the node. The node will not be split.")
                 continue
@@ -281,10 +287,12 @@ END
 
         # Normalize the variable importances
         logging.debug("Normalizing the variable importances.")
-        variable_importance_sum = 1.0 * sum(v for v in self.rule_importances_.itervalues())
-        self.rule_importances_ = dict((r, i / variable_importance_sum) for r, i in self.rule_importances_.iteritems())
+        variable_importance_sum = sum(v for v in self.rule_importances_.itervalues())
+        self.rule_importances_ = {r: float(i) / variable_importance_sum for r, i in self.rule_importances_.iteritems()}
 
         logging.debug("Training finished.")
+
+        return self
 
     def predict(self, X):
         """
