@@ -4,7 +4,7 @@
 [![Build Status](https://travis-ci.org/aldro61/mmit.svg?branch=master)](https://travis-ci.org/aldro61/mmit)
 [![Code Issues](https://www.quantifiedcode.com/api/v1/project/334605d421f0460ba846af83ebff870d/badge.svg)](https://www.quantifiedcode.com/app/project/334605d421f0460ba846af83ebff870d)
 
-Decision trees for interval-valued outputs
+Regression trees for interval censored output data
 
 Drouin, A., Hocking, T. D. & Laviolette, F. (2017). Maximum Margin Interval Trees. Under review.
 
