@@ -101,7 +101,7 @@ double PiecewiseFunction::get_minimum_position() {
     else if(equal(this->min_coefficients.quadratic, 0) && equal(this->min_coefficients.linear, 0)){
         if(is_end(this->min_ptr)){
             // Case: \___x lower bounds only
-            return get_breakpoint_position(std::prev(this->min_ptr)) + 1e-4;  // Add a small value because the previous breakpoint is not included in the minimum segment ]lower, upper]
+            return get_breakpoint_position(std::prev(this->min_ptr));
         }
         else if(is_begin(this->min_ptr)){
             // Case: ___x/ upper bounds only
@@ -164,14 +164,14 @@ int PiecewiseFunction::insert_point(double y, bool is_upper_bound) {
         F = Coefficients(0, s, this->margin - s * y);
     }
     else if(this->function_type == squared_hinge){
-        F = Coefficients(1, 2 * this->margin * s - 2 * y, -2 * this->margin * s * y + y * y + this->margin * this->margin);
+        F = Coefficients(1, 2 * this->margin * s - 2 * y, -2 * this->margin * s * y + y * y + this->margin * this->margin);  // TODO: check if this is ok
     }
     Fs = F * s;
 
     if(this->breakpoint_coefficients.empty()){
         // Initialization
         breakpoint_list_t::iterator insert = this->breakpoint_coefficients.insert(breakpoint_t(b, Fs)).first;
-        if(s == 1){
+        if(equal(s, 1)){
             this->min_ptr = insert;
             n_pointer_moves++;
         }
@@ -186,8 +186,6 @@ int PiecewiseFunction::insert_point(double y, bool is_upper_bound) {
 
         // If the breakpoint already exists, increase all its coefficients
         if (!breakpoint_was_added){
-            //std::cout << "Duplicated breakpoint" << std::endl;
-            Coefficients Fs = (F * s);
             breakpoint_ptr->second += Fs;
         }
 
@@ -219,8 +217,8 @@ int PiecewiseFunction::insert_point(double y, bool is_upper_bound) {
             // Move right
             //std::cout << "Attempting to MOVE RIGHT" << std::endl;
             while(!is_end(g) &&
-                  (is_begin(g) || !min_in_interval(G, get_breakpoint_position(std::prev(g)), min_pos)) &&
-                    (min_in_interval(G + g->second, get_breakpoint_position(g), get_breakpoint_position(std::next(g))) || !is_increasing_at(G + g->second, get_breakpoint_position(std::next(g))))){
+                  (min_in_interval(G + g->second, get_breakpoint_position(g), get_breakpoint_position(std::next(g)))  // If the next segment contains the minimum then move.
+                   || !is_increasing_at(G + g->second, get_breakpoint_position(std::next(g))))){  // Otherwise if the next segment is not increasing, we'll eventually reach the minimum.
                 G += g->second;
                 g = std::next(g);
                 min_pos = get_breakpoint_position(g);
