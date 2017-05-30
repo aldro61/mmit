@@ -72,41 +72,41 @@ def check_X_y(X, y):
     return X, y
 
 
-def float_equal(a, b):
+def float_equal(a, b, dec=6):
     """
     Returns True if a == b
 
     """
-    return np.isclose(a, b)
+    return np.abs(a - b) < 10.**-dec
 
 
-def float_less(a, b):
+def float_less(a, b, dec=6):
     """
         Returns True if a < b
 
     """
-    return (not np.isclose(a, b)) and a < b
+    return not float_equal(a, b, dec) and a < b
 
 
-def float_less_equal(a, b):
+def float_less_equal(a, b, dec=6):
     """
         Returns True if a <= b
 
     """
-    return float_equal(a, b) or float_less(a, b)
+    return float_equal(a, b, dec) or float_less(a, b, dec)
 
 
-def float_greater(a, b):
+def float_greater(a, b, dec=6):
     """
         Returns True if a > b
 
     """
-    return (not np.isclose(a, b)) and a > b
+    return not float_equal(a, b, dec) and a > b
 
 
-def float_greater_equal(a, b):
+def float_greater_equal(a, b, dec=6):
     """
         Returns True if a >= b
 
     """
-    return float_equal(a, b) or float_greater(a, b)
+    return float_equal(a, b, dec) or float_greater(a, b, dec)

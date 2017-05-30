@@ -5,31 +5,36 @@
 #include <cstdlib>
 #include <iostream>
 
-#define TOL 1e-6
+#define TOL 1e-9
 
 inline bool equal(double x, double y){
-    return std::abs(x - y) <= TOL;
+    if(isinf(x) || isinf(y)){
+        return x == y;
+    }
+    else{
+        return std::abs(x - y) <= TOL;
+    }
 }
 
 inline bool not_equal(double x, double y){
-    return std::abs(x - y) > TOL;
+    return !equal(x, y);
 }
 
 inline bool greater(double x, double y){
-    if(std::abs(x) == INFINITY || std::abs(y) == INFINITY){
+    if(isinf(x) || isinf(y)){
         return x > y;
     }
     else{
-        return std::abs(x - y) > TOL && x > y;
+        return !equal(x, y) && x > y;
     }
 }
 
 inline bool less(double x, double y){
-    if(std::abs(x) == INFINITY || std::abs(y) == INFINITY){
+    if(isinf(x) || isinf(y)){
         return x < y;
     }
     else{
-        return std::abs(x - y) > TOL && x < y;
+        return !equal(x, y) && x < y;
     }
 }
 

@@ -33,8 +33,7 @@ std::ostream& operator<<(std::ostream &os, Coefficients const &c){
  * Function polling
  */
 inline double gradient_at(Coefficients F, double x){
-    if(F.quadratic != 0){
-        //std::cout << "The gradient of " << F << " at is " << 2 * F.quadratic * x + F.linear << " at " << x << std::endl;
+    if(greater(F.quadratic, 0)){
         return 2 * F.quadratic * x + F.linear;
     }
     else{
@@ -43,40 +42,34 @@ inline double gradient_at(Coefficients F, double x){
 }
 
 inline bool is_increasing_at(Coefficients F, double x){
-    return gradient_at(F, x) > 0;
+    return greater(gradient_at(F, x), 0);
 }
 
 inline bool is_decreasing_at(Coefficients F, double x){
-    return gradient_at(F, x) < 0;
+    return less(gradient_at(F, x), 0);
 }
 
 inline double get_min(Coefficients F){
-    if(not_equal(F.quadratic, 0)){
+    if(!equal(F.quadratic, 0)){
         return -F.linear / (2 * F.quadratic);
     }
-    else if(not_equal(F.linear, 0)){
+    else if(!equal(F.linear, 0)){
         return F.linear * -INFINITY;
     }
     else{
         // Flat function: minimum is everywhere
-        //std::cout << "Error: Attempted to get the minimum of a flat function." << std::endl;
         return 1;
     }
 }
 
 inline bool min_in_interval(Coefficients F, double x1, double x2){
     // Note: the interval is ]x1, x2]
-    if(not_equal(F.quadratic, 0)){
-        double min = -F.linear / (2 * F.quadratic);
-        //std::cout << "**** Min in interval? " << min << " ]" << x1 << ", " << x2 << "]" << std::endl;
-        return less(x1, min) && (less(min, x2) || equal(x2, min));
-    }
-    else if(not_equal(F.linear, 0)){
-        return false; // Will never be, since min is either INF or -INF
+    if(equal(F.quadratic, 0) && equal(F.linear, 0)){
+        return true;
     }
     else{
-        // Flat function, so min is in any interval
-        return true;
+        double min = get_min(F);
+        return less(x1, min) && (less(min, x2) || equal(x2, min));
     }
 }
 
@@ -102,17 +95,20 @@ inline bool PiecewiseFunction::is_begin(breakpoint_list_t::iterator b_ptr) {
  */
 double PiecewiseFunction::get_minimum_position() {
     // Find the position of the minimum segment's minimum
-    if(equal(this->min_coefficients.quadratic, 0) && equal(this->min_coefficients.linear, 0)){
+    if(this->breakpoint_coefficients.size() == 0){
+        return -INFINITY;
+    }
+    else if(equal(this->min_coefficients.quadratic, 0) && equal(this->min_coefficients.linear, 0)){
         if(is_end(this->min_ptr)){
-            // Case: |___x lower bounds only, return +inf
-            return INFINITY;
+            // Case: \___x lower bounds only
+            return get_breakpoint_position(std::prev(this->min_ptr));
         }
         else if(is_begin(this->min_ptr)){
-            // Case: ___x/ upper bounds only, return -inf
-            return -INFINITY;
+            // Case: ___x/ upper bounds only
+            return get_breakpoint_position(this->min_ptr);
         }
         else{
-            // Case: |__x__/
+            // Case: \__x__/
             return (get_breakpoint_position(std::prev(this->min_ptr)) + get_breakpoint_position(this->min_ptr)) / 2;
         }
     }
@@ -121,28 +117,28 @@ double PiecewiseFunction::get_minimum_position() {
         return get_breakpoint_position(this->min_ptr);
     }
     else{
-        // Case: Minimum is in the segment to the left of the breakpoint
+        // Case: there exists a single minimum and it is in the minimum segment
         return get_min(this->min_coefficients);
     }
 }
 
 double PiecewiseFunction::get_minimum_value() {
     double min_pos = this->get_minimum_position();
-    double x_square = min_pos * min_pos;
-    if(x_square == INFINITY)  // Unbounded
+    if(isinf(min_pos)) {  // Only happens when there are no breakpoints in the function
         return 0;
-    return this->min_coefficients.quadratic * x_square + this->min_coefficients.linear * min_pos + this->min_coefficients.constant;
+    }
+    return this->min_coefficients.quadratic * min_pos * min_pos + this->min_coefficients.linear * min_pos + this->min_coefficients.constant;
 }
 
 
 /*
  * Solver dynamic programming updates
  */
-bool has_slack_at_position(double b, double s, Coefficients F, double pos){
-    if(s == -1 && less(pos, b)){
+bool has_slack_at_position(double func_breakpoint_pos, double func_sign, Coefficients F, double pos){
+    if(func_sign == -1 && less(pos, func_breakpoint_pos)){
         return true;
     }
-    else if(s == 1 && greater(pos, b)){
+    else if(func_sign == 1 && greater(pos, func_breakpoint_pos)){
         return true;
     }
     else{
@@ -162,9 +158,9 @@ int PiecewiseFunction::insert_point(double y, bool is_upper_bound) {
     }
 
     // Breakpoint info
-    float b = y - s * this->margin;
+    double b = y - s * this->margin;
     Coefficients F, Fs;
-    if(this->function_type == hinge){
+    if(this->function_type == linear_hinge){
         F = Coefficients(0, s, this->margin - s * y);
     }
     else if(this->function_type == squared_hinge){
@@ -175,7 +171,7 @@ int PiecewiseFunction::insert_point(double y, bool is_upper_bound) {
     if(this->breakpoint_coefficients.empty()){
         // Initialization
         breakpoint_list_t::iterator insert = this->breakpoint_coefficients.insert(breakpoint_t(b, Fs)).first;
-        if(s == 1){
+        if(equal(s, 1)){
             this->min_ptr = insert;
             n_pointer_moves++;
         }
@@ -190,8 +186,6 @@ int PiecewiseFunction::insert_point(double y, bool is_upper_bound) {
 
         // If the breakpoint already exists, increase all its coefficients
         if (!breakpoint_was_added){
-            //std::cout << "Duplicated breakpoint" << std::endl;
-            Coefficients Fs = (F * s);
             breakpoint_ptr->second += Fs;
         }
 
@@ -223,8 +217,8 @@ int PiecewiseFunction::insert_point(double y, bool is_upper_bound) {
             // Move right
             //std::cout << "Attempting to MOVE RIGHT" << std::endl;
             while(!is_end(g) &&
-                  (is_begin(g) || !min_in_interval(G, get_breakpoint_position(std::prev(g)), min_pos)) &&
-                    (min_in_interval(G + g->second, get_breakpoint_position(g), get_breakpoint_position(std::next(g))) || !is_increasing_at(G + g->second, get_breakpoint_position(std::next(g))))){
+                  (min_in_interval(G + g->second, get_breakpoint_position(g), get_breakpoint_position(std::next(g)))  // If the next segment contains the minimum then move.
+                   || !is_increasing_at(G + g->second, get_breakpoint_position(std::next(g))))){  // Otherwise if the next segment is not increasing, we'll eventually reach the minimum.
                 G += g->second;
                 g = std::next(g);
                 min_pos = get_breakpoint_position(g);

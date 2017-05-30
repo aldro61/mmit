@@ -15,6 +15,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 #include <cmath>
 #include <iostream>
+#include "double_utils.h"
 #include "solver.h"
 #include "piecewise_function.h"
 
@@ -25,13 +26,13 @@ int compute_optimal_costs(
         double *lower_vec, // array[n_data] of output lower limits (can be -INFINITY)
         double *upper_vec, // array[n_data] of output upper limits (can be INFINITY)
         double margin,
-        int loss, //0=hinge, 1=squared hinge
+        int loss, //0=linear_hinge, 1=squared_hinge
 // outputs
         int *moves_vec, //array[n_data] of number of pointer moves
         double *pred_vec, //array[n_data] of optimal predicted values
         double *cost_vec // array[n_data] of optimal cost
 ) {
-    PiecewiseFunction function(margin, loss == 0 ? hinge : squared_hinge);
+    PiecewiseFunction function(margin, loss == 0 ? linear_hinge : squared_hinge);
 
     // Compute the optimal solution for each interval
     for(int i = 0; i < n_data; i++){
@@ -39,11 +40,11 @@ int compute_optimal_costs(
         moves_vec[i] = 0;
 
         // Add the lower bound
-        if(lower_vec[i] > -INFINITY)
+        if(!isinf(lower_vec[i]))
             moves_vec[i] += function.insert_point(lower_vec[i], false);
 
         // Add the upper bound
-        if(upper_vec[i] < INFINITY)
+        if(!isinf(upper_vec[i]))
             moves_vec[i] += function.insert_point(upper_vec[i], true);
 
         pred_vec[i] = function.get_minimum_position();

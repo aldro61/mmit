@@ -26,7 +26,7 @@ typedef std::map<double, Coefficients, DoubleComparatorLess> breakpoint_list_t;
 typedef std::pair<double, Coefficients> breakpoint_t;
 
 enum FunctionType{
-    hinge,
+    linear_hinge,
     squared_hinge
 };
 
