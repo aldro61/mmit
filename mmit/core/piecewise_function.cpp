@@ -199,35 +199,39 @@ int PiecewiseFunction::insert_point(double y, bool is_upper_bound) {
             //std::cout << "The minimum function was updated to " << G << std::endl;
         }
 
-        // Move the minimum pointer
-        if(is_increasing_at(G, min_pos)){
-            // Move left
-            //std::cout << "Attempting to MOVE LEFT " << std::endl;
-            while(!is_begin(g) &&
-                  !is_decreasing_at(G, min_pos) &&
-                  !min_in_interval(G, get_breakpoint_position(std::prev(g)), min_pos)){
-                g = std::prev(g);
-                G -= g->second;
-                min_pos = get_breakpoint_position(g);
-                n_pointer_moves++;
-                //std::cout << "|_____ moved to breakpoint " << min_pos << " (Coefficients: " << G << ")" << std::endl;
+        // Note: The no_ptr_move loss is used for timing purposes only.
+        //       It prevents the pointer from moving.
+        if(this->function_type != no_ptr_move){
+            // Move the minimum pointer
+            if(is_increasing_at(G, min_pos)){
+                // Move left
+                //std::cout << "Attempting to MOVE LEFT " << std::endl;
+                while(!is_begin(g) &&
+                      !is_decreasing_at(G, min_pos) &&
+                      !min_in_interval(G, get_breakpoint_position(std::prev(g)), min_pos)){
+                    g = std::prev(g);
+                    G -= g->second;
+                    min_pos = get_breakpoint_position(g);
+                    n_pointer_moves++;
+                    //std::cout << "|_____ moved to breakpoint " << min_pos << " (Coefficients: " << G << ")" << std::endl;
+                }
             }
-        }
-        else if(is_decreasing_at(G, min_pos)){
-            // Move right
-            //std::cout << "Attempting to MOVE RIGHT" << std::endl;
-            while(!is_end(g) &&
-                  (min_in_interval(G + g->second, get_breakpoint_position(g), get_breakpoint_position(std::next(g)))  // If the next segment contains the minimum then move.
-                   || !is_increasing_at(G + g->second, get_breakpoint_position(std::next(g))))){  // Otherwise if the next segment is not increasing, we'll eventually reach the minimum.
-                G += g->second;
-                g = std::next(g);
-                min_pos = get_breakpoint_position(g);
-                n_pointer_moves++;
-                //std::cout << "|_____ moved to breakpoint " << min_pos << " (Coefficients: " << G << ")" << std::endl;
+            else if(is_decreasing_at(G, min_pos)){
+                // Move right
+                //std::cout << "Attempting to MOVE RIGHT" << std::endl;
+                while(!is_end(g) &&
+                      (min_in_interval(G + g->second, get_breakpoint_position(g), get_breakpoint_position(std::next(g)))  // If the next segment contains the minimum then move.
+                       || !is_increasing_at(G + g->second, get_breakpoint_position(std::next(g))))){  // Otherwise if the next segment is not increasing, we'll eventually reach the minimum.
+                    G += g->second;
+                    g = std::next(g);
+                    min_pos = get_breakpoint_position(g);
+                    n_pointer_moves++;
+                    //std::cout << "|_____ moved to breakpoint " << min_pos << " (Coefficients: " << G << ")" << std::endl;
+                }
             }
+            this->min_coefficients = G;
+            this->min_ptr = g;
         }
-        this->min_coefficients = G;
-        this->min_ptr = g;
    }
 
     // Log progress

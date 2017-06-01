@@ -27,7 +27,8 @@ typedef std::pair<double, Coefficients> breakpoint_t;
 
 enum FunctionType{
     linear_hinge,
-    squared_hinge
+    squared_hinge,
+    no_ptr_move
 };
 
 class PiecewiseFunction {

@@ -24,7 +24,7 @@ int compute_optimal_costs(
         double *lower_vec, // array[n_data] of output lower limits (can be -INFINITY)
         double *upper_vec, // array[n_data] of output upper limits (can be INFINITY)
         double margin,
-        int loss, //0=linear hinge, 1=squared hinge
+        int loss, //0=linear hinge, 1=squared hinge, 2=no_ptr_move
 // outputs
         int *moves_vec, //array[n_data] of number of pointer moves
         double *pred_vec, //array[n_data] of optimal predicted values

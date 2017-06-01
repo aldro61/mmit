@@ -7,7 +7,7 @@ compute_optimal_costs <- structure(function
  loss="hinge"
 ### character scalar, hinge or square.
 ){
-  fun.vec <- c(hinge=0L, square=1L)
+  fun.vec <- c(hinge=0L, square=1L, no_ptr_move=2L)
   if(!(is.character(loss) & length(loss)==1 & loss %in% names(fun.vec))){
     stop("loss must be either hinge or square")
   }

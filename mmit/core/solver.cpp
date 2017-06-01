@@ -26,13 +26,13 @@ int compute_optimal_costs(
         double *lower_vec, // array[n_data] of output lower limits (can be -INFINITY)
         double *upper_vec, // array[n_data] of output upper limits (can be INFINITY)
         double margin,
-        int loss, //0=linear_hinge, 1=squared_hinge
+        int loss, //0=linear_hinge, 1=squared_hinge, 2=no_ptr_move
 // outputs
         int *moves_vec, //array[n_data] of number of pointer moves
         double *pred_vec, //array[n_data] of optimal predicted values
         double *cost_vec // array[n_data] of optimal cost
 ) {
-    PiecewiseFunction function(margin, loss == 0 ? linear_hinge : squared_hinge);
+    PiecewiseFunction function(margin, loss == 0 ? linear_hinge : (loss == 1 ? squared_hinge : no_ptr_move));
 
     // Compute the optimal solution for each interval
     for(int i = 0; i < n_data; i++){
