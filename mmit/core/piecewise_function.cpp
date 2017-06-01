@@ -160,7 +160,7 @@ int PiecewiseFunction::insert_point(double y, bool is_upper_bound) {
     // Breakpoint info
     double b = y - s * this->margin;
     Coefficients F, Fs;
-    if(this->function_type == linear_hinge){
+    if(this->function_type == linear_hinge || this->function_type == no_ptr_move){
         F = Coefficients(0, s, this->margin - s * y);
     }
     else if(this->function_type == squared_hinge){
