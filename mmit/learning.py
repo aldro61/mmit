@@ -156,13 +156,15 @@ Data:
 -----
 margin: {4:.9f}
 
-lower_bounds: {5!s}
+loss type: {5!s}
 
-upper_bounds: {6!s}
+lower_bounds: {6!s}
+
+upper_bounds: {7!s}
 
 END
-""".format(left_costs[-1], right_costs[-1], left_preds[-1], right_preds[-1], self.margin, lower_sorted.tolist(),
-           upper_sorted.tolist()))
+""".format(left_costs[-1], right_costs[-1], left_preds[-1], right_preds[-1], self.margin, self.loss,
+           lower_sorted.tolist(), upper_sorted.tolist()))
 
                 # Combine the values of duplicate feature values and remove splits where all examples are in one leaf
                 unique_left_preds = left_preds[last_idx_by_value][:-1]
