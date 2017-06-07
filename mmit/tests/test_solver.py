@@ -232,7 +232,6 @@ class SolverTests(TestCase):
         Random testing with squared hinge loss
 
         """
-        return
         _random_testing(loss_degree=2)
 
     def test_real_data_1(self):
