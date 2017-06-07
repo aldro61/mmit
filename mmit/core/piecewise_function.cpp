@@ -146,7 +146,7 @@ bool has_slack_at_position(double func_breakpoint_pos, double func_sign, Coeffic
     }
 }
 
-int PiecewiseFunction::insert_point(double y, bool is_upper_bound) {
+int PiecewiseFunction::insert_point(double b, Coefficients F, bool is_upper_bound) {
     int n_pointer_moves = 0;
 
     double s;
@@ -156,17 +156,7 @@ int PiecewiseFunction::insert_point(double y, bool is_upper_bound) {
     else{
         s = -1.;
     }
-
-    // Breakpoint info
-    double b = y - s * this->margin;
-    Coefficients F, Fs;
-    if(this->function_type == linear_hinge){
-        F = Coefficients(0, s, this->margin - s * y);
-    }
-    else if(this->function_type == squared_hinge){
-        F = Coefficients(1, 2 * this->margin * s - 2 * y, -2 * this->margin * s * y + y * y + this->margin * this->margin);
-    }
-    Fs = F * s;
+    Coefficients Fs = F * s;
 
     if(this->breakpoint_coefficients.empty()){
         // Initialization
@@ -193,16 +183,13 @@ int PiecewiseFunction::insert_point(double y, bool is_upper_bound) {
         double min_pos = get_breakpoint_position(this->min_ptr);
         Coefficients G = this->min_coefficients;
         breakpoint_list_t::iterator g = this->min_ptr;
-        //std::cout << "The minimum breakpoint is at position " << min_pos << std::endl;
         if(has_slack_at_position(b, s, F, min_pos) || (equal(b, min_pos) && equal(s, -1))){
             G += F;
-            //std::cout << "The minimum function was updated to " << G << std::endl;
         }
 
         // Move the minimum pointer
         if(is_increasing_at(G, min_pos)){
             // Move left
-            //std::cout << "Attempting to MOVE LEFT " << std::endl;
             while(!is_begin(g) &&
                   !is_decreasing_at(G, min_pos) &&
                   !min_in_interval(G, get_breakpoint_position(std::prev(g)), min_pos)){
@@ -210,12 +197,10 @@ int PiecewiseFunction::insert_point(double y, bool is_upper_bound) {
                 G -= g->second;
                 min_pos = get_breakpoint_position(g);
                 n_pointer_moves++;
-                //std::cout << "|_____ moved to breakpoint " << min_pos << " (Coefficients: " << G << ")" << std::endl;
             }
         }
         else if(is_decreasing_at(G, min_pos)){
             // Move right
-            //std::cout << "Attempting to MOVE RIGHT" << std::endl;
             while(!is_end(g) &&
                   (min_in_interval(G + g->second, get_breakpoint_position(g), get_breakpoint_position(std::next(g)))  // If the next segment contains the minimum then move.
                    || !is_increasing_at(G + g->second, get_breakpoint_position(std::next(g))))){  // Otherwise if the next segment is not increasing, we'll eventually reach the minimum.
@@ -223,7 +208,6 @@ int PiecewiseFunction::insert_point(double y, bool is_upper_bound) {
                 g = std::next(g);
                 min_pos = get_breakpoint_position(g);
                 n_pointer_moves++;
-                //std::cout << "|_____ moved to breakpoint " << min_pos << " (Coefficients: " << G << ")" << std::endl;
             }
         }
         this->min_coefficients = G;
@@ -233,7 +217,6 @@ int PiecewiseFunction::insert_point(double y, bool is_upper_bound) {
     // Log progress
     if(this->verbose){
         std::cout << "\n\nINSERTION COMPLETED\n----------------------------" << std::endl;
-        std::cout << "Inserted y: " << y << std::endl;
         std::cout << "Breakpoint position: " << b << std::endl;
         std::cout << "Bound type: " << (is_upper_bound ? "upper" : "lower") << std::endl;
         std::cout << "N pointer moves: " << n_pointer_moves << std::endl;

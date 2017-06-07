@@ -25,18 +25,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 typedef std::map<double, Coefficients, DoubleComparatorLess> breakpoint_list_t;
 typedef std::pair<double, Coefficients> breakpoint_t;
 
-enum FunctionType{
-    linear_hinge,
-    squared_hinge
-};
-
 class PiecewiseFunction {
 
 private:
-    // Function parameters
-    FunctionType function_type;
-    double margin;
-
     // Breakpoint and their coefficients
     breakpoint_list_t breakpoint_coefficients;
 
@@ -45,23 +36,23 @@ private:
     breakpoint_list_t::iterator min_ptr;  // Always on the right of the minimum
 
     // Utility vars + functions
-    void construct(double margin, FunctionType loss, bool verbose){this->margin = margin; this->function_type = loss; this->verbose = verbose; this->min_ptr = breakpoint_coefficients.end();}
+    void construct(bool verbose){this->verbose = verbose; this->min_ptr = breakpoint_coefficients.end();}
     inline double get_breakpoint_position(breakpoint_list_t::iterator b_ptr);
     inline bool is_end(breakpoint_list_t::iterator b_ptr);
     inline bool is_begin(breakpoint_list_t::iterator b_ptr);
     bool verbose;
 
 public:
-    PiecewiseFunction(double margin, FunctionType loss, bool verbose){
-        construct(margin, loss, verbose);
+    PiecewiseFunction(bool verbose){
+        construct(verbose);
     }
 
-    PiecewiseFunction(double margin, FunctionType loss){
-        construct(margin, loss, false);
+    PiecewiseFunction(){
+        construct(false);
     }
 
     // Point insertion
-    int insert_point(double y, bool is_upper_bound);
+    int insert_point(double b, Coefficients F, bool is_upper_bound);
 
     // Minimum pointer functions
     double get_minimum_position();
