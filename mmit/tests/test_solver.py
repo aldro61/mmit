@@ -51,7 +51,6 @@ def estimate_total_loss(x, lower, upper, margin, loss_degree):
 
 
 def _random_testing(loss_degree):
-    return
     n_tests = 1000
     n_points = 100
     n_decimals = 2
