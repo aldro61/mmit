@@ -46,19 +46,19 @@ dependencies = ["joblib", "numpy", "scikit-learn", "six"]
 
 setup(
     name = "mmit",
-    version = "2017.03.15",
+    version = "1.0.0",
     packages = find_packages(),
 
     cmdclass={'build_ext':build_ext},
     setup_requires = dependencies,
     install_requires = dependencies,
 
-    author = "Toby Dylan Hocking, Alexandre Drouin",
-    author_email = "toby.hocking@r-project.org, aldro61@gmail.com",
+    author = "Alexandre Drouin, Toby Dylan Hocking",
+    author_email = "aldro61@gmail.com, toby.hocking@r-project.org",
     maintainer="Alexandre Drouin",
     maintainer_email="aldro61@gmail.com",
-    description="Max Margin Interval Trees",
-    long_description = "Description: Fast O(P N log N) algorithm for learning a regression tree with interval censored "
+    description="Maximum Margin Interval Trees",
+    long_description = "Description: Fast O(p n log n) algorithm for learning a regression tree with interval censored "
                        "output data.",
     license = "GPL-3",
     keywords = "machine learning regression tree censored interval data",
