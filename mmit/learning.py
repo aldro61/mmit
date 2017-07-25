@@ -33,7 +33,7 @@ class SolverError(Exception):
 
 
 class MaxMarginIntervalTree(BaseEstimator, RegressorMixin):
-    def __init__(self, margin=0.0, loss="linear", max_depth=np.infty, min_samples_split=0, random_state=None):
+    def __init__(self, margin=0.0, loss="linear_hinge", max_depth=np.infty, min_samples_split=0, random_state=None):
         """
         Max margin interval tree
 
@@ -42,7 +42,7 @@ class MaxMarginIntervalTree(BaseEstimator, RegressorMixin):
         margin: float, default: 0
             The margin on each side of the predicted value
         loss: string, default="linear"
-            The loss function to use (linear, squared)
+            The loss function to use (linear_hinge, squared_hinge)
         max_depth: int, default: infinity
             The maximum depth of the tree
         min_samples_split: int, default: 0
@@ -132,9 +132,9 @@ class MaxMarginIntervalTree(BaseEstimator, RegressorMixin):
 
                 # Get the cost values for each side
                 _, left_preds, left_costs = compute_optimal_costs(lower_sorted, upper_sorted, self.margin,
-                                                                  0 if self.loss == "linear" else 1)
+                                                                  0 if self.loss == "linear_hinge" else 1)
                 _, right_preds, right_costs = compute_optimal_costs(lower_sorted[::-1].copy(), upper_sorted[::-1].copy(),
-                                                                    self.margin, 0 if self.loss == "linear" else 1)
+                                                                    self.margin, 0 if self.loss == "linear_hinge" else 1)
 
                 # XXX: Runtime test case to ensure that the solver is working correctly. The solution for the cases
                 # were the left and right leaves contain all the examples should be exactly the same.
@@ -221,7 +221,7 @@ END
         self.rule_importances_ = defaultdict(float)
 
         # Define the root node
-        _, preds, costs = compute_optimal_costs(y_lower, y_upper, self.margin, 0 if self.loss == "linear" else 1)
+        _, preds, costs = compute_optimal_costs(y_lower, y_upper, self.margin, 0 if self.loss == "linear_hinge" else 1)
         root = RegressionTreeNode(depth=0, example_idx=np.arange(len(y)), predicted_value=preds[-1], cost_value=costs[-1])
 
         # Initialize the tree building procedure
