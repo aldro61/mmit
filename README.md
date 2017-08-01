@@ -2,7 +2,6 @@
 
 [![License: GPL v3](https://img.shields.io/badge/License-GPL%20v3-blue.svg)](http://www.gnu.org/licenses/gpl-3.0)
 [![Build Status](https://travis-ci.org/aldro61/mmit.svg?branch=master)](https://travis-ci.org/aldro61/mmit)
-[![Code Issues](https://www.quantifiedcode.com/api/v1/project/334605d421f0460ba846af83ebff870d/badge.svg)](https://www.quantifiedcode.com/app/project/334605d421f0460ba846af83ebff870d)
 
 Regression trees for interval censored output data
 
