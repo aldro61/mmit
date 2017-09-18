@@ -39,7 +39,7 @@ class PruningTests(TestCase):
         Requires fitted estimator
 
         """
-        self.assertRaises(_NotFittedError, min_cost_complexity_pruning, self.estimator)
+        self.assertRaises(NotFittedError, min_cost_complexity_pruning, self.estimator)
 
     def test_pruning_a_leaf(self):
         """
