@@ -18,7 +18,7 @@ import numpy as np
 import sys
 
 from sklearn.base import clone
-from sklearn.utils.validation import _NotFittedError
+from sklearn.exceptions import NotFittedError
 from unittest import TestCase
 
 from .. import MaxMarginIntervalTree
@@ -37,7 +37,7 @@ class MMITTests(TestCase):
 
         """
         estimator = MaxMarginIntervalTree()
-        self.assertRaises(_NotFittedError, estimator.predict, [])
+        self.assertRaises(NotFittedError, estimator.predict, [])
 
     def test_set_params(self):
         """
