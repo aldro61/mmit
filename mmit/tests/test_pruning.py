@@ -17,7 +17,7 @@ from __future__ import print_function
 import numpy as np
 import sys
 
-from sklearn.utils.validation import _NotFittedError
+from sklearn.exceptions import NotFittedError
 from unittest import TestCase
 
 from .. import MaxMarginIntervalTree
