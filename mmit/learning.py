@@ -57,7 +57,7 @@ class MaxMarginIntervalTree(BaseEstimator, RegressorMixin):
         self.loss = loss
         self.max_depth = max_depth
         self.min_samples_split = min_samples_split
-        self.random_state = check_random_state(random_state)
+        self.random_state = random_state
 
     def fit(self, X, y, feature_names=None, level_callback=None, split_callback=None):
         """
@@ -84,6 +84,8 @@ class MaxMarginIntervalTree(BaseEstimator, RegressorMixin):
         if split_callback is None:
             def split_callback(x):
                 pass
+
+        random_state = check_random_state(self.random_state)
 
         self.feature_names_ = feature_names
 
@@ -192,7 +194,7 @@ END
                 return None, None, None
 
             logging.debug("There are %d optimal splits with a cost of %.4f", len(best_splits), best_cost)
-            keep_idx = self.random_state.randint(0, len(best_splits))
+            keep_idx = random_state.randint(0, len(best_splits))
             best_split = best_splits[keep_idx]
             best_split_leaf_preds = best_preds[keep_idx]
             best_split_leaf_costs = best_leaf_costs[keep_idx]
