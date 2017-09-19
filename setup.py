@@ -46,7 +46,7 @@ dependencies = ["joblib", "numpy", "scikit-learn", "six"]
 
 setup(
     name = "mmit",
-    version = "1.1.0",
+    version = "1.1.1",
     packages = find_packages(),
 
     cmdclass={'build_ext':build_ext},
