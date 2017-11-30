@@ -57,7 +57,7 @@ def _random_testing(loss_degree):
     estimator_sample_size = 10000
     estimator_tol_decimals = 6
 
-    for i in xrange(n_tests):
+    for i in range(n_tests):
         # Random test case generation
         margin = round(np.random.rand(), n_decimals)
         target_lower = np.round(np.random.rand(n_points), n_decimals)
@@ -214,7 +214,7 @@ class SolverTests(TestCase):
         unshuffled_cost = costs[-1]
         del moves, preds, costs
 
-        for i in xrange(10):
+        for i in range(10):
             shuffler = np.arange(len(self.target_lower))
             np.random.shuffle(shuffler)
             moves, preds, costs = solver.compute_optimal_costs(self.target_lower[shuffler], self.target_upper[shuffler], margin, 0)
@@ -312,4 +312,4 @@ class SolverTests(TestCase):
         margin = 0.5  # Should not affect the solution
         values = np.random.rand(1000)
         moves, preds, costs = solver.compute_optimal_costs(values, values, margin, 0)  # linear hinge
-        np.testing.assert_almost_equal(preds, [np.median(values[: i + 1]) for i in xrange(len(values))])
+        np.testing.assert_almost_equal(preds, [np.median(values[: i + 1]) for i in range(len(values))])

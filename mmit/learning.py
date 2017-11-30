@@ -13,6 +13,7 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 """
+import six
 import logging
 import numpy as np
 import warnings; warnings.filterwarnings("ignore")  # Disable all warnings
@@ -113,7 +114,7 @@ class MaxMarginIntervalTree(BaseEstimator, RegressorMixin):
             best_preds = []  # (left_pred, right_pred)
             best_leaf_costs = []  # (left_cost, right_cost)
 
-            for feat_idx in xrange(X.shape[1]):
+            for feat_idx in range(X.shape[1]):
                 feat = X[node.example_idx, feat_idx]
 
                 # Sort the feature values
@@ -291,8 +292,9 @@ END
 
         # Normalize the variable importances
         logging.debug("Normalizing the variable importances.")
-        variable_importance_sum = sum(v for v in self.rule_importances_.itervalues())
-        self.rule_importances_ = {r: float(i) / variable_importance_sum for r, i in self.rule_importances_.iteritems()}
+        variable_importance_sum = sum(v for v in six.itervalues(self.rule_importances_))
+        self.rule_importances_ = {r: float(i) / variable_importance_sum
+                                  for r, i in six.iteritems(self.rule_importances_)}
 
         logging.debug("Training finished.")
 
