@@ -16,6 +16,7 @@
 from __future__ import print_function
 import numpy as np
 import sys
+from six import range
 
 from numpy import infty as inf
 from unittest import TestCase
