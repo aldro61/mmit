@@ -13,11 +13,11 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 """
-import six
 import logging
 import numpy as np
 import warnings; warnings.filterwarnings("ignore")  # Disable all warnings
 
+from six import iteritems, itervalues
 from collections import defaultdict, deque
 from sklearn.base import BaseEstimator, RegressorMixin
 from sklearn.utils import check_random_state
@@ -273,7 +273,6 @@ END
             node.right_child = right_child
             split_callback(node)
 
-            # Update rule importances (decrease in cost)
             self.rule_importances_[str(node.rule)] += node.cost_value - \
                                                       node.left_child.cost_value - \
                                                       node.right_child.cost_value
@@ -292,9 +291,9 @@ END
 
         # Normalize the variable importances
         logging.debug("Normalizing the variable importances.")
-        variable_importance_sum = sum(v for v in six.itervalues(self.rule_importances_))
+        variable_importance_sum = sum(v for v in itervalues(self.rule_importances_))
         self.rule_importances_ = {r: float(i) / variable_importance_sum
-                                  for r, i in six.iteritems(self.rule_importances_)}
+                                  for r, i in iteritems(self.rule_importances_)}
 
         logging.debug("Training finished.")
 
