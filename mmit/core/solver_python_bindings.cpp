@@ -100,18 +100,9 @@ PyMODINIT_FUNC PyInit_solver() {
 #else
 
 
-PyMODINIT_FUNC
-initsolver
-        (void){
-    (void)Py_InitModule("solver",Methods);
+PyMODINIT_FUNC initsolver (void) {
+    (void)Py_InitModule("solver", Methods);
     import_array();//necessary from numpy otherwise we crash with segfault
 }
-
-// PyMODINIT_FUNC
-// initsolver
-//         (void){
-//     (void)Py_InitModule("solver", Methods);
-//     import_array();//necessary from numpy otherwise we crash with segfault
-// }
 
 #endif
