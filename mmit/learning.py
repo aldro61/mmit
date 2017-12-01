@@ -18,6 +18,7 @@ import numpy as np
 import warnings; warnings.filterwarnings("ignore")  # Disable all warnings
 
 from six import iteritems, itervalues
+from six.moves import range
 from collections import defaultdict, deque
 from sklearn.base import BaseEstimator, RegressorMixin
 from sklearn.utils import check_random_state
