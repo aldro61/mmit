@@ -13,4 +13,4 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 """
-from .learning import MaxMarginIntervalTree
+from .learning import MaxMarginIntervalTree, RandomForestIntervalRegressor
