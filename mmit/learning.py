@@ -17,10 +17,16 @@ import logging
 import numpy as np
 import warnings; warnings.filterwarnings("ignore")  # Disable all warnings
 
+from six import iteritems, itervalues
+from six.moves import range
 from collections import defaultdict, deque
 from sklearn.base import BaseEstimator, RegressorMixin
 from sklearn.utils import check_random_state
 from sklearn.utils.validation import check_array, check_consistent_length, check_is_fitted
+from sklearn.ensemble.forest import ForestRegressor, _parallel_build_trees
+from scipy.sparse import issparse
+from contextlib import closing
+from multiprocessing import Pool
 
 from .metrics import *
 from .core.solver import compute_optimal_costs
@@ -28,12 +34,20 @@ from .model import DecisionStump, RegressionTreeNode
 from .utils import check_X_y, float_equal, float_less
 
 
+from sklearn.tree._tree import DTYPE, DOUBLE
+from sklearn.externals.joblib import Parallel, delayed
+
+
+#DTYPE = np.float32
+
+
 class SolverError(Exception):
     pass
 
 
 class MaxMarginIntervalTree(BaseEstimator, RegressorMixin):
-    def __init__(self, margin=0.0, loss="linear_hinge", max_depth=np.infty, min_samples_split=0, random_state=None):
+    def __init__(self, margin=0.0, loss="linear_hinge", max_depth=np.infty,
+                 min_samples_split=0, max_features=None, random_state=None):
         """
         Max margin interval tree
 
@@ -47,6 +61,9 @@ class MaxMarginIntervalTree(BaseEstimator, RegressorMixin):
             The maximum depth of the tree
         min_samples_split: int, default: 0
             The minimum number of examples required to split a node
+        max_features: None or int or float, default: None
+            The maximum number of features to consider at every node split
+            (same procedure as in scikit learn)
         random_state: int, RandomState instance or None, optional (default=None)
             If int, random_state is the seed used by the random number generator; If RandomState instance, random_state
             is the random number generator; If None, the random number generator is the RandomState instance used by
@@ -57,9 +74,31 @@ class MaxMarginIntervalTree(BaseEstimator, RegressorMixin):
         self.loss = loss
         self.max_depth = max_depth
         self.min_samples_split = min_samples_split
+        self.max_features = max_features
         self.random_state = random_state
 
-    def fit(self, X, y, feature_names=None, level_callback=None, split_callback=None):
+
+    def _validate_X_predict(self, X, check_input):
+        """Validate X whenever one tries to predict, apply, predict_proba"""
+        if check_input:
+            X = check_array(X, dtype=DTYPE, accept_sparse="csr")
+            if issparse(X) and (X.indices.dtype != np.intc or
+                                X.indptr.dtype != np.intc):
+                raise ValueError("No support for np.int64 index based "
+                                 "sparse matrices")
+
+        n_features = X.shape[1]
+        if self.n_features_ != n_features:
+            raise ValueError("Number of features of the model must "
+                             "match the input. Model n_features is %s and "
+                             "input n_features is %s "
+                             % (self.n_features_, n_features))
+
+        return X
+
+
+    def fit(self, X, y, feature_names=None, level_callback=None,
+            split_callback=None, sample_weight=None, check_input=None):
         """
         Fits the decision tree regressor
 
@@ -94,6 +133,8 @@ class MaxMarginIntervalTree(BaseEstimator, RegressorMixin):
             raise ValueError("The maximum tree depth must be greater than 1.")
         X, y = check_X_y(X, y)
 
+        n_samples, self.n_features_ = X.shape
+
         # Split the intervals into upper and lower bounds
         y_lower, y_upper = zip(*y)
         y_lower = np.array(y_lower, dtype=np.double)
@@ -113,7 +154,23 @@ class MaxMarginIntervalTree(BaseEstimator, RegressorMixin):
             best_preds = []  # (left_pred, right_pred)
             best_leaf_costs = []  # (left_cost, right_cost)
 
-            for feat_idx in xrange(X.shape[1]):
+            # Selection of the feature indices based the max_features
+            # hyperparameter
+            if self.max_features is None:
+                feat_indices = range(X.shape[1])
+            elif isinstance(self.max_features, float):
+                n_features = max(1, int(X.shape[1] * self.max_features))
+                feat_indices = np.random.randint(0, X.shape[1], size=n_features)
+            elif isinstance(self.max_features, int):
+                assert self.max_features >= 1
+                assert self.max_features <= X.shape[1]
+                feat_indices = np.random.randint(0, X.shape[1], size=self.max_features)
+            else:
+                raise ValueError("Invalid type %s for max_features" % type(self.max_features))
+
+
+            #for feat_idx in range(X.shape[1]):
+            for feat_idx in feat_indices:
                 feat = X[node.example_idx, feat_idx]
 
                 # Sort the feature values
@@ -272,7 +329,6 @@ END
             node.right_child = right_child
             split_callback(node)
 
-            # Update rule importances (decrease in cost)
             self.rule_importances_[str(node.rule)] += node.cost_value - \
                                                       node.left_child.cost_value - \
                                                       node.right_child.cost_value
@@ -291,14 +347,15 @@ END
 
         # Normalize the variable importances
         logging.debug("Normalizing the variable importances.")
-        variable_importance_sum = sum(v for v in self.rule_importances_.itervalues())
-        self.rule_importances_ = {r: float(i) / variable_importance_sum for r, i in self.rule_importances_.iteritems()}
+        variable_importance_sum = sum(v for v in itervalues(self.rule_importances_))
+        self.rule_importances_ = {r: float(i) / variable_importance_sum
+                                  for r, i in iteritems(self.rule_importances_)}
 
         logging.debug("Training finished.")
 
         return self
 
-    def predict(self, X):
+    def predict(self, X, check_input=None):
         """
         Estimates the labels of some examples
 
@@ -345,3 +402,169 @@ END
 
     def check_is_fitted(self):
         return check_is_fitted(self, ["tree_", "rule_importances_"])
+
+
+def build_interval_tree(args):
+    X, y, kwargs = args
+    return MaxMarginIntervalTree(**kwargs).fit(X, y)
+
+class RandomForestIntervalRegressor(ForestRegressor):
+
+
+    # TODO we gotta override the fit method..... threading backend with joblib
+    # doesnt speed up python binding + cpp (vs pure cython implementation,
+    # which does)
+
+    def __init__(self,
+                 n_estimators=10,
+                 margin=0.,
+                 loss="linear_hinge",
+                 max_depth=np.infty,
+                 min_samples_split=0,
+                 max_features=None,
+                 bootstrap=True,
+                 oob_score=False,
+                 n_jobs=-1,
+                 random_state=None,
+                 verbose=0,
+                 warm_start=False):
+        super(RandomForestIntervalRegressor, self).__init__(
+            base_estimator=MaxMarginIntervalTree(),
+            n_estimators=n_estimators,
+            estimator_params=("margin", "loss", "max_depth",
+                              "min_samples_split", "max_features",
+                              "random_state"),
+            bootstrap=bootstrap,
+            oob_score=oob_score,
+            n_jobs=n_jobs,
+            random_state=random_state,
+            verbose=verbose,
+            warm_start=warm_start)
+
+        self.margin = margin
+        self.loss = loss
+        self.max_depth = max_depth
+        self.min_samples_split = min_samples_split
+        self.max_features = max_features
+
+
+    def fit(self, X, y, sample_weight=None):
+
+        """Build a forest of trees from the training set (X, y).
+        Parameters
+        ----------
+        X : array-like or sparse matrix of shape = [n_samples, n_features]
+            The training input samples. Internally, its dtype will be converted to
+            ``dtype=np.float32``. If a sparse matrix is provided, it will be
+            converted into a sparse ``csc_matrix``.
+        y : array-like, shape = [n_samples] or [n_samples, n_outputs]
+            The target values (class labels in classification, real numbers in
+            regression).
+        sample_weight : array-like, shape = [n_samples] or None
+            Sample weights. If None, then samples are equally weighted. Splits
+            that would create child nodes with net zero or negative weight are
+            ignored while searching for a split in each node. In the case of
+            classification, splits are also ignored if they would result in any
+            single class carrying a negative weight in either child node.
+        Returns
+        -------
+        self : object
+            Returns self.
+        """
+        # Validate or convert input data
+        X = check_array(X, accept_sparse="csc", dtype=DTYPE)
+        y = check_array(y, accept_sparse='csc', ensure_2d=False, dtype=None)
+        if sample_weight is not None:
+            sample_weight = check_array(sample_weight, ensure_2d=False)
+        if issparse(X):
+            # Pre-sort indices to avoid that each individual tree of the
+            # ensemble sorts the indices.
+            X.sort_indices()
+
+        # Remap output
+        n_samples, self.n_features_ = X.shape
+
+        y = np.atleast_1d(y)
+        if y.ndim == 2 and y.shape[1] == 1:
+            warn("A column-vector y was passed when a 1d array was"
+                 " expected. Please change the shape of y to "
+                 "(n_samples,), for example using ravel().",
+                 DataConversionWarning, stacklevel=2)
+
+        if y.ndim == 1:
+            # reshape is necessary to preserve the data contiguity against vs
+            # [:, np.newaxis] that does not.
+            y = np.reshape(y, (-1, 1))
+
+        self.n_outputs_ = y.shape[1]
+
+        y, expanded_class_weight = self._validate_y_class_weight(y)
+
+        if getattr(y, "dtype", None) != DOUBLE or not y.flags.contiguous:
+            y = np.ascontiguousarray(y, dtype=DOUBLE)
+
+        if expanded_class_weight is not None:
+            if sample_weight is not None:
+                sample_weight = sample_weight * expanded_class_weight
+            else:
+                sample_weight = expanded_class_weight
+
+        # Check parameters
+        self._validate_estimator()
+
+        if not self.bootstrap and self.oob_score:
+            raise ValueError("Out of bag estimation only available"
+                             " if bootstrap=True")
+
+        random_state = check_random_state(self.random_state)
+
+        if not self.warm_start or not hasattr(self, "estimators_"):
+            # Free allocated memory, if any
+            self.estimators_ = []
+
+        n_more_estimators = self.n_estimators - len(self.estimators_)
+
+        if n_more_estimators < 0:
+            raise ValueError('n_estimators=%d must be larger or equal to '
+                             'len(estimators_)=%d when warm_start==True'
+                             % (self.n_estimators, len(self.estimators_)))
+
+        elif n_more_estimators == 0:
+            warn("Warm-start fitting without increasing n_estimators does not "
+                 "fit new trees.")
+        else:
+            if self.warm_start and len(self.estimators_) > 0:
+                # We draw from the random state to get the random state we
+                # would have got if we hadn't used a warm_start.
+                random_state.randint(MAX_INT, size=len(self.estimators_))
+
+            # for fitting the trees is internally releasing the Python GIL
+            # making threading always more efficient than multiprocessing in
+            # that case.
+            tree_kwargs = {'margin': self.margin,
+                           'loss': self.loss,
+                           'max_depth': self.max_depth,
+                           'min_samples_split': self.min_samples_split,
+                           'max_features': self.max_features}
+
+            # TODO make this deterministic
+            print("Multiprocessing: creating trees...%s jobs for %s estimators" % (self.n_jobs, n_more_estimators))
+            with closing(Pool(self.n_jobs)) as pool:
+                iterable = ((X, y, tree_kwargs) for i in range(n_more_estimators))
+                trees = pool.map(build_interval_tree, iterable)
+            #print("Done, get results")
+            #trees = trees.get()
+            print("All done!")
+
+            # Collect newly grown trees
+            self.estimators_.extend(trees)
+
+        if self.oob_score:
+            self._set_oob_score(X, y)
+
+        # Decapsulate classes_ attributes
+        if hasattr(self, "classes_") and self.n_outputs_ == 1:
+            self.n_classes_ = self.n_classes_[0]
+            self.classes_ = self.classes_[0]
+
+        return self
