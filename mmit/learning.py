@@ -17,6 +17,8 @@ import logging
 import numpy as np
 import warnings; warnings.filterwarnings("ignore")  # Disable all warnings
 
+from six import iteritems, itervalues
+from six.moves import range
 from collections import defaultdict, deque
 from sklearn.base import BaseEstimator, RegressorMixin
 from sklearn.utils import check_random_state
@@ -113,7 +115,7 @@ class MaxMarginIntervalTree(BaseEstimator, RegressorMixin):
             best_preds = []  # (left_pred, right_pred)
             best_leaf_costs = []  # (left_cost, right_cost)
 
-            for feat_idx in xrange(X.shape[1]):
+            for feat_idx in range(X.shape[1]):
                 feat = X[node.example_idx, feat_idx]
 
                 # Sort the feature values
@@ -272,7 +274,6 @@ END
             node.right_child = right_child
             split_callback(node)
 
-            # Update rule importances (decrease in cost)
             self.rule_importances_[str(node.rule)] += node.cost_value - \
                                                       node.left_child.cost_value - \
                                                       node.right_child.cost_value
@@ -291,8 +292,9 @@ END
 
         # Normalize the variable importances
         logging.debug("Normalizing the variable importances.")
-        variable_importance_sum = sum(v for v in self.rule_importances_.itervalues())
-        self.rule_importances_ = {r: float(i) / variable_importance_sum for r, i in self.rule_importances_.iteritems()}
+        variable_importance_sum = sum(v for v in itervalues(self.rule_importances_))
+        self.rule_importances_ = {r: float(i) / variable_importance_sum
+                                  for r, i in iteritems(self.rule_importances_)}
 
         logging.debug("Training finished.")
 

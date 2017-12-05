@@ -80,9 +80,29 @@ static PyMethodDef Methods[] = {
         {NULL, NULL, 0, NULL}
 };
 
-PyMODINIT_FUNC
-initsolver
-        (void){
-    (void)Py_InitModule("solver",Methods);
+
+
+#if PY_MAJOR_VERSION >= 3
+
+static struct PyModuleDef solver_module = {
+    PyModuleDef_HEAD_INIT,
+    "solver",
+    NULL,
+    -1,
+    Methods
+};
+
+PyMODINIT_FUNC PyInit_solver() {
+    import_array();
+    return PyModule_Create(&solver_module);
+};
+
+#else
+
+
+PyMODINIT_FUNC initsolver (void) {
+    (void)Py_InitModule("solver", Methods);
     import_array();//necessary from numpy otherwise we crash with segfault
 }
+
+#endif
