@@ -32,10 +32,11 @@ notifications:
   email:
     on_success: change
     on_failure: change
+  slack: 
+    graal-slack:IYu0NiR9pbqud64UpsZe1pQS
 
 env:
   matrix:
     - TEST_SUITE=test_R.out
     - TEST_SUITE=test_python.out
-
     
