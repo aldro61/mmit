@@ -1,3 +1,8 @@
+language: python
+
+python:
+  - 2.7
+  - 3.6
 
 sudo: required
 
@@ -21,15 +26,11 @@ install:
   - pip install -U pip pip-tools
   - pip install numpy scipy scikit-learn
 
-matrix:
-  include:
-    - language: python
+script:
+  - make $TEST_SUITE
 
-        script:
-          - make $TEST_SUITE
-
-        after_failure:
-          - ./travis-tool.sh dump_logs
+after_failure:
+  - ./travis-tool.sh dump_logs
 
 notifications:
   email:
@@ -42,4 +43,4 @@ env:
   matrix:
     - TEST_SUITE=test_R.out
     - TEST_SUITE=test_python.out
-
+    
