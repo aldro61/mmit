@@ -64,7 +64,7 @@ int compute_optimal_costs(
 
         // Uncensored output
         if(equal(lower_vec[i], upper_vec[i])) {
-            if (!isinf(lower_vec[i])){
+            if (!std::isinf(lower_vec[i])){
                 Coefficients F1 = get_coefficients(lower_vec[i], 0., false, loss_type);
                 Coefficients F2 = get_coefficients(upper_vec[i], 0., true, loss_type);
                 moves_vec[i] += function.insert_point(lower_vec[i], F1, false);
@@ -75,14 +75,14 @@ int compute_optimal_costs(
         // Censored output
         else {
             // Add the lower bound
-            if (!isinf(lower_vec[i])){
+            if (!std::isinf(lower_vec[i])){
                 Coefficients F = get_coefficients(lower_vec[i], margin, false, loss_type);
                 double b = get_breakpoint(lower_vec[i], margin, false);
                 moves_vec[i] += function.insert_point(b, F, false);
             }
 
             // Add the upper bound
-            if (!isinf(upper_vec[i])){
+            if (!std::isinf(upper_vec[i])){
                 Coefficients F = get_coefficients(upper_vec[i], margin, true, loss_type);
                 double b = get_breakpoint(upper_vec[i], margin, true);
                 moves_vec[i] += function.insert_point(b, F, true);

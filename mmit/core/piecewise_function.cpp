@@ -124,7 +124,7 @@ double PiecewiseFunction::get_minimum_position() {
 
 double PiecewiseFunction::get_minimum_value() {
     double min_pos = this->get_minimum_position();
-    if(isinf(min_pos)) {  // Only happens when there are no breakpoints in the function
+    if(std::isinf(min_pos)) {  // Only happens when there are no breakpoints in the function
         return 0;
     }
     return this->min_coefficients.quadratic * min_pos * min_pos + this->min_coefficients.linear * min_pos + this->min_coefficients.constant;
