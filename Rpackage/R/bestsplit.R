@@ -12,21 +12,32 @@ bestsplit <- structure(function
   
   for (index in 2:(length(feature.mat[1,]))){
     feat = feature.mat[, index]
-    sorted <- order(feat)
+    
+    #unique and sorted
+    sorted <- order(feat)[!duplicated(feat)] 
     z<- feat
     feat <- z[sorted]
-    rev_feat <-z[rev(sorted)]
+    rev_feat <-z[rev(sorted)]     #reverse order
     z<- target.mat
     tar <- z[sorted,]
-    rev_tar <- z[rev(sorted),]
+    rev_tar <- z[rev(sorted),]     #reverse order
     
+    if(length(sorted)==1){
+      next
+    }
     
+    #compute cost, prediction
     leftpred <- compute_optimal_costs(tar,margin)
     rightpred <- compute_optimal_costs(rev_tar,margin)
     
-    split_cost <- leftpred$cost+rightpred$cost
+    #unique and removing cases where all examples are in one leaf
+    leftpred <- leftpred[sorted,]
+    rightpred <- rightpred[sorted,]
     
-    if(any(split_cost<best_split$cost)){
+    #removing NA cases
+    split_cost <- na.omit(leftpred$cost+rightpred$cost)
+
+    if(min(split_cost)<best_split$cost){
       best_split$cost <- min(split_cost)
       best_split$br <- feat[which.min(split_cost)]
       best_split$varid <- index
@@ -36,11 +47,3 @@ bestsplit <- structure(function
   }
   return(best_split)
 })
-
-
-data(neuroblastomaProcessed, package="penaltyLearning")
-survTarget <- with(neuroblastomaProcessed, {Surv(target.mat[, 1], target.mat[,2], type="interval2")})
-feature.mat <- data.frame(log.penalty=survTarget, neuroblastomaProcessed$feature.mat)
-target.mat <- neuroblastomaProcessed$target.mat
-best_split <- bestsplit(target.mat,feature.mat,2.0,loss="hinge")
-View(best_split)
