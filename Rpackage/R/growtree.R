@@ -4,7 +4,7 @@ growtree <- structure(function(target.mat, feature.mat, depth=0, maxdepth = Inf,
   if (depth > maxdepth) return(partynode(id = id))
 
   #if sample per node is less than minimum, we stop tree growth
-  if(length(target.mat[1,])<min_sample) return(partynode(id = id))
+  if(length(target.mat[,1])<=min_sample) return(partynode(id = id))
 
   #split the tree at the node.
   #print(length(feature.mat[,2]))
