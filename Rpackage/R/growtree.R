@@ -8,7 +8,7 @@ growtree <- structure(function(target.mat, feature.mat, depth=0, maxdepth = Inf,
 
   #split the tree at the node.
   #print(length(feature.mat[,2]))
-  sp <- bestsplit(target.mat,feature.mat,margin,loss="hinge")
+  sp <- bestsplit(target.mat,feature.mat,margin,loss)
   sp <- partysplit(varid = sp$varid,br = sp$br)
 
   #if no split, we stop
@@ -42,7 +42,6 @@ growtree <- structure(function(target.mat, feature.mat, depth=0, maxdepth = Inf,
 
   #creating partynode list of kids
   kids <- vector(mode = "list", length = max(kidids, na.rm = TRUE))
-  #I want a list of elems in left and right********
 
   #if no left right kids, stop tree growth
   if(length(kids)<=1) return(partynode(id = id))
@@ -56,7 +55,7 @@ growtree <- structure(function(target.mat, feature.mat, depth=0, maxdepth = Inf,
     }
     depth <- depth+1
     #print(length(tar[[kidid]][,2]))
-    kids[[kidid]] <- growtree(tar[[kidid]], kid[[kidid]], depth = depth, maxdepth = maxdepth, margin = margin, id = as.integer(myid + 1))
+    kids[[kidid]] <- growtree(tar[[kidid]], kid[[kidid]], depth = depth, maxdepth = maxdepth, margin = margin, loss = loss, id = as.integer(myid + 1),min_sample = min_sample)
   }
   return(partynode(id = as.integer(id), split = sp, kids = kids))
 })
