@@ -32,8 +32,8 @@ bestsplit <- structure(function
     }
 
     #compute cost, prediction
-    leftpred <- compute_optimal_costs(tar,margin)
-    rightpred <- compute_optimal_costs(rev_tar,margin)
+    leftpred <- compute_optimal_costs(tar,margin,loss)
+    rightpred <- compute_optimal_costs(rev_tar,margin,loss)
 
     #unique and removing cases where all examples are in one leaf
     leftpred <- leftpred[last_idx,]
