@@ -7,7 +7,7 @@ growtree <- structure(function(target.mat, feature.mat, depth=0, maxdepth = Inf,
   if(length(target.mat[1,])<min_sample) return(partynode(id = id))
 
   #split the tree at the node.
-  print(length(feature.mat[,2]))
+  #print(length(feature.mat[,2]))
   sp <- bestsplit(target.mat,feature.mat,margin,loss="hinge")
   sp <- partysplit(varid = sp$varid,br = sp$br)
 
