@@ -11,7 +11,6 @@ mmit <- structure(function(formula, target.mat, feature.mat, weights = NULL,dept
   tree <- party(node, data = feature.mat, fitted = data.frame("(fitted)" = fitted_node(node, data = feature.mat),
                                                           "(response)" = model.response(feature.mat),
                                                           check.names = FALSE), terms = terms(feature.mat))
-  tree <- as.constparty(tree)
 
   return(tree)
 })
