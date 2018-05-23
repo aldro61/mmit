@@ -1,7 +1,7 @@
 growtree <- structure(function(target.mat, feature.mat, depth=0, maxdepth = Inf,margin=0.0,loss="hinge",id = 1L, min_sample = 1,pred=NULL, side = NULL) {
 
   #if depth exceeds we stop the further growth of tree
-  if (depth > maxdepth) return(partynode(id = id))
+  if (depth >= maxdepth) return(partynode(id = id))
   
 
   #if sample per node is less than minimum, we stop tree growth
