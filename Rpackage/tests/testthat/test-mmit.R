@@ -9,8 +9,6 @@ target.mat <- rbind(
 feature.mat <- rbind(
   c(1,0,0), c(1,1,0), c(1,2,0),
   c(1,3,0), c(1,4,0), c(1,5,0))
-colnames(feature.mat) <- c("a", "b", "c")
-feature.mat <- data.frame(feature.mat)
 
 #linear hinge, margin = 0, test best split
 out<-bestsplit(target.mat, feature.mat, margin=0.0, loss="hinge")
@@ -33,6 +31,9 @@ test_that("margin=0.0 yields cost 0", {
   expect_equal(out$varid, 2)
   expect_equal(out$row, 3)
 })
+
+colnames(feature.mat) <- c("a", "b", "c")
+feature.mat <- data.frame(feature.mat)
 
 #linear hinge, margin = 0, test mmit
 out<-predict(mmit(a~., target.mat, feature.mat))
