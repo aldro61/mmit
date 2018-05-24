@@ -1,2 +1,4 @@
 useDynLib(mmit)
 exportPattern("^[[:alpha:]]")
+import(partykit)
+import(survival)
