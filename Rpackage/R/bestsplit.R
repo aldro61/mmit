@@ -55,6 +55,10 @@ bestsplit <- structure(function
       best_split$br <- feat[which.min(split_cost)]
       best_split$varid <- index
       best_split$row <- which.min(split_cost)
+      
+      #left and right prediction to be passed to partynode info
+      best_split$leftpred <- leftleaf$pred[which.min(split_cost)]
+      best_split$rightpred <- rightleaf$pred[which.min(split_cost)+1]
     }
 
   }
