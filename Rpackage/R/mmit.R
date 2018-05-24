@@ -1,4 +1,6 @@
-mmit <- structure(function(formula, target.mat, feature.mat, weights = NULL,depth=0, maxdepth = Inf,margin=0.0,loss="hinge",id = 1L, min_sample = 1) {
+mmit <- structure(function(formula, target.mat, feature.mat, weights = NULL,
+                           depth=0, maxdepth = Inf, margin=0.0, loss="hinge",
+                           id = 1L, min_sample = 1) {
   
   #arranging such that response is column 1.
   response <- all.vars(formula)[1]
@@ -16,6 +18,7 @@ mmit <- structure(function(formula, target.mat, feature.mat, weights = NULL,dept
 })
 
 
+#example
 #library(survival)
 #data(neuroblastomaProcessed, package="penaltyLearning")
 #survTarget <- with(neuroblastomaProcessed, {Surv(target.mat[, 1], target.mat[,2], type="interval2")})
