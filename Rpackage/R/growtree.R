@@ -1,5 +1,5 @@
 growtree <- structure(function(target.mat, feature.mat, depth=0, maxdepth = Inf,
-                               margin=0.0, loss="hinge", id = 1L, min_sample = 1,
+                               margin = 0.0, loss="hinge", id = 1L, min_sample = 1,
                                pred=NULL, side = NULL) {
 
   #if depth exceeds we stop the further growth of tree
@@ -7,7 +7,7 @@ growtree <- structure(function(target.mat, feature.mat, depth=0, maxdepth = Inf,
   
 
   #if sample per node is less than minimum, we stop tree growth
-  if(length(target.mat[,1]) <= min_sample) return(partynode(id = id, info = pred[[side]]))
+  if(length(target.mat[, 1]) <= min_sample) return(partynode(id = id, info = pred[[side]]))
 
   #split the tree at the node.
   sp <- bestsplit(target.mat, feature.mat, margin, loss,pred)
@@ -56,10 +56,13 @@ growtree <- structure(function(target.mat, feature.mat, depth=0, maxdepth = Inf,
       myid <- id
     }
     depth <- depth+1
-    kids[[kidid]] <- growtree(tar[[kidid]], kid[[kidid]], pred=splt, side = 4+kidid, depth = depth,
+    
+    #side = 4+kidid as pred[[5]] is left prediction and pred[[6]] right
+    kids[[kidid]] <- growtree(tar[[kidid]], kid[[kidid]], pred = splt, side = 4 + kidid, depth = depth,
                               maxdepth = maxdepth, margin = margin, loss = loss, 
                               id = as.integer(myid + 1),min_sample = min_sample)
   }
+  
   return(partynode(id = as.integer(id), split = sp, kids = kids, info = pred[[side]]))
 })
 
