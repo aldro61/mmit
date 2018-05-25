@@ -10,7 +10,6 @@ growtree <- structure(function(target.mat, feature.mat, depth=0, maxdepth = Inf,
   if(length(target.mat[,1]) <= min_sample) return(partynode(id = id, info = pred[[side]]))
 
   #split the tree at the node.
-  #print(length(feature.mat[,2]))
   sp <- bestsplit(target.mat, feature.mat, margin, loss)
   splt <- sp
 
@@ -30,7 +29,6 @@ growtree <- structure(function(target.mat, feature.mat, depth=0, maxdepth = Inf,
 
   #splitting into kids
   kidids <- kidids_split(sp, data = feature.mat) #list of right left kids
-  #print(length(kidids))
 
   #creating partynode list of kids
   kids <- vector(mode = "list", length = max(kidids, na.rm = TRUE))
@@ -52,18 +50,16 @@ growtree <- structure(function(target.mat, feature.mat, depth=0, maxdepth = Inf,
 
 
   for (kidid in 1:length(kids)) {
-    #print(kidid)
     if (kidid > 1) {
       myid <- max(nodeids(kids[[kidid - 1]]))
     } else {
       myid <- id
     }
     depth <- depth+1
-    #print(length(tar[[kidid]][,2]))
-    #print(depth)
-    kids[[kidid]] <- growtree(tar[[kidid]], kid[[kidid]], pred=splt, side = 4+kidid, depth = depth, maxdepth = maxdepth, margin = margin, loss = loss, id = as.integer(myid + 1),min_sample = min_sample)
+    kids[[kidid]] <- growtree(tar[[kidid]], kid[[kidid]], pred=splt, side = 4+kidid, depth = depth,
+                              maxdepth = maxdepth, margin = margin, loss = loss, 
+                              id = as.integer(myid + 1),min_sample = min_sample)
   }
-  #print(partynode(id = as.integer(id), split = sp, kids = kids))
   return(partynode(id = as.integer(id), split = sp, kids = kids, info = pred[[side]]))
 })
 
