@@ -15,7 +15,7 @@ feature.mat <- data.frame(feature.mat)
 
 #linear hinge, margin = 0, test best split
 out <- bestsplit(target.mat, feature.mat, margin=0.0, loss="hinge")
-test_that("margin=0.0 yields cost 0", {
+test_that("finding best split for hinge loss, margin as 0", {
   expect_equal(out$leftpred, 0.5)
   expect_equal(out$rightpred, 2.5)
   expect_equal(out$cost, 0.0)
@@ -26,7 +26,7 @@ test_that("margin=0.0 yields cost 0", {
 
 #square hinge, margin = 0, test best split
 out<-bestsplit(target.mat, feature.mat, margin=0.0, loss="square")
-test_that("margin=0.0 yields cost 0", {
+test_that("finding best split for squared loss, margin as 0", {
   expect_equal(out$leftpred, 0.5)
   expect_equal(out$rightpred, 2.5)
   expect_equal(out$cost, 0.0)
@@ -41,7 +41,7 @@ feature.mat <- data.frame(d=survTarget, feature.mat)
 #linear hinge, margin = 0, test mmit
 out <- mmit(d~., target.mat, feature.mat)
 p <- predict(out)
-test_that("margin=0.0 yields cost 0", {
+test_that("predicting the tree mmit() with hinge loss", {
   expect_equal(nodeapply(out, ids = p[[1]], info_node)[[1]], 0.5)
   expect_equal(nodeapply(out, ids = p[[2]], info_node)[[1]], 0.5)
   expect_equal(nodeapply(out, ids = p[[3]], info_node)[[1]], 0.5)
@@ -54,7 +54,7 @@ test_that("margin=0.0 yields cost 0", {
 #square hinge, margin = 0, test mmit
 out <- mmit(d~., target.mat, feature.mat, loss="square")
 p <- predict(out)
-test_that("margin=0.0 yields cost 0", {
+test_that("predicting the tree mmit() with square loss", {
   expect_equal(nodeapply(out, ids = p[[1]], info_node)[[1]], 0.5)
   expect_equal(nodeapply(out, ids = p[[2]], info_node)[[1]], 0.5)
   expect_equal(nodeapply(out, ids = p[[3]], info_node)[[1]], 0.5)
