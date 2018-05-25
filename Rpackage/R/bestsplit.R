@@ -10,7 +10,7 @@ bestsplit <- structure(function
   best_split$row <- NULL
 
   #loop for every feature
-  for (index in 2:(length(feature.mat[1,]))){
+  for (index in 1:(length(feature.mat[1,]))){
     feat <- feature.mat[, index]
 
     #sorted
