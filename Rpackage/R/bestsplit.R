@@ -42,7 +42,7 @@ bestsplit <- structure(function
     rightleaf <- rightleaf[first_idx,]
     rightleaf <- rightleaf[-1,]
 
-    #removing NA cases and summing both orders
+    #summing both orders
     split_cost <- leftleaf$cost + rightleaf$cost
 
     #if no split possible
