@@ -44,10 +44,10 @@ p <- predict(out)
 test_that("margin=0.0 yields cost 0", {
   expect_equal(nodeapply(out, ids = p[[1]], info_node)[[1]], 0.5)
   expect_equal(nodeapply(out, ids = p[[2]], info_node)[[1]], 0.5)
-  #expect_equal(nodeapply(out, ids = p[[3]], info_node)[[1]], NA)
+  expect_equal(nodeapply(out, ids = p[[3]], info_node)[[1]], NA)
   expect_equal(nodeapply(out, ids = p[[4]], info_node)[[1]], 2.5)
   expect_equal(nodeapply(out, ids = p[[5]], info_node)[[1]], 2.5)
-  #expect_equal(nodeapply(out, ids = p[[6]], info_node)[[1]], NA)
+  expect_equal(nodeapply(out, ids = p[[6]], info_node)[[1]], NA)
 })
 
 
@@ -57,9 +57,9 @@ p <- predict(out)
 test_that("margin=0.0 yields cost 0", {
   expect_equal(nodeapply(out, ids = p[[1]], info_node)[[1]], 0.5)
   expect_equal(nodeapply(out, ids = p[[2]], info_node)[[1]], 0.5)
-  #expect_equal(nodeapply(out, ids = p[[3]], info_node)[[1]], NA)
+  expect_equal(nodeapply(out, ids = p[[3]], info_node)[[1]], NA)
   expect_equal(nodeapply(out, ids = p[[4]], info_node)[[1]], 2.5)
   expect_equal(nodeapply(out, ids = p[[5]], info_node)[[1]], 2.5)
-  #expect_equal(nodeapply(out, ids = p[[6]], info_node)[[1]], NA)
+  expect_equal(nodeapply(out, ids = p[[6]], info_node)[[1]], NA)
 })
 
