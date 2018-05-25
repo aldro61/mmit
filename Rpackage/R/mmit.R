@@ -2,9 +2,12 @@ mmit <- structure(function(formula, target.mat, feature.mat, weights = NULL,
                            depth=0, maxdepth = Inf, margin=0.0, loss="hinge",
                            id = 1L, min_sample = 1) {
   
-  #arranging such that response is column 1.
+  #arranging such that response is not present in feature.mat.
   response <- all.vars(formula)[1]
   feature.mat <- model.frame(formula, data = feature.mat)
+  if(response %in% colnames(feature.mat)){
+    feature.mat$response <- NULL 
+  }
   
   #tree
   node<- growtree(target.mat, feature.mat, maxdepth = maxdepth, margin = margin)
