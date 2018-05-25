@@ -25,7 +25,7 @@ bestsplit <- structure(function
     last_idx <- last_idx[-1]
 
     #if no unique elements
-    if(length(last_idx) == 0){
+    if(length(last_idx) == 1){
       next
     }
 
@@ -35,10 +35,10 @@ bestsplit <- structure(function
 
     #unique and removing cases where all examples are in one leaf
     leftleaf <- leftleaf[last_idx,]
-    leftleaf <- leftleaf[-length(leftleaf[,1]),]
-    rightleaf$moves <- rev(rightleaf[,1])
-    rightleaf$pred <- rev(rightleaf[,2])
-    rightleaf$cost <- rev(rightleaf[,3])
+    leftleaf <- leftleaf[-length(leftleaf[, 1]),]
+    rightleaf$moves <- rev(rightleaf[, 1])
+    rightleaf$pred <- rev(rightleaf[, 2])
+    rightleaf$cost <- rev(rightleaf[, 3])
     rightleaf <- rightleaf[first_idx,]
     rightleaf <- rightleaf[-1,]
 
@@ -58,7 +58,7 @@ bestsplit <- structure(function
       
       #left and right prediction to be passed to partynode info
       best_split$leftpred <- leftleaf$pred[which.min(split_cost)]
-      best_split$rightpred <- rightleaf$pred[which.min(split_cost)+1]
+      best_split$rightpred <- rightleaf$pred[which.min(split_cost) + 1]
     }
 
   }
@@ -67,7 +67,7 @@ bestsplit <- structure(function
   if(is.null(pred)){
     return(best_split)
   }
-  if(best_split$cost>=pred$cost){
+  if(best_split$cost >= pred$cost){
     return(NULL)
   }
   return(best_split)
