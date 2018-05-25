@@ -39,7 +39,7 @@ growtree <- structure(function(target.mat, feature.mat, depth=0, maxdepth = Inf,
   if(length(kids) <= 1) return(partynode(id = id, info = pred[[side]]))
 
   #creating list of data into
-  for(i in 1:length(feature.mat[,2])){
+  for(i in 1:length(feature.mat[,1])){
     if(kidids[i] == 1){
       kid$left <- rbind(kid$left, feature.mat[i,])
       tar$left <- rbind(tar$left, target.mat[i,])
