@@ -1,7 +1,7 @@
 bestsplit <- structure(function
 ### Compute vector of optimal prediction and cost.
 #We have the feature and target value of the data that is to be splitted.
-(target.mat, feature.mat, margin=0.0, loss="hinge"){
+(target.mat, feature.mat, margin=0.0, loss="hinge",pred = NULL){
   #We keep track of the following values for each optimal split
   best_split <- NULL
   best_split$cost <- Inf
@@ -61,6 +61,14 @@ bestsplit <- structure(function
       best_split$rightpred <- rightleaf$pred[which.min(split_cost)+1]
     }
 
+  }
+  
+  #check if node cost is less than splitting cost
+  if(is.null(pred)){
+    return(best_split)
+  }
+  if(best_split$cost>=pred$cost){
+    return(NULL)
   }
   return(best_split)
 })
