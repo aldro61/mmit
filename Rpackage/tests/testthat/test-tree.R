@@ -16,7 +16,7 @@ colnames(feature.mat) <- c("a", "b", "c")
 feature.mat <- data.frame(feature.mat)
 
 #linear hinge, margin = 0, test best split
-out <- bestsplit(target.mat, feature.mat, margin=0.0, loss="hinge", weights)
+out <- bestsplit(target.mat, feature.mat, margin=0.0, loss="hinge", weights = weights)
 test_that("finding best split for hinge loss, margin as 0", {
   expect_equal(out$leftpred, 0.5)
   expect_equal(out$rightpred, 2.5)
@@ -27,7 +27,7 @@ test_that("finding best split for hinge loss, margin as 0", {
 })
 
 #square hinge, margin = 0, test best split
-out<-bestsplit(target.mat, feature.mat, margin=0.0, loss="square", weights)
+out<-bestsplit(target.mat, feature.mat, margin=0.0, loss="square", weights = weights)
 test_that("finding best split for squared loss, margin as 0", {
   expect_equal(out$leftpred, 0.5)
   expect_equal(out$rightpred, 2.5)
