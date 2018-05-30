@@ -1,39 +1,47 @@
 bestsplit <- structure(function
 ### Compute vector of optimal prediction and cost.
-#We have the feature and target value of the data that is to be splitted.
-(target.mat, feature.mat, margin=0.0, loss="hinge",pred = NULL){
-  #We keep track of the following values for each optimal split
+### We have the feature and target value of the data that is to be splitted.
+(target.mat, feature.mat, margin=0.0, loss="hinge",pred = NULL, weights = NULL){
+  ###We keep track of the following values for each optimal split
   best_split <- NULL
   best_split$cost <- Inf
   best_split$br <- NULL
   best_split$varid <- NULL
   best_split$row <- NULL
 
-  #loop for every feature
+  ### extract response values from data
+  dummy_tar_1 <- rep(target.mat[,1], times = weights)
+  dummy_tar_2 <- rep(target.mat[,2], times = weights)
+  target.mat <- cbind(dummy_tar_1,dummy_tar_2)
+  
+  ### loop for every feature
   for (index in 1:(length(feature.mat[1,]))){
     feat <- feature.mat[, index]
-
-    #sorted
+    
+    ### extract data value as per weight
+    feat <- rep(feat, times = weights)
+    
+    ### sorted
     sorted <- order(feat)
     feat <- feat[sorted]
     tar <- target.mat[sorted,]
     rev_tar <- target.mat[rev(sorted),]   #reverse order
 
-    #1st and last index of duplicate elem
+    ### 1st and last index of duplicate elem
     first_idx <- order(feat)[!duplicated(feat)]
     last_idx <- c(first_idx-1, length(feat))
     last_idx <- last_idx[-1]
 
-    #if no unique elements
+    ### if no unique elements
     if(length(last_idx) == 1){
       next
     }
 
-    #compute cost, prediction
+    ### compute cost, prediction
     leftleaf <- compute_optimal_costs(tar, margin, loss)
     rightleaf <- compute_optimal_costs(rev_tar, margin, loss)
 
-    #unique and removing cases where all examples are in one leaf
+    ### unique and removing cases where all examples are in one leaf
     leftleaf <- leftleaf[last_idx,]
     leftleaf <- leftleaf[-length(leftleaf[, 1]),]
     rightleaf$moves <- rev(rightleaf[, 1])
@@ -42,10 +50,10 @@ bestsplit <- structure(function
     rightleaf <- rightleaf[first_idx,]
     rightleaf <- rightleaf[-1,]
 
-    #summing both orders
+    ### summing both orders
     split_cost <- leftleaf$cost + rightleaf$cost
 
-    #if no split possible
+    ### if no split possible
     if(length(split_cost) == 0){
       next
     }
@@ -56,14 +64,14 @@ bestsplit <- structure(function
       best_split$varid <- index
       best_split$row <- which.min(split_cost)
       
-      #left and right prediction to be passed to partynode info
+      ### left and right prediction to be passed to partynode info
       best_split$leftpred <- leftleaf$pred[which.min(split_cost)]
-      best_split$rightpred <- rightleaf$pred[which.min(split_cost) + 1]
+      best_split$rightpred <- rightleaf$pred[which.min(split_cost)]
     }
 
   }
   
-  #check if node cost is less than splitting cost
+  ### check if node cost is less than splitting cost
   if(is.null(pred)){
     return(best_split)
   }
