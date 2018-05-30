@@ -10,11 +10,13 @@ feature.mat <- rbind(
   c(1,0,0), c(1,1,0), c(1,2,0),
   c(1,3,0), c(1,4,0), c(1,5,0))
 
+weights <- rep(1L, nrow(feature.mat))
+
 colnames(feature.mat) <- c("a", "b", "c")
 feature.mat <- data.frame(feature.mat)
 
 #linear hinge, margin = 0, test best split
-out <- bestsplit(target.mat, feature.mat, margin=0.0, loss="hinge")
+out <- bestsplit(target.mat, feature.mat, margin=0.0, loss="hinge", weights)
 test_that("finding best split for hinge loss, margin as 0", {
   expect_equal(out$leftpred, 0.5)
   expect_equal(out$rightpred, 2.5)
@@ -25,7 +27,7 @@ test_that("finding best split for hinge loss, margin as 0", {
 })
 
 #square hinge, margin = 0, test best split
-out<-bestsplit(target.mat, feature.mat, margin=0.0, loss="square")
+out<-bestsplit(target.mat, feature.mat, margin=0.0, loss="square", weights)
 test_that("finding best split for squared loss, margin as 0", {
   expect_equal(out$leftpred, 0.5)
   expect_equal(out$rightpred, 2.5)
