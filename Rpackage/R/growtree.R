@@ -10,7 +10,7 @@ growtree <- structure(function(target.mat, feature.mat, depth=0, maxdepth = Inf,
   if(sum(weights) <= min_sample) return(partynode(id = id, info = pred[[side]]))
 
   ### split the tree at the node.
-  sp <- bestsplit(target.mat, feature.mat, margin, loss, pred, weights)
+  sp <- bestsplit(target.mat, feature.mat, weights, margin, loss, pred)
   splt <- sp
 
   ### if no split, we stop
