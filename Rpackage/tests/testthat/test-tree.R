@@ -41,12 +41,12 @@ test_that("finding best split for squared loss, margin as 0", {
 out <- mmit(target.mat, feature.mat)
 p <- predict(out)
 test_that("predicting the tree mmit() with hinge loss", {
-  expect_equal(nodeapply(out, ids = p[[1]][[1]], info_node)[[1]], 0.5)
-  expect_equal(nodeapply(out, ids = p[[2]][[1]], info_node)[[1]], 0.5)
-  expect_equal(nodeapply(out, ids = p[[3]][[1]], info_node)[[1]], 0.5)
-  expect_equal(nodeapply(out, ids = p[[4]][[1]], info_node)[[1]], 2.5)
-  expect_equal(nodeapply(out, ids = p[[5]][[1]], info_node)[[1]], 2.5)
-  expect_equal(nodeapply(out, ids = p[[6]][[1]], info_node)[[1]], 2.5)
+  expect_equal(nodeapply(out, ids = p[[1]], info_node)[[1]][[1]], 0.5)
+  expect_equal(nodeapply(out, ids = p[[2]], info_node)[[1]][[1]], 0.5)
+  expect_equal(nodeapply(out, ids = p[[3]], info_node)[[1]][[1]], 0.5)
+  expect_equal(nodeapply(out, ids = p[[4]], info_node)[[1]][[1]], 2.5)
+  expect_equal(nodeapply(out, ids = p[[5]], info_node)[[1]][[1]], 2.5)
+  expect_equal(nodeapply(out, ids = p[[6]], info_node)[[1]][[1]], 2.5)
 })
 
 
@@ -54,11 +54,11 @@ test_that("predicting the tree mmit() with hinge loss", {
 out <- mmit(target.mat, feature.mat, loss="square")
 p <- predict(out)
 test_that("predicting the tree mmit() with square loss", {
-  expect_equal(nodeapply(out, ids = p[[1]][[1]], info_node)[[1]], 0.5)
-  expect_equal(nodeapply(out, ids = p[[2]][[1]], info_node)[[1]], 0.5)
-  expect_equal(nodeapply(out, ids = p[[3]][[1]], info_node)[[1]], 0.5)
-  expect_equal(nodeapply(out, ids = p[[4]][[1]], info_node)[[1]], 2.5)
-  expect_equal(nodeapply(out, ids = p[[5]][[1]], info_node)[[1]], 2.5)
-  expect_equal(nodeapply(out, ids = p[[6]][[1]], info_node)[[1]], 2.5)
+  expect_equal(nodeapply(out, ids = p[[1]], info_node)[[1]][[1]], 0.5)
+  expect_equal(nodeapply(out, ids = p[[2]], info_node)[[1]][[1]], 0.5)
+  expect_equal(nodeapply(out, ids = p[[3]], info_node)[[1]][[1]], 0.5)
+  expect_equal(nodeapply(out, ids = p[[4]], info_node)[[1]][[1]], 2.5)
+  expect_equal(nodeapply(out, ids = p[[5]], info_node)[[1]][[1]], 2.5)
+  expect_equal(nodeapply(out, ids = p[[6]], info_node)[[1]][[1]], 2.5)
 })
 
