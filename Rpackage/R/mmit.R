@@ -9,7 +9,7 @@
 #' @param maxdepth The maximum depth criteia
 #' @param min_sample The minimum number of sample required 
 #' 
-#' @return An object of class party.
+#' @return The learned regression tree as an object of class party.
 #' 
 #' @author Toby Dylan Hocking, Alexandre Drouin, Torsten Hothorn, Parismita Das
 #' 
