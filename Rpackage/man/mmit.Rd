@@ -21,7 +21,7 @@ mmit(formula, target.mat, feature.mat, weights = NULL, depth = 0,
 \item{min_sample}{The minimum number of sample required}
 }
 \value{
-An object of class party.
+The learned regression tree as an object of class party.
 }
 \description{
 Learning a regression tree for censored data.
