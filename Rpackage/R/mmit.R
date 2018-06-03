@@ -34,7 +34,7 @@ mmit <- structure(function(target.mat, feature.mat, weights = NULL,
                            depth=0, maxdepth = Inf, margin=0.0, loss="hinge",
                            id = 1L, min_sample = 1) {
   
-  ### arranging such that response is not present in feature.mat.
+  ### arranging feature.mat.
   feature.mat <- model.frame(data = feature.mat)
   
   ### assigning all weights as 1 in the beginning. weights determine which data is to be considered in which node.
