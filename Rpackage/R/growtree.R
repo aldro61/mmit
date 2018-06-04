@@ -9,6 +9,15 @@ growtree <- structure(function(target.mat, feature.mat, depth=0, maxdepth = Inf,
     colnames(pid) <- c("prediction", "cost")
   }
 
+  if(side == 10){
+    ### calculate root node cost (as no split thus leftcost + rightcost = 0 + cost )
+    pid <- compute_optimal_costs(target.mat, margin, loss)
+    pid <- cbind(pid[[2]], pid[[3]])
+    pid <- pid[length(pid[,1]),]
+    pid <- data.frame(pid[1], pid[2], row.names = "")
+    colnames(pid) <- c("prediction", "cost")
+  }
+  
   ### if depth exceeds we stop the further growth of tree
   if (depth >= maxdepth) return(partynode(id = id, info = pid))
   
