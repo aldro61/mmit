@@ -42,7 +42,8 @@ mmit <- structure(function(target.mat, feature.mat, weights = NULL,
   stopifnot(length(weights) == nrow(feature.mat) & max(abs(weights - floor(weights))) < .Machine$double.eps)
   
   ### tree
-  node<- growtree(target.mat, feature.mat, maxdepth = maxdepth, margin = margin, weights = weights)
+  ### if root then side is 10 as check, to identify the root
+  node<- growtree(target.mat, feature.mat, maxdepth = maxdepth, margin = margin, weights = weights, side = 10)
   
   ### compute terminal node number for each observation
   tree <- party(node, data = feature.mat, fitted = data.frame("(fitted)" = fitted_node(node, data = feature.mat),
