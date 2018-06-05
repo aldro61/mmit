@@ -1,0 +1,13 @@
+-*~
+-*.so
+-*.o
+-symbols.rds
+-*.Rcheck
+-Rpackage.check
+-*.tar.gz
+-.Rhistory
+-*.pyc
+-*.egg-info
+-build
+-dist
+-.Rproj.user
