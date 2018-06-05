@@ -20,6 +20,8 @@ init_pruning <- structure(function(tree){
     ### left right child ids and partynodes
     left_kid_id <- sapply(kids_node(node), id_node)[1]
     right_kid_id <- sapply(kids_node(node), id_node)[2]
+    left_kid <- nodeapply(tree, ids = left_kid_id)[[1]]
+    right_kid <- nodeapply(tree, ids = right_kid_id)[[1]]
     
     ### cases where node doesnt have 2 leaves
     if(!(is.terminal(left_kid) && is.terminal(right_kid))){
