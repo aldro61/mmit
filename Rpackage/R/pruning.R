@@ -14,11 +14,20 @@ pruning <- structure(function(tree){
     #print("tree")
     #print(soln)
     ### prune the weakest links from tail of tree
-    for(n in length(soln[,  1]):1){
+    ### sort solution
+    if(length(order(soln[, 2]))>1){
+      soln <- soln[order(soln[, 2]),]
+    }
+    print(soln)
+    for(n in length(soln[, 2]):1){
+      ### ignore non int value tell than 1
+      if(soln[n, 2]<1){
+        soln[n, 2] <- 1
+      }
       tree <- nodeprune(tree, ids = soln[n, 2])
     }
     
-    ###
+    ### if terminal root return current tree
     if(is.terminal(tree)){
       return(rbind(c(mit_gt, tree)))
     }
