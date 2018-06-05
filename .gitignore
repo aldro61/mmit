@@ -10,3 +10,4 @@ Rpackage.check
 *.egg-info
 build
 dist
+.Rproj.user
