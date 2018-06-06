@@ -30,15 +30,17 @@
 #' out <- mmit(target.mat, feature.mat)
 #' 
 #' @export
-mmit <- structure(function(target.mat, feature.mat, weights = NULL,
-                           depth=0, maxdepth = Inf, margin=0.0, loss="hinge",
-                           id = 1L, min_sample = 1) {
+mmit <- structure(function(target.mat, feature.mat,  
+                           maxdepth = Inf, margin=0.0, loss="hinge",
+                           min_sample = 1) {
+  ### partynode id and initial depth
+  id = 1L
   
   ### arranging feature.mat.
   feature.mat <- model.frame(data = feature.mat)
   
   ### assigning all weights as 1 in the beginning. weights determine which data is to be considered in which node.
-  if (is.null(weights)) weights <- rep(1L, nrow(feature.mat))
+  weights <- rep(1L, nrow(feature.mat))
   stopifnot(length(weights) == nrow(feature.mat) & max(abs(weights - floor(weights))) < .Machine$double.eps)
   
   ### tree

@@ -41,9 +41,6 @@ growtree <- structure(function(target.mat, feature.mat, depth=0, maxdepth = Inf,
 
   ### creating partynode list of kids
   kids <- vector(mode = "list", length = max(kidids, na.rm = TRUE))
-  
-  ### if no left right kids, stop tree growth
-  if(length(kids) <= 1) return(partynode(id = id, info = node_info_print))
 
 
   for (kidid in 1:length(kids)) {
