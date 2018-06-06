@@ -9,7 +9,7 @@ growtree <- structure(function(target.mat, feature.mat, depth=0, maxdepth = Inf,
     colnames(node_info_print) <- c("prediction", "cost")
   }
   
-  ### passing side = 10 as arguement if node is root.
+  ### if node is root.
   if(is.null(side)){
     ### calculate root node cost (as no split thus leftcost + rightcost = 0 + cost )
     node_info_print <- compute_optimal_costs(target.mat, margin, loss)

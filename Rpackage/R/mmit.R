@@ -44,7 +44,6 @@ mmit <- structure(function(target.mat, feature.mat,
   stopifnot(length(weights) == nrow(feature.mat) & max(abs(weights - floor(weights))) < .Machine$double.eps)
   
   ### tree
-  ### if root then side is 10 as check, to identify the root
   node<- growtree(target.mat, feature.mat, maxdepth = maxdepth, margin = margin, weights = weights)
   
   ### compute terminal node number for each observation
