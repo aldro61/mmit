@@ -10,9 +10,6 @@ pruning <- structure(function(tree){
     ### min_gt is same for all weakest links
     mit_gt <- soln[1, 1]
     
-    #print(tree)
-    #print("tree")
-    #print(soln)
     ### prune the weakest links from tail of tree
     ### sort solution
     if(length(order(soln[, 2]))>1){
