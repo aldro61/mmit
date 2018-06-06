@@ -1,17 +1,29 @@
-*~
-*.so
-*.o
-symbols.rds
-*.Rcheck
-Rpackage.check
-*.tar.gz
+-*~
+-*.so
+-*.o
+-symbols.rds
+-*.Rcheck
+-Rpackage.check
+-*.tar.gz
+-.Rhistory
+-*.pyc
+-*.egg-info
+-build
+-dist
+
+
+
+# History files
 .Rhistory
+<<<<<<< HEAD
 *.pyc
 *.egg-info
 build
 dist
 # History files
 .Rhistory
+=======
+>>>>>>> 75fd4d08b01951252e31189bfa78e2b7d86a11b4
 .Rapp.history
 
 # Session Data files
@@ -28,6 +40,11 @@ dist
 
 # RStudio files
 .Rproj.user/
+<<<<<<< HEAD
+=======
+-.Rproj.user
+
+>>>>>>> 75fd4d08b01951252e31189bfa78e2b7d86a11b4
 
 # produced vignettes
 vignettes/*.html
@@ -45,5 +62,9 @@ vignettes/*.pdf
 *.knit.md
 
 # Shiny token, see https://shiny.rstudio.com/articles/shinyapps.html
+<<<<<<< HEAD
 rsconnect/
 .Rproj.user
+=======
+rsconnect/
+>>>>>>> 75fd4d08b01951252e31189bfa78e2b7d86a11b4

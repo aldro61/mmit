@@ -8,6 +8,12 @@ bestsplit <- structure(function
   best_split$br <- NULL
   best_split$varid <- NULL
   best_split$row <- NULL
+  
+  ### initialise pred$cost with root node's cost.
+  if(is.null(pred)){
+    pred$cost <- as.numeric(tail(compute_optimal_costs(target.mat, margin, loss),1)[3])
+    ### as root cost = left + right = left + 0
+  }
 
   ### extract response values from data
   dummy_tar_1 <- rep(target.mat[,1], times = weights)
@@ -72,9 +78,6 @@ bestsplit <- structure(function
   }
   
   ### check if node cost is less than splitting cost
-  if(is.null(pred)){
-    return(best_split)
-  }
   if(best_split$cost >= pred$cost){
     return(NULL)
   }
