@@ -76,19 +76,19 @@ colnames(feature.mat) <- c("a", "b", "c")
 feature.mat <- data.frame(feature.mat)
 
 #maxdepth = 2 , depth = 0
-tree <- growtree(target.mat, feature.mat, depth=0, maxdepth = 2, margin = 2.0,weights = weights)
+tree <- growtree(target.mat, feature.mat, depth=0, maxdepth = 2, margin = 2.0, weights = weights)
 test_that("depth check maxdepth = 2 , depth = 0", {
   expect_equal(depth(tree),2)
 })
 
 #maxdepth = 3 , depth = 1
-tree <- growtree(target.mat, feature.mat, depth=1, maxdepth = 3, margin = 2.0,weights = weights)
+tree <- growtree(target.mat, feature.mat, depth=1, maxdepth = 3, margin = 2.0, weights = weights)
 test_that("depth check maxdepth = 3 , depth = 1", {
   expect_equal(depth(tree),2)
 })
 
 #maxdepth = 3 , depth = 0
-tree <- growtree(target.mat, feature.mat, depth=0, maxdepth = 3, margin = 2.0,weights = weights)
+tree <- growtree(target.mat, feature.mat, depth=0, maxdepth = 3, margin = 2.0, weights = weights)
 test_that("maxdepth = 3 , depth = 0", {
   expect_equal(depth(tree),3)
 })
