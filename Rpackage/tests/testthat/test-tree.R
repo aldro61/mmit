@@ -63,30 +63,33 @@ test_that("predicting the tree mmit() with square loss", {
 })
 
 ### test for depth 
-library(survival)
-install.packages("penaltyLearning")
-library(penaltyLearning)
-data(neuroblastomaProcessed, package="penaltyLearning")
-feature.mat <- data.frame(neuroblastomaProcessed$feature.mat)[1:45,]
-target.mat <- neuroblastomaProcessed$target.mat[1:45,]
+target.mat <- rbind(
+  c(0,1), c(1,2), c(0,5),
+  c(2,4), c(6,3), c(2,7))
+
+feature.mat <- rbind(
+  c(1,0,4), c(1,1,1), c(1,2,1),
+  c(1,3,0), c(1,4,8), c(1,5,0))
 weights <- rep(1L, nrow(feature.mat))
-tree <- mmit(target.mat, feature.mat, maxdepth = Inf, margin = 2.0)
+
+colnames(feature.mat) <- c("a", "b", "c")
+feature.mat <- data.frame(feature.mat)
 
 #maxdepth = 2 , depth = 0
 tree <- growtree(target.mat, feature.mat, depth=0, maxdepth = 2, margin = 2.0,weights = weights)
-test_that("predicting the tree mmit() with square loss", {
+test_that("depth check maxdepth = 2 , depth = 0", {
   expect_equal(depth(tree),2)
 })
 
 #maxdepth = 3 , depth = 1
 tree <- growtree(target.mat, feature.mat, depth=1, maxdepth = 3, margin = 2.0,weights = weights)
-test_that("predicting the tree mmit() with square loss", {
+test_that("depth check maxdepth = 3 , depth = 1", {
   expect_equal(depth(tree),2)
 })
 
 #maxdepth = 3 , depth = 0
 tree <- growtree(target.mat, feature.mat, depth=0, maxdepth = 3, margin = 2.0,weights = weights)
-test_that("predicting the tree mmit() with square loss", {
+test_that("maxdepth = 3 , depth = 0", {
   expect_equal(depth(tree),3)
 })
 
