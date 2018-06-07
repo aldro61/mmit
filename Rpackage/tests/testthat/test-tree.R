@@ -62,3 +62,29 @@ test_that("predicting the tree mmit() with square loss", {
   expect_equal(nodeapply(out, ids = p[[6]], info_node)[[1]][[1]], 2.5)
 })
 
+### test for depth 
+library(survival)
+data(neuroblastomaProcessed, package="penaltyLearning")
+feature.mat <- data.frame(neuroblastomaProcessed$feature.mat)[1:45,]
+target.mat <- neuroblastomaProcessed$target.mat[1:45,]
+weights <- rep(1L, nrow(feature.mat))
+tree <- mmit(target.mat, feature.mat, maxdepth = Inf, margin = 2.0)
+
+#maxdepth = 2 , depth = 0
+tree <- growtree(target.mat, feature.mat, depth=0, maxdepth = 2, margin = 2.0,weights = weights)
+test_that("predicting the tree mmit() with square loss", {
+  expect_equal(depth(tree),2)
+})
+
+#maxdepth = 3 , depth = 1
+tree <- growtree(target.mat, feature.mat, depth=1, maxdepth = 3, margin = 2.0,weights = weights)
+test_that("predicting the tree mmit() with square loss", {
+  expect_equal(depth(tree),2)
+})
+
+#maxdepth = 3 , depth = 0
+tree <- growtree(target.mat, feature.mat, depth=0, maxdepth = 3, margin = 2.0,weights = weights)
+test_that("predicting the tree mmit() with square loss", {
+  expect_equal(depth(tree),3)
+})
+
