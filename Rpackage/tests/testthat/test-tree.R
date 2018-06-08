@@ -3,12 +3,12 @@ context("trivial")
 library(mmit)
 
 target.mat <- rbind(
-  c(0,1), c(0,1), c(0,1),
-  c(2,3), c(2,3), c(2,3))
+  c(0, 1), c(0, 1), c(0, 1),
+  c(2, 3), c(2, 3), c(2, 3))
 
 feature.mat <- rbind(
-  c(1,0,0), c(1,1,0), c(1,2,0),
-  c(1,3,0), c(1,4,0), c(1,5,0))
+  c(1, 0, 0), c(1, 1, 0), c(1, 2, 0),
+  c(1, 3, 0), c(1, 4, 0), c(1, 5, 0))
 
 weights <- rep(1L, nrow(feature.mat))
 
@@ -64,12 +64,12 @@ test_that("predicting the tree mmit() with square loss", {
 
 ### test for depth 
 target.mat <- rbind(
-  c(0,1), c(1,2), c(0,5),
-  c(2,4), c(6,3), c(2,7))
+  c(0, 1), c(1, 2), c(0, 5),
+  c(2, 4), c(6, 3), c(2, 7))
 
 feature.mat <- rbind(
-  c(1,0,4), c(1,1,1), c(1,2,1),
-  c(1,3,0), c(1,4,8), c(1,5,0))
+  c(1, 0, 4), c(1, 1, 1), c(1, 2, 1),
+  c(1, 3, 0), c(1, 4, 8), c(1, 5, 0))
 weights <- rep(1L, nrow(feature.mat))
 
 colnames(feature.mat) <- c("a", "b", "c")
@@ -77,19 +77,19 @@ feature.mat <- data.frame(feature.mat)
 
 #maxdepth = 2 , depth = 0
 tree <- growtree(target.mat, feature.mat, depth=0, maxdepth = 2, margin = 2.0, weights = weights)
-test_that("depth check maxdepth = 2 , depth = 0", {
-  expect_equal(depth(tree),2)
+test_that("depth check maxdepth = 2, depth = 0", {
+  expect_equal(depth(tree), 2)
 })
 
 #maxdepth = 3 , depth = 1
 tree <- growtree(target.mat, feature.mat, depth=1, maxdepth = 3, margin = 2.0, weights = weights)
-test_that("depth check maxdepth = 3 , depth = 1", {
-  expect_equal(depth(tree),2)
+test_that("depth check maxdepth = 3, depth = 1", {
+  expect_equal(depth(tree), 2)
 })
 
 #maxdepth = 3 , depth = 0
 tree <- growtree(target.mat, feature.mat, depth=0, maxdepth = 3, margin = 2.0, weights = weights)
-test_that("maxdepth = 3 , depth = 0", {
-  expect_equal(depth(tree),3)
+test_that("maxdepth = 3, depth = 0", {
+  expect_equal(depth(tree), 3)
 })
 
