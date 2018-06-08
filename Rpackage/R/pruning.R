@@ -5,23 +5,23 @@ pruning <- structure(function(tree){
   
   sequential_prune <- function(tree){
     ### find weakest links
-    soln <- weakest_link(tree)
+    wlink <- weakest_link(tree)
     
     ### min_gt is same for all weakest links
-    mit_gt <- soln[1, 1]
+    mit_gt <- wlink[1, 1]
     
     ### prune the weakest links from tail of tree
     ### sort solution
-    if(length(order(soln[, 2]))>1){
-      soln <- soln[order(soln[, 2]),]
+    if(length(order(wlink[, 2]))>1){
+      wlink <- wlink[order(wlink[, 2]),]
     }
-    print(soln)
-    for(n in length(soln[, 2]):1){
+    print(wlink)
+    for(n in length(wlink[, 2]):1){
       ### ignore non int value tell than 1
-      if(soln[n, 2]<1){
-        soln[n, 2] <- 1
+      if(wlink[n, 2]<1){
+        wlink[n, 2] <- 1
       }
-      tree <- nodeprune(tree, ids = soln[n, 2])
+      tree <- nodeprune(tree, ids = wlink[n, 2])
     }
     
     ### if terminal root return current tree
