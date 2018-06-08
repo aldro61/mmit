@@ -14,17 +14,17 @@ init_pruning <- structure(function(tree){
     ### node id from the last
     node_id <- tail(inner_id, n = n)[1]
     ### partynode object
-    t <- nodeapply(tree, ids = node_id)[[1]]
-    node <- as.partynode(t)
+    node <- nodeapply(tree, ids = node_id)[[1]]
+    
     
     ### left right child ids and partynodes
-    left_kid_id <- sapply(kids_node(node), id_node)[1]
-    right_kid_id <- sapply(kids_node(node), id_node)[2]
-    left_kid <- nodeapply(tree, ids = left_kid_id)[[1]]
-    right_kid <- nodeapply(tree, ids = right_kid_id)[[1]]
+    kids <- kids_node(node)
+    kid_ids <- sapply(kids, id_node)
+    left_kid_id <- kid_ids[1]
+    right_kid_id <- kid_ids[2]
     
     ### cases where node doesnt have 2 leaves
-    if(!(is.terminal(left_kid) && is.terminal(right_kid))){
+    if(!(is.terminal(kids[[1]]) && is.terminal(kids[[2]]))){
       next
     }
     
