@@ -63,8 +63,12 @@ vignettes/*.pdf
 
 # Shiny token, see https://shiny.rstudio.com/articles/shinyapps.html
 <<<<<<< HEAD
+<<<<<<< HEAD
 rsconnect/
 .Rproj.user
 =======
 rsconnect/
 >>>>>>> 75fd4d08b01951252e31189bfa78e2b7d86a11b4
+=======
+rsconnect/
+>>>>>>> 51d9b055ff9a805bea5d9a1b071124bebdce682c
