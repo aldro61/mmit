@@ -5,22 +5,8 @@ growtree <- structure(function(target.mat, feature.mat, depth=0, maxdepth = Inf,
   node_info_print <- NULL
   ### creating dataframe of info
   if(!is.null(pred)){
-<<<<<<< HEAD
-    pid <- data.frame(pred[[side]], pred[[1]], row.names = "")
-    colnames(pid) <- c("prediction", "cost")
-  }
-  
-  if(side == 10){
-    ### calculate root node cost (as no split thus leftcost + rightcost = 0 + cost )
-    pid <- compute_optimal_costs(target.mat, margin, loss)
-    pid <- cbind(pid[[2]], pid[[3]])
-    pid <- pid[length(pid[,1]),]
-    pid <- data.frame(pid[1], pid[2], row.names = "")
-    colnames(pid) <- c("prediction", "cost")
-=======
     node_info_print <- data.frame(pred[[side]], pred[[1]],row.names = "")
     colnames(node_info_print) <- c("prediction", "cost")
->>>>>>> 75fd4d08b01951252e31189bfa78e2b7d86a11b4
   }
   
   ### if node is root.
