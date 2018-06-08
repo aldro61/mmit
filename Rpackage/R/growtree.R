@@ -42,7 +42,6 @@ growtree <- structure(function(target.mat, feature.mat, depth=0, maxdepth = Inf,
   ### creating partynode list of kids
   kids <- vector(mode = "list", length = max(kidids, na.rm = TRUE))
 
-  depth <- depth+1
   for (kidid in 1:length(kids)) {
     ### select observations for current node
     w <- weights
@@ -56,9 +55,9 @@ growtree <- structure(function(target.mat, feature.mat, depth=0, maxdepth = Inf,
     }
     
     #side = 4+kidid as pred[[5]] is left prediction and pred[[6]] right
-    kids[[kidid]] <- growtree(target.mat, feature.mat, pred = splt, side = 4 + kidid, depth = depth,
+    kids[[kidid]] <- growtree(target.mat, feature.mat, pred = splt, side = 4 + kidid, depth = depth + 1,
                               maxdepth = maxdepth, margin = margin, loss = loss, 
-                              id = as.integer(myid + 1),min_sample = min_sample, weights = w)
+                              id = as.integer(myid + 1), min_sample = min_sample, weights = w)
   }
   
   return(partynode(id = as.integer(id), split = sp, kids = kids, info = node_info_print))
