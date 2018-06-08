@@ -1,5 +1,5 @@
 -*~
--*.so
+  -*.so
 -*.o
 -symbols.rds
 -*.Rcheck
@@ -15,15 +15,6 @@
 
 # History files
 .Rhistory
-<<<<<<< HEAD
-*.pyc
-*.egg-info
-build
-dist
-# History files
-.Rhistory
-=======
->>>>>>> 75fd4d08b01951252e31189bfa78e2b7d86a11b4
 .Rapp.history
 
 # Session Data files
@@ -37,14 +28,11 @@ dist
 
 # Output files from R CMD check
 /*.Rcheck/
+  
+  # RStudio files
+  .Rproj.user/
+  -.Rproj.user
 
-# RStudio files
-.Rproj.user/
-<<<<<<< HEAD
-=======
--.Rproj.user
-
->>>>>>> 75fd4d08b01951252e31189bfa78e2b7d86a11b4
 
 # produced vignettes
 vignettes/*.html
@@ -55,20 +43,11 @@ vignettes/*.pdf
 
 # knitr and R markdown default cache directories
 /*_cache/
-/cache/
-
-# Temporary files created by R markdown
-*.utf8.md
+  /cache/
+  
+  # Temporary files created by R markdown
+  *.utf8.md
 *.knit.md
 
 # Shiny token, see https://shiny.rstudio.com/articles/shinyapps.html
-<<<<<<< HEAD
-<<<<<<< HEAD
 rsconnect/
-.Rproj.user
-=======
-rsconnect/
->>>>>>> 75fd4d08b01951252e31189bfa78e2b7d86a11b4
-=======
-rsconnect/
->>>>>>> 51d9b055ff9a805bea5d9a1b071124bebdce682c
