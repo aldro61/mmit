@@ -6,4 +6,6 @@ License: GPL-3
 Title: Max Margin Interval Trees
 Description: Fast O(P N log N) algorithm for learning a regression tree
  with interval censored output data.
+Depends: partykit, survival 
+RoxygenNote: 6.0.1
 Suggests: testthat
