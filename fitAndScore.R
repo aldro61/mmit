@@ -57,11 +57,19 @@ fit_and_score <- structure(function(tree, target.mat, feature.mat,
       fold_prune_trees[[i]] <- fold_data[, -1]
     }
     
+    ### alphas list should not contain repeating alpha
+    master_alphas <- master_alphas[!duplicated(master_alphas)]
+    fold_alphas <- fold_alphas[!duplicated(fold_alphas)]
+    
+    
     # Compute the test risk for all pruned trees of each fold
     alpha_path_score <- NULL
     for(i in 1 : n_folds){
-      for(j in 1 : length(fold_prune_trees[[i]])){
-        fit <- fitted_node(fold_prune_trees[[i]][j,], feature.mat[fold_split_idx$test[i,],])
+      for(j in 1 : length(fold_prune_trees[[i]][,1])){
+        ### convert pruned tree list to partynode
+        node <- fold_prune_trees[[i]][[j]]
+        
+        fit <- fitted_node(node, feature.mat[fold_split_idx$test[i,],])
         n <- nodeapply(tree, ids = fit, info_node)
         ###prediction of test data
         prediction <- matrix(unlist(n), nrow = length(n), byrow = T)[,1]
@@ -90,13 +98,17 @@ fit_and_score <- structure(function(tree, target.mat, feature.mat,
     best_score <- Inf
     best_tree <- NULL
     
-    for(i in 1:length(master_pruned_trees)){
+    for(i in 1:length(master_pruned_trees[,1])){
       if(i < (length(master_alphas) - 1)){
-        geo_mean_alpha_k <- sqrt(master_alphas[i] * master_alphas[i + 1])
+        geo_mean_alpha_k <- sqrt(master_alphas[[i]]* master_alphas[[i + 1]])
       }
       else{
         geo_mean_alpha_k <- Inf
       }
+      
+      x <- between(geo_mean_alpha_k, min(alpha_path_score), max(alpha_path_score))
+      
+      ############# incomplete, figuring out how to find where geo_mean_alpha_k lies
       cv_score <- mean(alpha_path_score[, geo_mean_alpha_k])
       #train_score <- scorer(target.mat, prediction)
       #train_objective <- cost of all nodes  
@@ -113,7 +125,7 @@ fit_and_score <- structure(function(tree, target.mat, feature.mat,
     ### For each fold, build a decision tree
     fold_test_scores <- NULL
     for(i in 1:n_folds){
-      fit <- predict(fold_tree[[i]], feature.mat[fold_split_idx$test[i,],])
+      fit <- fitted_node(fold_tree[[i]], feature.mat[fold_split_idx$test[i,],])
       n <- nodeapply(tree, ids = fit,info_node)
       prediction <- matrix(unlist(n), nrow = length(n), byrow = T)[,1]
       fold_test_scores <- c(fold_test_scores, scorer(target.mat, prediction))
@@ -137,7 +149,7 @@ fit_and_score <- structure(function(tree, target.mat, feature.mat,
   best_params <- parameters
   best_params$alpha <- best_alpha
   
-  
+  ########## return statement not done yet
   
 })
     
