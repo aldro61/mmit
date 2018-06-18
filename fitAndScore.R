@@ -70,7 +70,7 @@ fit_and_score <- structure(function(tree, target.mat, feature.mat,
         node <- fold_prune_trees[[i]][[j]]
         
         fit <- fitted_node(node, feature.mat[fold_split_idx$test[i,],])
-        n <- nodeapply(tree, ids = fit, info_node)
+        n <- nodeapply(node, ids = fit, info_node)
         ###prediction of test data
         prediction <- matrix(unlist(n), nrow = length(n), byrow = T)[,1]
         ###error calc
@@ -106,7 +106,6 @@ fit_and_score <- structure(function(tree, target.mat, feature.mat,
         geo_mean_alpha_k <- Inf
       }
       
-      x <- between(geo_mean_alpha_k, min(alpha_path_score), max(alpha_path_score))
       
       ############# incomplete, figuring out how to find where geo_mean_alpha_k lies
       cv_score <- mean(alpha_path_score[, geo_mean_alpha_k])
