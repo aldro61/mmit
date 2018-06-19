@@ -106,11 +106,27 @@ fit_and_score <- structure(function(tree, target.mat, feature.mat,
         geo_mean_alpha_k <- Inf
       }
       
+      ### compute cv_score as mean of each fold scores
+      cv_score <- 0
+      for(i in 1:n_folds){
+        for(j in 1:length(alpha_path_score[,1])){
+          if((geo_mean_alpha_k < alpha_path_score[j,2]) && (geo_mean_alpha_k >= alpha_path_score[j,1])){
+            cv_score <- cv_score + alpha_path_score[j,3]
+          }
+        }
+      }
       
-      ############# incomplete, figuring out how to find where geo_mean_alpha_k lies
-      cv_score <- mean(alpha_path_score[, geo_mean_alpha_k])
-      #train_score <- scorer(target.mat, prediction)
-      #train_objective <- cost of all nodes  
+      ### calc train score
+      fit <- predict(master_tree, feature.mat)
+      n <- nodeapply(master_tree, ids = fit, info_node)
+      prediction <- matrix(unlist(n), nrow = length(n), byrow = T)[,1]
+      train_score <- scorer(target.mat, prediction)
+      
+      ### calc cost of all leaves
+      ter_id <- nodeids(master_tree, terminal = TRUE)
+      n <- nodeapply(master_tree, ids = ter_id, info_node)
+      train_objective <- sum(matrix(unlist(n), nrow = length(n), byrow = T)[,2])
+        
       
       if(cv_score < best_score){
         best_score <- cv_score
