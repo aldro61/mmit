@@ -126,7 +126,12 @@ fit_and_score <- structure(function(tree, target.mat, feature.mat,
       ter_id <- nodeids(master_tree, terminal = TRUE)
       n <- nodeapply(master_tree, ids = ter_id, info_node)
       train_objective <- sum(matrix(unlist(n), nrow = length(n), byrow = T)[,2])
-        
+      
+      # Log metrics for this alpha value
+      alphas <- c(alphas, geo_mean_alpha_k)
+      alpha_cv_scores <- c(alpha_cv_scores, cv_score)
+      alpha_train_scores <- c(alpha_train_scores, train_score)
+      alpha_train_objective_values <- c(alpha_train_objective_values, train_objective)
       
       if(cv_score < best_score){
         best_score <- cv_score
@@ -140,31 +145,47 @@ fit_and_score <- structure(function(tree, target.mat, feature.mat,
     ### For each fold, build a decision tree
     fold_test_scores <- NULL
     for(i in 1:n_folds){
-      fit <- fitted_node(fold_tree[[i]], feature.mat[fold_split_idx$test[i,],])
-      n <- nodeapply(tree, ids = fit,info_node)
+      fit <- predict(fold_tree[[i]], feature.mat[fold_split_idx$test[i,],])
+      n <- nodeapply(fold_tree[[i]], ids = fit,info_node)
       prediction <- matrix(unlist(n), nrow = length(n), byrow = T)[,1]
       fold_test_scores <- c(fold_test_scores, scorer(target.mat, prediction))
     }
     
     ### master tree predictions
     fit <- predict(master_tree, feature.mat)
-    n <- nodeapply(tree, ids = fit,info_node)
+    n <- nodeapply(master_tree, ids = fit,info_node)
     prediction <- matrix(unlist(n), nrow = length(n), byrow = T)[,1]
     master_scores <- scorer(target.mat, prediction)
       
     best_alpha <-  0.
-    best_score <- rowMeans(fold_test_scores)
+    best_score <- mean(fold_test_scores)
     best_tree <- master_tree
     alphas <- c(0.)
     alpha_cv_scores <- c(best_score)
     alpha_train_scores <- c(master_scores)
-    #alpha_train_objective_values < c(l.cost_value for l in master_predictor.tree_.leaves)
+    
+    ### calc cost of all leaves
+    ter_id <- nodeids(master_tree, terminal = TRUE)
+    n <- nodeapply(master_tree, ids = ter_id, info_node)
+    alpha_train_objective_values <- sum(matrix(unlist(n), nrow = length(n), byrow = T)[,2])
   }
   ### Append alpha to the parameters
   best_params <- parameters
   best_params$alpha <- best_alpha
   
-  ########## return statement not done yet
+  ### Generate a big dictionnary of all HP combinations considered (including alpha) and their CV scores
+  cv_results <- cbind(parameters$maxdepth, parameters$margin, parameters$min_sample, 
+                      alphas, alpha_cv_scores, alpha_train_scores, alpha_train_objective_values)
+  colnames(cv_results) <- c("maxdepth", "margin", "min sample","alpha", " cv score", "train score", "train objective vale")
+  cv_results <- as.data.frame(cv_results)
   
+  output <- NULL
+  output$best_score <- best_score
+  output$best_estimator <- best_tree
+  output$best_params <- best_params
+  output$cv_result <- cv_results
+  
+  
+  return(output)
 })
     
