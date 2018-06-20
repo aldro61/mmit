@@ -9,12 +9,13 @@ pruning <- structure(function(tree){
     ### min_gt is same for all weakest links
     mit_gt <- wlink[1, 1]
     
-    ### prune the weakest links from tail of tree
-    ### sort solution
-    if(length(order(wlink[, 2]))>1){
-      wlink <- wlink[order(wlink[, 2]),]
+    ### to prune the weakest links from tail of tree we apply sorting
+    ### sort solution 
+    sorted_wlink <- order(wlink[, 2])
+    if(length(sorted_wlink)>1){
+      wlink <- wlink[sorted_wlink,]
     }
-    print(wlink)
+
     for(n in length(wlink[, 2]):1){
       ### ignore non int value less than 1
       if(wlink[n, 2]<1){
@@ -23,11 +24,8 @@ pruning <- structure(function(tree){
       tree <- nodeprune(tree, ids = wlink[n, 2])
     }
     
-    ### party object to partynode (tree1 and tree are equal)
-    tree1 <- nodeapply(tree, ids = 1)[[1]]
-    
     ### if terminal root return current tree
-    if(is.terminal(tree1)){
+    if(is.terminal(nodeapply(tree, ids = 1)[[1]])){
       return(rbind(c(mit_gt, tree)))
     }
     else{
@@ -35,10 +33,7 @@ pruning <- structure(function(tree){
     }
   }
   
-  ### party object to partynode (tree1 and tree are equal)
-  Tree1 <- nodeapply(T1, ids = 1)[[1]]
-  
-  if(is.terminal(Tree1)){
+  if(is.terminal(nodeapply(T1, ids = 1)[[1]])){
     return(rbind(c(0.0, T1)))
   }
   else{
