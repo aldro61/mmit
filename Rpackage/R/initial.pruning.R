@@ -7,7 +7,7 @@ init_pruning <- structure(function(tree){
   
   ### if there is no inner node
   if(length(inner_id) == 0){
-    return(NULL)
+    return(tree)
   }
   
   for(n in 1:length(inner_id)){
