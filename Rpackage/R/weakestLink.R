@@ -29,11 +29,8 @@ weakest_link <- structure(function(tree){
       ### current alpha value
       current_gt <- (node_cost - C_Tt)/(length(ter_id) - 1)
       
-      ### left right child ids and partynodes
+      ### left right child ids and partynodes stored in list kids
       kids <- kids_node(tree)
-      kid_ids <- sapply(kids, id_node)
-      left_kid_id <- kid_ids[1]
-      right_kid_id <- kid_ids[2]
   
       ### weakest link from left tree part
       wlink <- find_weakest_link(kids[[1]])
