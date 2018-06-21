@@ -17,10 +17,6 @@ pruning <- structure(function(tree){
     }
 
     for(n in length(wlink[, 2]):1){
-      ### ignore non int value less than 1
-      if(wlink[n, 2]<1){
-        wlink[n, 2] <- 1
-      }
       tree <- nodeprune(tree, ids = wlink[n, 2])
     }
     
