@@ -13,10 +13,10 @@ zero_one_loss <- function(y_true, y_pred){
 mse <- function(y_true, y_pred){
   error <- 0.0
   for(i in 1 : length(y_pred)){
-    if(y_true[i,1] < y_pred[i]){
+    if(y_true[i,1] > y_pred[i]){
       error <- error + (y_true[i,1] - y_pred[i])**2
     }
-    else if(y_true[i,2] > y_pred[i]){
+    else if(y_true[i,2] <= y_pred[i]){
       error <- error + (y_true[i,2] - y_pred[i])**2
     }
   }
