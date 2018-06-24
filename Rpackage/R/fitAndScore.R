@@ -1,29 +1,29 @@
 fit_and_score <- structure(function(tree, target.mat, feature.mat, 
-                                    parameters, feature_names=NULL, 
-                                    n_folds = 3, scorer=NULL, loss = "hinge",
+                                    parameters, feature_names = NULL, 
+                                    n_folds = 3, scorer = NULL, loss = "hinge",
                                     pruning = TRUE){
   ### total length
-  l <- length(target.mat[, 1])
+  l <- nrow(target.mat)
   
   ### train and test index for each fold
   fold_split_idx <- NULL
   
   ### initial row
-  fold_split_idx$train <- seq(from = 1, to = ((l/n_folds)*(n_folds-1)), by = 1)
-  fold_split_idx$test <- seq(from = ((l/n_folds)*(n_folds-1)) + 1, to = l, by = 1)
+  fold_split_idx$train <- seq(from = 1, to = ((l / n_folds) * (n_folds - 1)), by = 1)
+  fold_split_idx$test <- seq(from = ((l / n_folds) * (n_folds - 1)) + 1, to = l, by = 1)
   
   ### middle values
-  for(n in (n_folds-1):2){
-    this_row_train <- c(seq(from = 1, to = ((l/n_folds)*(n-1)), by = 1), seq(from = as.integer((l/n_folds)*(n)+1), to = l, by = 1))
-    this_row_test <- seq(from = ((l/n_folds)*(n-1)) + 1, to = as.integer((l/n_folds)*(n)))
+  for(n in (n_folds-1) : 2){
+    this_row_train <- c(seq(from = 1, to = ((l / n_folds) * (n - 1)), by = 1), seq(from = as.integer((l / n_folds) * (n) + 1), to = l, by = 1))
+    this_row_test <- seq(from = ((l / n_folds) * (n - 1)) + 1, to = as.integer((l / n_folds) * (n)))
     
     fold_split_idx$train <- rbind(fold_split_idx$train, this_row_train)
     fold_split_idx$test <- rbind(fold_split_idx$test, this_row_test)
   }
   
   ### end row
-  this_row_train <- seq(from = (as.integer((l/n_folds)+1)), to = l, by = 1)
-  this_row_test <- seq(from = 1, to = as.integer((l/n_folds)), by = 1)
+  this_row_train <- seq(from = (as.integer((l / n_folds) + 1)), to = l, by = 1)
+  this_row_test <- seq(from = 1, to = as.integer((l / n_folds)), by = 1)
   
   fold_split_idx$train <- rbind(fold_split_idx$train, this_row_train)
   fold_split_idx$test <- rbind(fold_split_idx$test, this_row_test)
@@ -65,20 +65,21 @@ fit_and_score <- structure(function(tree, target.mat, feature.mat,
     # Compute the test risk for all pruned trees of each fold
     alpha_path_score <- NULL
     for(i in 1 : n_folds){
-      for(j in 1 : length(fold_prune_trees[[i]][,1])){
+      for(j in 1 : nrow(fold_prune_trees[[i]])){
         ### convert pruned tree list to partynode
         node <- fold_prune_trees[[i]][[j]]
         
         fit <- fitted_node(node, feature.mat[fold_split_idx$test[i,],])
         n <- nodeapply(node, ids = fit, info_node)
+        print("1")  #### if node = root*
         ###prediction of test data
         prediction <- matrix(unlist(n), nrow = length(n), byrow = T)[,1]
         ###error calc
         fold_test_scores <- scorer(target.mat[fold_split_idx$test[i,],], prediction)
         
         ### creating a dataframe with init alpha, final alpha, score value
-        if(j < (length(fold_alphas[[i]]) - 1)){
-          alpha_path_score <- rbind(alpha_path_score, c(fold_alphas[[i]][j], fold_alphas[[i]][j+1], fold_test_scores))
+        if(j < (length(fold_alphas[[i]]))){
+          alpha_path_score <- rbind(alpha_path_score, c(fold_alphas[[i]][j], fold_alphas[[i]][j + 1], fold_test_scores))
         }
         else{
           alpha_path_score <- rbind(alpha_path_score, c(fold_alphas[[i]][j], Inf, fold_test_scores))
@@ -98,9 +99,9 @@ fit_and_score <- structure(function(tree, target.mat, feature.mat,
     best_score <- Inf
     best_tree <- NULL
     
-    for(i in 1:length(master_pruned_trees[,1])){
-      if(i < (length(master_alphas) - 1)){
-        geo_mean_alpha_k <- sqrt(master_alphas[[i]]* master_alphas[[i + 1]])
+    for(i in 1 : length(master_pruned_trees[,1])){
+      if(i < (length(master_alphas))){
+        geo_mean_alpha_k <- sqrt(master_alphas[[i]] * master_alphas[[i + 1]])
       }
       else{
         geo_mean_alpha_k <- Inf
@@ -108,10 +109,10 @@ fit_and_score <- structure(function(tree, target.mat, feature.mat,
       
       ### compute cv_score as mean of each fold scores
       cv_score <- 0
-      for(i in 1:n_folds){
-        for(j in 1:length(alpha_path_score[,1])){
-          if((geo_mean_alpha_k < alpha_path_score[j,2]) && (geo_mean_alpha_k >= alpha_path_score[j,1])){
-            cv_score <- cv_score + alpha_path_score[j,3]
+      for(i in 1 : n_folds){
+        for(j in 1 : nrow(alpha_path_score)){
+          if((geo_mean_alpha_k < alpha_path_score[j, 2]) && (geo_mean_alpha_k >= alpha_path_score[j, 1])){
+            cv_score <- cv_score + alpha_path_score[j, 3]
           }
         }
       }
@@ -119,13 +120,13 @@ fit_and_score <- structure(function(tree, target.mat, feature.mat,
       ### calc train score
       fit <- predict(master_tree, feature.mat)
       n <- nodeapply(master_tree, ids = fit, info_node)
-      prediction <- matrix(unlist(n), nrow = length(n), byrow = T)[,1]
+      prediction <- matrix(unlist(n), nrow = length(n), byrow = T)[, 1]
       train_score <- scorer(target.mat, prediction)
       
       ### calc cost of all leaves
       ter_id <- nodeids(master_tree, terminal = TRUE)
       n <- nodeapply(master_tree, ids = ter_id, info_node)
-      train_objective <- sum(matrix(unlist(n), nrow = length(n), byrow = T)[,2])
+      train_objective <- sum(matrix(unlist(n), nrow = length(n), byrow = T)[, 2])
       
       # Log metrics for this alpha value
       alphas <- c(alphas, geo_mean_alpha_k)
@@ -144,9 +145,9 @@ fit_and_score <- structure(function(tree, target.mat, feature.mat,
   else{
     ### For each fold, build a decision tree
     fold_test_scores <- NULL
-    for(i in 1:n_folds){
+    for(i in 1 : n_folds){
       fit <- predict(fold_tree[[i]], feature.mat[fold_split_idx$test[i,],])
-      n <- nodeapply(fold_tree[[i]], ids = fit,info_node)
+      n <- nodeapply(fold_tree[[i]], ids = fit, info_node)
       prediction <- matrix(unlist(n), nrow = length(n), byrow = T)[,1]
       fold_test_scores <- c(fold_test_scores, scorer(target.mat, prediction))
     }
@@ -154,7 +155,7 @@ fit_and_score <- structure(function(tree, target.mat, feature.mat,
     ### master tree predictions
     fit <- predict(master_tree, feature.mat)
     n <- nodeapply(master_tree, ids = fit,info_node)
-    prediction <- matrix(unlist(n), nrow = length(n), byrow = T)[,1]
+    prediction <- matrix(unlist(n), nrow = length(n), byrow = T)[, 1]
     master_scores <- scorer(target.mat, prediction)
       
     best_alpha <-  0.
@@ -167,7 +168,7 @@ fit_and_score <- structure(function(tree, target.mat, feature.mat,
     ### calc cost of all leaves
     ter_id <- nodeids(master_tree, terminal = TRUE)
     n <- nodeapply(master_tree, ids = ter_id, info_node)
-    alpha_train_objective_values <- sum(matrix(unlist(n), nrow = length(n), byrow = T)[,2])
+    alpha_train_objective_values <- sum(matrix(unlist(n), nrow = length(n), byrow = T)[, 2])
   }
   ### Append alpha to the parameters
   best_params <- parameters

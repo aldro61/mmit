@@ -1,4 +1,4 @@
-pruning <- structure(function(tree){
+mmit.pruning <- structure(function(tree){
   ### T1 is the tree after initital pruning of Tmax
   T1 <- init_pruning(tree)
   
@@ -16,7 +16,7 @@ pruning <- structure(function(tree){
       wlink <- wlink[sorted_wlink,]
     }
 
-    for(n in length(wlink[, 2]):1){
+    for(n in nrow(wlink):1){
       tree <- nodeprune(tree, ids = wlink[n, 2])
     }
     

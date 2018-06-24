@@ -21,7 +21,7 @@ bestsplit <- structure(function
   target.mat <- cbind(dummy_tar_1,dummy_tar_2)
   
   ### loop for every feature
-  for (index in 1:(length(feature.mat[1,]))){
+  for (index in 1:(ncol(feature.mat))){
     feat <- feature.mat[, index]
     
     ### extract data value as per weight
@@ -49,7 +49,7 @@ bestsplit <- structure(function
 
     ### unique and removing cases where all examples are in one leaf
     leftleaf <- leftleaf[last_idx,]
-    leftleaf <- leftleaf[-length(leftleaf[, 1]),]
+    leftleaf <- leftleaf[-nrow(leftleaf),]
     rightleaf$moves <- rev(rightleaf[, 1])
     rightleaf$pred <- rev(rightleaf[, 2])
     rightleaf$cost <- rev(rightleaf[, 3])
