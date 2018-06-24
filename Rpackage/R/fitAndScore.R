@@ -45,16 +45,16 @@ fit_and_score <- structure(function(tree, target.mat, feature.mat,
   ### if pruning
   if(pruning){
     # Get the pruned master and cross-validation trees
-    master_data <- pruning(master_tree)
-    master_alphas <- master_data[, 1]
-    master_pruned_trees <- master_data[, -1]
+    master_data <- mmit.pruning(master_tree)
+    master_alphas <- lapply(master_data, function(x) x$alpha)
+    master_pruned_trees <- lapply(master_data, function(x) x$tree)
     
     fold_alphas <- NULL
     fold_prune_trees <- NULL
     for(i in 1 : n_folds){
-      fold_data <- pruning(fold_tree[[i]])
-      fold_alphas[[i]] <- fold_data[, 1] 
-      fold_prune_trees[[i]] <- fold_data[, -1]
+      fold_data <- mmit.pruning(fold_tree[[i]])
+      fold_alphas[[i]] <- lapply(fold_data, function(x) x$alpha)
+      fold_prune_trees[[i]] <- lapply(fold_data, function(x) x$tree)
     }
     
     ### alphas list should not contain repeating alpha
