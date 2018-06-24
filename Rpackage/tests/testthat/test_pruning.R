@@ -8,7 +8,7 @@ kidskids <- NULL
 info_print <- data.frame(1, 10, row.names = "")
 colnames(info_print) <- c("prediction", "cost")
 root <- partynode(1, info = info_print)
-output <- pruning(root)
+output <- mmit.pruning(root)
 cost <- nodeapply(root, ids = 1, info_node)[[1]][1, 2]
 test_that("finding pruning of tree with root as leave", {
   expect_equal(output[[1]], 0.)
@@ -29,7 +29,7 @@ colnames(info_print) <- c("prediction", "cost")
 split <- partysplit(varid = as.integer(1), breaks = 2)
 root <- partynode(1, split = split, kids = kids, info = info_print)
 
-output <- pruning(root)
+output <- mmit.pruning(root)
 cost <- nodeapply(root, ids = 1, info_node)[[1]][1,2]
 test_that("initial pruning", {
   expect_equal(output[[1]], 0.)
@@ -94,7 +94,7 @@ colnames(info_print) <- c("prediction", "cost")
 root <- partynode(1, split = split, kids = kids, info = info_print)
 
 #pruning
-output <- pruning(root)
+output <- mmit.pruning(root)
 test_that("pruning test 1", {
   #alpha
   expect_equal(unlist(output[, 1]), c(0, 2, 3.5))
@@ -141,7 +141,7 @@ colnames(info_print) <- c("prediction", "cost")
 root <- partynode(1, split = split, kids = kids, info = info_print)
 
 #pruning
-output <- pruning(root)
+output <- mmit.pruning(root)
 test_that("pruning test 2", {
   #alpha
   expect_equal(unlist(output[, 1]), c(0, 7, 18, 70))
