@@ -5,28 +5,21 @@ fit_and_score <- structure(function(tree, target.mat, feature.mat,
   ### total length
   l <- nrow(target.mat)
   
+  ### shuffle the data 
+  rand <- sample(nrow(target.mat))
+  target.mat <- target.mat[rand,]
+  feature.mat <- feature.mat[rand,]
+  
   ### train and test index for each fold
   fold_split_idx <- NULL
   
-  ### initial row
-  fold_split_idx$train <- seq(from = 1, to = ((l / n_folds) * (n_folds - 1)), by = 1)
-  fold_split_idx$test <- seq(from = ((l / n_folds) * (n_folds - 1)) + 1, to = l, by = 1)
-  
-  ### middle values
-  for(n in (n_folds-1) : 2){
-    this_row_train <- c(seq(from = 1, to = ((l / n_folds) * (n - 1)), by = 1), seq(from = as.integer((l / n_folds) * (n) + 1), to = l, by = 1))
-    this_row_test <- seq(from = ((l / n_folds) * (n - 1)) + 1, to = as.integer((l / n_folds) * (n)))
+  ### segment the data into test and train
+  for(i in 1:n_folds){
+    #Segement your data by fold using the which() function 
+    fold_split_idx$test <- which(folds==i,arr.ind=TRUE)
+    fold_split_idx$train <- which(folds!=i,arr.ind=TRUE)
     
-    fold_split_idx$train <- rbind(fold_split_idx$train, this_row_train)
-    fold_split_idx$test <- rbind(fold_split_idx$test, this_row_test)
   }
-  
-  ### end row
-  this_row_train <- seq(from = (as.integer((l / n_folds) + 1)), to = l, by = 1)
-  this_row_test <- seq(from = 1, to = as.integer((l / n_folds)), by = 1)
-  
-  fold_split_idx$train <- rbind(fold_split_idx$train, this_row_train)
-  fold_split_idx$test <- rbind(fold_split_idx$test, this_row_test)
   
   ### fold trees
   fold_tree <- NULL
