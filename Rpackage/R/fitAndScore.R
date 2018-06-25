@@ -10,6 +10,10 @@ fit_and_score <- structure(function(tree, target.mat, feature.mat,
   target.mat <- target.mat[rand,]
   feature.mat <- feature.mat[rand,]
   
+  
+  ### Create n equally size folds
+  folds <- cut(seq(1,nrow(target.mat)),breaks=n_folds,labels=FALSE)
+  
   ### train and test index for each fold
   fold_split_idx <- NULL
   
