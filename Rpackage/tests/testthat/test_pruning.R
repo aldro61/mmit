@@ -11,7 +11,7 @@ root <- partynode(1, info = info_print)
 output <- mmit.pruning(root)
 cost <- nodeapply(root, ids = 1, info_node)[[1]][1, 2]
 test_that("finding pruning of tree with root as leave", {
-  expect_equal(lapply(output, function(x) x$alpha), c(0.))
+  expect_equal(unlist(lapply(output, function(x) x$alpha)), 0.)
   expect_equal(cost, 10.)
 })
 
@@ -32,7 +32,7 @@ root <- partynode(1, split = split, kids = kids, info = info_print)
 output <- mmit.pruning(root)
 cost <- nodeapply(root, ids = 1, info_node)[[1]][1,2]
 test_that("initial pruning", {
-  expect_equal(lapply(output, function(x) x$alpha), c(0.))
+  expect_equal(unlist(lapply(output, function(x) x$alpha)), 0.)
   expect_equal(cost, 10.)
 })
 
@@ -97,7 +97,7 @@ root <- partynode(1, split = split, kids = kids, info = info_print)
 output <- mmit.pruning(root)
 test_that("pruning test 1", {
   #alpha
-  expect_equal(lapply(output, function(x) x$alpha), c(0, 2, 3.5))
+  expect_equal(unlist(lapply(output, function(x) x$alpha)), c(3.5, 2, 0.0))
 })
 
 
@@ -144,5 +144,5 @@ root <- partynode(1, split = split, kids = kids, info = info_print)
 output <- mmit.pruning(root)
 test_that("pruning test 2", {
   #alpha
-  expect_equal(lapply(output, function(x) x$alpha), c(0, 7, 18, 70))
+  expect_equal(unlist(lapply(output, function(x) x$alpha)), c(70, 18, 7, 0))
 })

@@ -20,8 +20,8 @@ fit_and_score <- structure(function(tree, target.mat, feature.mat,
   ### segment the data into test and train
   for(i in 1:n_folds){
     #Segement your data by fold using the which() function 
-    fold_split_idx$test <- which(folds==i,arr.ind=TRUE)
-    fold_split_idx$train <- which(folds!=i,arr.ind=TRUE)
+    fold_split_idx$test <- rbind(fold_split_idx$test, which(folds==i,arr.ind=TRUE))
+    fold_split_idx$train <- rbind(fold_split_idx$train, which(folds!=i,arr.ind=TRUE))
     
   }
   
@@ -43,15 +43,15 @@ fit_and_score <- structure(function(tree, target.mat, feature.mat,
   if(pruning){
     # Get the pruned master and cross-validation trees
     master_data <- mmit.pruning(master_tree)
-    master_alphas <- lapply(master_data, function(x) x$alpha)
-    master_pruned_trees <- lapply(master_data, function(x) x$tree)
+    master_alphas <- rev(unlist(lapply(master_data, function(x) x$alpha)))
+    master_pruned_trees <- rev(lapply(master_data, function(x) x$tree))
     
     fold_alphas <- NULL
     fold_prune_trees <- NULL
     for(i in 1 : n_folds){
       fold_data <- mmit.pruning(fold_tree[[i]])
-      fold_alphas[[i]] <- lapply(fold_data, function(x) x$alpha)
-      fold_prune_trees[[i]] <- lapply(fold_data, function(x) x$tree)
+      fold_alphas[[i]] <- rev(unlist(lapply(fold_data, function(x) x$alpha)))
+      fold_prune_trees[[i]] <- rev(lapply(fold_data, function(x) x$tree))
     }
     
     ### alphas list should not contain repeating alpha
@@ -62,29 +62,47 @@ fit_and_score <- structure(function(tree, target.mat, feature.mat,
     # Compute the test risk for all pruned trees of each fold
     alpha_path_score <- NULL
     for(i in 1 : n_folds){
-      for(j in 1 : nrow(fold_prune_trees[[i]])){
+      for(j in 1 : length(fold_prune_trees[[i]])){
         ### convert pruned tree list to partynode
         node <- fold_prune_trees[[i]][[j]]
         
-        fit <- fitted_node(node, feature.mat[fold_split_idx$test[i,],])
-        n <- nodeapply(node, ids = fit, info_node)
-        print("1")  #### if node = root*
-        ###prediction of test data
-        prediction <- matrix(unlist(n), nrow = length(n), byrow = T)[,1]
+        fit <- predict(node, feature.mat[fold_split_idx$test[i,],])
+        ### if tree is root only, n is null, then predictions are equal to root predictions
+        if(length(unique(fit)) <= 1){
+          prediction <- compute_optimal_costs(target.mat[fold_split_idx$test[i,],], parameters$margin, loss)$pred
+          prediction <- rep(prediction[length(prediction)], length(prediction))
+        }
+        else{
+          n <- nodeapply(node, ids = fit, info_node)
+          ###prediction of test data
+          prediction <- matrix(unlist(n), nrow = length(n), byrow = T)[,1]
+        }
+        
+        
         ###error calc
         fold_test_scores <- scorer(target.mat[fold_split_idx$test[i,],], prediction)
         
         ### creating a dataframe with init alpha, final alpha, score value
         if(j < (length(fold_alphas[[i]]))){
-          alpha_path_score <- rbind(alpha_path_score, c(fold_alphas[[i]][j], fold_alphas[[i]][j + 1], fold_test_scores))
-        }
+          if(length(alpha_path_score)<i){
+            alpha_path_score[[i]] <- c(fold_alphas[[i]][j], fold_alphas[[i]][j + 1], fold_test_scores)
+          }
+          else{
+            alpha_path_score[[i]] <- rbind(alpha_path_score[[i]], c(fold_alphas[[i]][j], fold_alphas[[i]][j + 1], fold_test_scores))
+            }
+          }
         else{
-          alpha_path_score <- rbind(alpha_path_score, c(fold_alphas[[i]][j], Inf, fold_test_scores))
+          
+          if(length(alpha_path_score)<i){
+            alpha_path_score[[i]] <- c(fold_alphas[[i]][j], Inf, fold_test_scores)
+          }
+          else{
+            alpha_path_score[[i]] <- rbind(alpha_path_score[[i]], c(fold_alphas[[i]][j], Inf, fold_test_scores))
+          }
         }
-        colnames(alpha_path_score) <- c("init alpha", " final alpha", "score")
-        alpha_path_score <- as.data.frame(alpha_path_score)
       }
-      
+      colnames(alpha_path_score[[i]]) <- c("init alpha", " final alpha", "score")
+      alpha_path_score[[i]] <- as.data.frame(alpha_path_score[[i]])
     }
     
     # Prune the master tree based on the CV estimates
