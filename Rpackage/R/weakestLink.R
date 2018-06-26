@@ -34,13 +34,13 @@ weakest_link <- structure(function(tree){
   
       ### weakest link from left tree part
       wlink <- find_weakest_link(kids[[1]])
-      left_min_gt <- tail(wlink)[1]
-      left_weakest_links <- tail(wlink)[2]
+      left_min_gt <- tail(wlink, 1)[1]
+      left_weakest_links <- tail(wlink, 1)[2]
       
       ### weakest link from right tree part
       wlink <- find_weakest_link(kids[[2]])
-      right_min_gt <- tail(wlink)[1]
-      right_weakest_links <- tail(wlink)[2]
+      right_min_gt <- tail(wlink, 1)[1]
+      right_weakest_links <- tail(wlink, 1)[2]
       
       if(isTRUE(all.equal(current_gt, min(left_min_gt, right_min_gt)))){
         ### if all gt same

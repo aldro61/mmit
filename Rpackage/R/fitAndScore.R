@@ -114,7 +114,7 @@ fit_and_score <- structure(function(tree, target.mat, feature.mat,
     best_score <- Inf
     best_tree <- NULL
     
-    for(i in 1 : length(master_pruned_trees[,1])){
+    for(i in 1 : length(master_pruned_trees)){
       if(i < (length(master_alphas))){
         geo_mean_alpha_k <- sqrt(master_alphas[[i]] * master_alphas[[i + 1]])
       }
@@ -125,12 +125,14 @@ fit_and_score <- structure(function(tree, target.mat, feature.mat,
       ### compute cv_score as mean of each fold scores
       cv_score <- 0
       for(i in 1 : n_folds){
-        for(j in 1 : nrow(alpha_path_score)){
-          if((geo_mean_alpha_k < alpha_path_score[j, 2]) && (geo_mean_alpha_k >= alpha_path_score[j, 1])){
-            cv_score <- cv_score + alpha_path_score[j, 3]
+        for(j in 1 : nrow(alpha_path_score[[i]])){
+          if((geo_mean_alpha_k < alpha_path_score[[i]][j, 2]) && (geo_mean_alpha_k >= alpha_path_score[[i]][j, 1])){
+            cv_score <- cv_score + alpha_path_score[[i]][j, 3]
+            break
           }
         }
       }
+      cv_score <- cv_score/n_folds
       
       ### calc train score
       fit <- predict(master_tree, feature.mat)
@@ -192,7 +194,7 @@ fit_and_score <- structure(function(tree, target.mat, feature.mat,
   ### Generate a big dictionnary of all HP combinations considered (including alpha) and their CV scores
   cv_results <- cbind(parameters$maxdepth, parameters$margin, parameters$min_sample, 
                       alphas, alpha_cv_scores, alpha_train_scores, alpha_train_objective_values)
-  colnames(cv_results) <- c("maxdepth", "margin", "min sample","alpha", " cv score", "train score", "train objective vale")
+  colnames(cv_results) <- c("maxdepth", "margin", "min_sample","alpha", " cv_score", "train_score", "train_objective_value")
   cv_results <- as.data.frame(cv_results)
   
   output <- NULL
