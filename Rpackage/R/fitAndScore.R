@@ -1,4 +1,4 @@
-fit_and_score <- structure(function(tree, target.mat, feature.mat, 
+fit_and_score <- structure(function(target.mat, feature.mat, 
                                     parameters, feature_names = NULL, 
                                     n_folds = 3, scorer = NULL, loss = "hinge",
                                     pruning = TRUE){
@@ -66,19 +66,10 @@ fit_and_score <- structure(function(tree, target.mat, feature.mat,
         ### convert pruned tree list to partynode
         node <- fold_prune_trees[[i]][[j]]
         
-        fit <- predict(node, feature.mat[fold_split_idx$test[i,],])
-        ### if tree is root only, n is null, then predictions are equal to root predictions
-        if(length(unique(fit)) <= 1){
-          prediction <- compute_optimal_costs(target.mat[fold_split_idx$test[i,],], parameters$margin, loss)$pred
-          prediction <- rep(prediction[length(prediction)], length(prediction))
-        }
-        else{
-          n <- nodeapply(node, ids = fit, info_node)
-          ###prediction of test data
-          prediction <- matrix(unlist(n), nrow = length(n), byrow = T)[,1]
-        }
+        ### predictions of the tree for test data
+        prediction <- mmit.predict(node, feature.mat[fold_split_idx$test[i,],])
         
-        
+
         ###error calc
         fold_test_scores <- scorer(target.mat[fold_split_idx$test[i,],], prediction)
         
@@ -135,9 +126,7 @@ fit_and_score <- structure(function(tree, target.mat, feature.mat,
       cv_score <- cv_score/n_folds
       
       ### calc train score
-      fit <- predict(master_tree, feature.mat)
-      n <- nodeapply(master_tree, ids = fit, info_node)
-      prediction <- matrix(unlist(n), nrow = length(n), byrow = T)[, 1]
+      prediction <- mmit.predict(master_tree, feature.mat)
       train_score <- scorer(target.mat, prediction)
       
       ### calc cost of all leaves
@@ -163,16 +152,12 @@ fit_and_score <- structure(function(tree, target.mat, feature.mat,
     ### For each fold, build a decision tree
     fold_test_scores <- NULL
     for(i in 1 : n_folds){
-      fit <- predict(fold_tree[[i]], feature.mat[fold_split_idx$test[i,],])
-      n <- nodeapply(fold_tree[[i]], ids = fit, info_node)
-      prediction <- matrix(unlist(n), nrow = length(n), byrow = T)[,1]
+      prediction <- mmit.predict(fold_tree[[i]], feature.mat[fold_split_idx$test[i,],])
       fold_test_scores <- c(fold_test_scores, scorer(target.mat, prediction))
     }
     
     ### master tree predictions
-    fit <- predict(master_tree, feature.mat)
-    n <- nodeapply(master_tree, ids = fit,info_node)
-    prediction <- matrix(unlist(n), nrow = length(n), byrow = T)[, 1]
+    prediction <- mmit.predict(master_tree, feature.mat)
     master_scores <- scorer(target.mat, prediction)
       
     best_alpha <-  0.
