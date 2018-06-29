@@ -12,7 +12,7 @@ fit_and_score <- structure(function(target.mat, feature.mat,
   
   
   ### Create n equally size folds
-  folds <- cut(seq(1,nrow(target.mat)),breaks=n_folds,labels=FALSE)
+  folds <- cut(seq(1,nrow(target.mat)), breaks=n_folds, labels=FALSE)
   
   ### train and test index for each fold
   fold_split_idx <- NULL
@@ -20,8 +20,8 @@ fit_and_score <- structure(function(target.mat, feature.mat,
   ### segment the data into test and train
   for(i in 1:n_folds){
     #Segement your data by fold using the which() function 
-    fold_split_idx$test <- rbind(fold_split_idx$test, which(folds==i,arr.ind=TRUE))
-    fold_split_idx$train <- rbind(fold_split_idx$train, which(folds!=i,arr.ind=TRUE))
+    fold_split_idx$test <- rbind(fold_split_idx$test, which(folds==i, arr.ind=TRUE))
+    fold_split_idx$train <- rbind(fold_split_idx$train, which(folds!=i, arr.ind=TRUE))
     
   }
   
@@ -37,7 +37,6 @@ fit_and_score <- structure(function(target.mat, feature.mat,
   master_tree <- mmit(target.mat, feature.mat,  
                       maxdepth = as.numeric(parameters$maxdepth), margin = as.numeric(parameters$margin), 
                       loss = loss, min_sample = as.numeric(parameters$min_sample))
-  
   
   ### if pruning
   if(pruning){
@@ -105,7 +104,7 @@ fit_and_score <- structure(function(target.mat, feature.mat,
     best_score <- Inf
     best_tree <- NULL
     
-    for(i in 1 : length(master_pruned_trees)){
+    for(i in 1 : length(master_alphas)){
       if(i < (length(master_alphas))){
         geo_mean_alpha_k <- sqrt(master_alphas[[i]] * master_alphas[[i + 1]])
       }
@@ -146,7 +145,6 @@ fit_and_score <- structure(function(target.mat, feature.mat,
         best_tree <- master_pruned_trees[[i]]
       }
     }
-    
   }
   else{
     ### For each fold, build a decision tree
@@ -187,7 +185,6 @@ fit_and_score <- structure(function(target.mat, feature.mat,
   output$best_estimator <- best_tree
   output$best_params <- best_params
   output$cv_result <- cv_results
-  
   
   return(output)
 })
