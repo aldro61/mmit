@@ -15,7 +15,7 @@ mmit.cv <- structure(function(target.mat, feature.mat,
       ### see all permutation combination of param grid values
       cv_result[[i]] <- fit_and_score(target.mat = target.mat, feature.mat = feature.mat, 
                                        parameters = parameters[i,], feature_names = feature_names, 
-                                       n_folds = n_folds, scorer = scorer, loss = loss,
+                                       n_folds = n_folds, scorer = scorer,
                                        pruning = pruning)
 
       if(attr(scorer, "direction")(best_result$best_score, cv_result[[i]]$best_score) == cv_result[[i]]$best_score){
