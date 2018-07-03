@@ -1,6 +1,6 @@
 fit_and_score <- structure(function(target.mat, feature.mat, 
                                     parameters, feature_names = NULL, 
-                                    n_folds = 3, scorer = NULL, loss = "hinge",
+                                    n_folds = 3, scorer = NULL, 
                                     pruning = TRUE){
   ### total length
   l <- nrow(target.mat)
@@ -30,13 +30,18 @@ fit_and_score <- structure(function(target.mat, feature.mat,
   for(i in 1:n_folds){
     fold_tree[[i]] <- mmit(target.mat[fold_split_idx$train[i,],], feature.mat[fold_split_idx$train[i,],],  
                                        maxdepth = as.numeric(parameters$maxdepth), margin = as.numeric(parameters$margin), 
-                                       loss = loss, min_sample = as.numeric(parameters$min_sample))
+                                       loss = parameters$loss, min_sample = as.numeric(parameters$min_sample))
   }
   
   ### master tree
   master_tree <- mmit(target.mat, feature.mat,  
                       maxdepth = as.numeric(parameters$maxdepth), margin = as.numeric(parameters$margin), 
-                      loss = loss, min_sample = as.numeric(parameters$min_sample))
+                      loss = parameters$loss, min_sample = as.numeric(parameters$min_sample))
+  
+ 
+  ### for traning data
+  alpha_train_scores <- NULL
+  alpha_train_objective_values <- NULL
   
   ### if pruning
   if(pruning){
@@ -67,28 +72,20 @@ fit_and_score <- structure(function(target.mat, feature.mat,
         
         ### predictions of the tree for test data
         prediction <- mmit.predict(node, feature.mat[fold_split_idx$test[i,],])
-        
 
         ###error calc
         fold_test_scores <- scorer(target.mat[fold_split_idx$test[i,],], prediction)
         
         ### creating a dataframe with init alpha, final alpha, score value
-        if(j < (length(fold_alphas[[i]]))){
-          if(length(alpha_path_score)<i){
-            alpha_path_score[[i]] <- c(fold_alphas[[i]][j], fold_alphas[[i]][j + 1], fold_test_scores)
-          }
-          else{
-            alpha_path_score[[i]] <- rbind(alpha_path_score[[i]], c(fold_alphas[[i]][j], fold_alphas[[i]][j + 1], fold_test_scores))
-            }
+        if(j < length(fold_alphas[[i]])){
+          data <- c(fold_alphas[[i]][j], fold_alphas[[i]][j + 1], fold_test_scores)
+          if(length(alpha_path_score)<i) alpha_path_score[[i]] <- data
+          else alpha_path_score[[i]] <- rbind(alpha_path_score[[i]], data)
           }
         else{
-          
-          if(length(alpha_path_score)<i){
-            alpha_path_score[[i]] <- c(fold_alphas[[i]][j], Inf, fold_test_scores)
-          }
-          else{
-            alpha_path_score[[i]] <- rbind(alpha_path_score[[i]], c(fold_alphas[[i]][j], Inf, fold_test_scores))
-          }
+          data <- c(fold_alphas[[i]][j], Inf, fold_test_scores)
+          if(length(alpha_path_score)<i) alpha_path_score[[i]] <- data
+          else alpha_path_score[[i]] <- rbind(alpha_path_score[[i]], data)
         }
       }
       colnames(alpha_path_score[[i]]) <- c("init alpha", " final alpha", "score")
@@ -98,14 +95,12 @@ fit_and_score <- structure(function(target.mat, feature.mat,
     # Prune the master tree based on the CV estimates
     alphas <- NULL
     alpha_cv_scores <- NULL
-    alpha_train_scores <- NULL
-    alpha_train_objective_values <- NULL
     best_alpha <- -1
-    best_score <- Inf
+    best_score <- attr(scorer, "worst")
     best_tree <- NULL
     
     for(i in 1 : length(master_alphas)){
-      if(i < (length(master_alphas))){
+      if(i < length(master_alphas)){
         geo_mean_alpha_k <- sqrt(master_alphas[[i]] * master_alphas[[i + 1]])
       }
       else{
@@ -116,28 +111,17 @@ fit_and_score <- structure(function(target.mat, feature.mat,
       cv_score <- 0
       for(i in 1 : n_folds){
         for(j in 1 : nrow(alpha_path_score[[i]])){
-          if((geo_mean_alpha_k < alpha_path_score[[i]][j, 2]) && (geo_mean_alpha_k >= alpha_path_score[[i]][j, 1])){
-            cv_score <- cv_score + alpha_path_score[[i]][j, 3]
+          if((geo_mean_alpha_k < alpha_path_score[[i]][j,]$` final alpha`) && (geo_mean_alpha_k >= alpha_path_score[[i]][j, ]$`init alpha`)){
+            cv_score <- cv_score + alpha_path_score[[i]][j, ]$score
             break
           }
         }
       }
       cv_score <- cv_score/n_folds
       
-      ### calc train score
-      prediction <- mmit.predict(master_tree, feature.mat)
-      train_score <- scorer(target.mat, prediction)
-      
-      ### calc cost of all leaves
-      ter_id <- nodeids(master_tree, terminal = TRUE)
-      n <- nodeapply(master_tree, ids = ter_id, info_node)
-      train_objective <- sum(matrix(unlist(n), nrow = length(n), byrow = T)[, 2])
-      
       # Log metrics for this alpha value
       alphas <- c(alphas, geo_mean_alpha_k)
       alpha_cv_scores <- c(alpha_cv_scores, cv_score)
-      alpha_train_scores <- c(alpha_train_scores, train_score)
-      alpha_train_objective_values <- c(alpha_train_objective_values, train_objective)
       
       if(cv_score < best_score){
         best_score <- cv_score
@@ -153,31 +137,34 @@ fit_and_score <- structure(function(target.mat, feature.mat,
       prediction <- mmit.predict(fold_tree[[i]], feature.mat[fold_split_idx$test[i,],])
       fold_test_scores <- c(fold_test_scores, scorer(target.mat, prediction))
     }
-    
-    ### master tree predictions
-    prediction <- mmit.predict(master_tree, feature.mat)
-    master_scores <- scorer(target.mat, prediction)
       
     best_alpha <-  0.
     best_score <- mean(fold_test_scores)
     best_tree <- master_tree
     alphas <- c(0.)
     alpha_cv_scores <- c(best_score)
-    alpha_train_scores <- c(master_scores)
     
-    ### calc cost of all leaves
-    ter_id <- nodeids(master_tree, terminal = TRUE)
-    n <- nodeapply(master_tree, ids = ter_id, info_node)
-    alpha_train_objective_values <- sum(matrix(unlist(n), nrow = length(n), byrow = T)[, 2])
   }
+  ### calc train score
+  prediction <- mmit.predict(master_tree, feature.mat)
+  train_score <- scorer(target.mat, prediction)
+  
+  ### calc cost of all leaves
+  ter_id <- nodeids(master_tree, terminal = TRUE)
+  n <- nodeapply(master_tree, ids = ter_id, info_node)
+  train_objective <- sum(matrix(unlist(n), nrow = length(n), byrow = T)[, 2])
+  
+  alpha_train_scores <- c(alpha_train_scores, train_score)
+  alpha_train_objective_values <- c(alpha_train_objective_values, train_objective)
+  
   ### Append alpha to the parameters
   best_params <- parameters
   best_params$alpha <- best_alpha
   
   ### Generate a big dictionnary of all HP combinations considered (including alpha) and their CV scores
-  cv_results <- cbind(parameters$maxdepth, parameters$margin, parameters$min_sample, 
+  cv_results <- cbind(parameters$maxdepth, parameters$margin, parameters$min_sample, parameters$loss,
                       alphas, alpha_cv_scores, alpha_train_scores, alpha_train_objective_values)
-  colnames(cv_results) <- c("maxdepth", "margin", "min_sample","alpha", " cv_score", "train_score", "train_objective_value")
+  colnames(cv_results) <- c("maxdepth", "margin", "min_sample", "loss", "alpha", " cv_score", "train_score", "train_objective_value")
   cv_results <- as.data.frame(cv_results)
   
   output <- NULL
@@ -187,5 +174,22 @@ fit_and_score <- structure(function(target.mat, feature.mat,
   output$cv_result <- cv_results
   
   return(output)
+  
+}, ex=function(){
+  
+  library(survival)
+  data(neuroblastomaProcessed, package="penaltyLearning")
+  feature.mat <- data.frame(neuroblastomaProcessed$feature.mat)[1:45,]
+  target.mat <- neuroblastomaProcessed$target.mat[1:45,]
+
+  parameters <- NULL
+  parameters$maxdepth <- Inf
+  parameters$margin <- 2
+  parameters$min_sample <- 2
+  parameters$loss <- c("hinge")
+  
+  result <- fit_and_score(target.mat, feature.mat, parameters, scorer = mse)
+  
+  
 })
     
