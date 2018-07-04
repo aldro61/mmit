@@ -8,7 +8,6 @@ weakest_link <- structure(function(tree){
     node_id <- all_id[1]
     node_cost <- as.numeric(nodeapply(tree, ids = node_id, info_node)[[1]][2])
     
-    
     ### catch numeric zero of the root
     if(length(node_cost) == 0){
       node_cost <- tail(compute_optimal_costs(target.mat, margin, loss),1)[[3]]
@@ -25,7 +24,8 @@ weakest_link <- structure(function(tree){
       
       ### sum of cost of tree
       C_Tt <- sum(matrix(unlist(n), nrow = length(n), byrow = T)[,2])
-      
+      assert_that(C_Tt <= node_cost)
+                  
       ### current alpha value
       current_gt <- (node_cost - C_Tt)/(length(ter_id) - 1)
       
