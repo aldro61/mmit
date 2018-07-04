@@ -34,6 +34,8 @@ init_pruning <- structure(function(tree){
     right_cost <- as.numeric(nodeapply(tree, ids = right_kid_id, info_node)[[1]][2])
     
     ### check if node cost equal to left + right.
+    assert_that(node_cost >= (left_cost + right_cost))
+    
     if(isTRUE(all.equal(node_cost, (left_cost + right_cost)))){
       tree <- nodeprune(tree, ids = node_id)
     }
