@@ -41,11 +41,11 @@ info_print <- data.frame(1, 15, row.names = "")
 colnames(info_print) <- c("prediction", "cost")
 kids[[1]] <- partynode(2, info = info_print)
 
-info_print <- data.frame(1, 15, row.names = "")
+info_print <- data.frame(1, 1, row.names = "")
 colnames(info_print) <- c("prediction", "cost")
 kids[[2]] <- partynode(3, info = info_print)
 
-info_print <- data.frame(1, 10 , row.names = "")
+info_print <- data.frame(1, 20 , row.names = "")
 colnames(info_print) <- c("prediction", "cost")
 split <- partysplit(varid = as.integer(1), breaks = 2)
 root <- partynode(1, split = split, kids = kids, info = info_print)
@@ -146,3 +146,4 @@ test_that("pruning test 2", {
   #alpha
   expect_equal(unlist(lapply(output, function(x) x$alpha)), c(70, 18, 7, 0))
 })
+
