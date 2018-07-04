@@ -123,7 +123,7 @@ fit_and_score <- structure(function(target.mat, feature.mat,
       alphas <- c(alphas, geo_mean_alpha_k)
       alpha_cv_scores <- c(alpha_cv_scores, cv_score)
       
-      if(cv_score < best_score){
+      if(attr(scorer, "direction")(cv_score, best_score) == cv_score){
         best_score <- cv_score
         best_alpha <- geo_mean_alpha_k
         best_tree <- master_pruned_trees[[i]]
