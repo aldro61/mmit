@@ -5,8 +5,16 @@ growtree <- structure(function(target.mat, feature.mat, depth=0, maxdepth = Inf,
   node_info_print <- NULL
   ### creating dataframe of info
   if(!is.null(pred)){
-    node_info_print <- data.frame(pred[[side]], pred[[1]],row.names = "")
-    colnames(node_info_print) <- c("prediction", "cost")
+    ###left
+    if(side == 1){
+      node_info_print <- data.frame(pred$leftpred, pred$leftcost, row.names = "")
+      colnames(node_info_print) <- c("prediction", "cost")
+    }
+    else{
+      node_info_print <- data.frame(pred$rightpred, pred$rightcost, row.names = "")
+      colnames(node_info_print) <- c("prediction", "cost")
+    }
+    
   }
   
   ### if node is root.
@@ -54,8 +62,8 @@ growtree <- structure(function(target.mat, feature.mat, depth=0, maxdepth = Inf,
       myid <- id
     }
     
-    #side = 4+kidid as pred[[5]] is left prediction and pred[[6]] right
-    kids[[kidid]] <- growtree(target.mat, feature.mat, pred = splt, side = 4 + kidid, depth = depth + 1,
+    # 1 is left side, 2 is right side 
+    kids[[kidid]] <- growtree(target.mat, feature.mat, pred = splt, side = kidid, depth = depth + 1,
                               maxdepth = maxdepth, margin = margin, loss = loss, 
                               id = as.integer(myid + 1), min_sample = min_sample, weights = w)
   }
