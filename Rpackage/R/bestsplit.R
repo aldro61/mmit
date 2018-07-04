@@ -5,9 +5,13 @@ bestsplit <- structure(function
   ### We keep track of the following values for each optimal split
   best_split <- NULL
   best_split$cost <- Inf
+  best_split$leftcost <- Inf
+  best_split$rightcost <- Inf
   best_split$br <- NULL
   best_split$varid <- NULL
   best_split$row <- NULL
+  best_split$leftpred <- NULL
+  best_split$rightpred <- NULL
   
   ### initialise pred$cost with root node's cost.
   if(is.null(pred)){
@@ -66,6 +70,8 @@ bestsplit <- structure(function
 
     if(min(split_cost) < best_split$cost){
       best_split$cost <- min(split_cost)
+      best_split$leftcost <- leftleaf$cost[which.min(split_cost)]
+      best_split$rightcost <- rightleaf$cost[which.min(split_cost)]
       best_split$br <- feat[which.min(split_cost)]
       best_split$varid <- index
       best_split$row <- which.min(split_cost)
