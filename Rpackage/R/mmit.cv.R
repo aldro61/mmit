@@ -4,7 +4,7 @@ mmit.cv <- structure(function(target.mat, feature.mat,
                               pruning = TRUE){
   
   ### combinations of all parameters grid
-  parameters <- expand.grid(max_depth = param_grid$maxdepth, margin = param_grid$margin, min_sample = param_grid$min_sample, loss = param_grid$loss)
+  parameters <- expand.grid(maxdepth = param_grid$maxdepth, margin = param_grid$margin, min_sample = param_grid$min_sample, loss = param_grid$loss)
   parameters <- as.data.frame(parameters)
   
   ### for param grid run loop to check best value
