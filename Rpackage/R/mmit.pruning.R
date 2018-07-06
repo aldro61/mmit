@@ -1,3 +1,39 @@
+#' The Pruned Max Margin Interval Tree
+#'
+#' Pruning the regression tree for censored data.
+#'
+#' @param tree The fitted tree using \code{"mmit()"} function
+#' 
+#' @return The learned regression tree as an object of class party.
+#' 
+#' @author Toby Dylan Hocking, Alexandre Drouin, Torsten Hothorn, Parismita Das
+#' 
+#' @examples
+#' library(mmit)
+#' target.mat <- rbind(
+#'   c(0,1), c(0,1), c(0,1),
+#'   c(2,3), c(2,3), c(2,3))
+#' 
+#' feature.mat <- rbind(
+#'   c(1,0,0), c(1,1,0), c(1,2,0),
+#'   c(1,3,0), c(1,4,0), c(1,5,0))
+#' 
+#' colnames(feature.mat) <- c("a", "b", "c")
+#' feature.mat <- data.frame(feature.mat)
+#' 
+#' 
+#' tree <- mmit(target.mat, feature.mat)
+#' 
+#' pruned_tree <- mmit.pruning(tree)
+#' 
+#' @export
+
+
+
+#### needs work...eturn type
+
+
+
 mmit.pruning <- structure(function(tree){
   ### T1 is the tree after initital pruning of Tmax
   T1 <- init_pruning(tree)

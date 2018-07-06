@@ -1,3 +1,25 @@
+#' The Zero One Loss
+#'
+#' Metric for error calculation where the function gives zero value inside the interval else one. 
+#'
+#' @param y_true The actual response variable of the model
+#' @param y_pred The predicted response value of the model
+#' 
+#' @return A numeric value which signifies the error quantity.
+#' 
+#' @author Toby Dylan Hocking, Alexandre Drouin, Torsten Hothorn, Parismita Das
+#' 
+#' @examples
+#' library(mmit)
+#' y_true <- rbind(
+#'   c(0,1), c(0,1), c(0,1),
+#'   c(2,3), c(2,3), c(2,3))
+#' 
+#' y_pred <- c(0.5, 2, 0, 1.5, 3.5, 2.5)
+#' 
+#'out <- zero_one_loss(y_true, y_pred)
+#'
+#'@export
 ## zero if inside the interval, 1 if outside
 zero_one_loss <- structure(function(y_true, y_pred){
   error <- 0.0
@@ -12,6 +34,29 @@ zero_one_loss <- structure(function(y_true, y_pred){
 direction = min,
 worst = Inf)
 
+
+#' The Mean Square Error
+#'
+#' Metric for mean aquare error calculation.
+#'
+#' @param y_true The actual response variable of the model
+#' @param y_pred The predicted response value of the model
+#' 
+#' @return A numeric value which signifies the error quantity.
+#' 
+#' @author Toby Dylan Hocking, Alexandre Drouin, Torsten Hothorn, Parismita Das
+#' 
+#' @examples
+#' library(mmit)
+#' y_true <- rbind(
+#'   c(0,1), c(0,1), c(0,1),
+#'   c(2,3), c(2,3), c(2,3))
+#' 
+#' y_pred <- c(0.5, 2, 0, 1.5, 3.5, 2.5)
+#' 
+#'out <- mse(y_true, y_pred)
+#' 
+#' @export
 ### mean square error
 mse <- structure(function(y_true, y_pred){
   error <- 0.0
@@ -28,3 +73,6 @@ mse <- structure(function(y_true, y_pred){
 ### attributes
 direction = min,
 worst= Inf)
+
+
+
