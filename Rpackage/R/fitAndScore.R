@@ -1,6 +1,5 @@
 fit_and_score <- structure(function(target.mat, feature.mat, 
-                                    parameters, feature_names = NULL, 
-                                    n_folds = 3, scorer = NULL, 
+                                    parameters, n_folds = 3, scorer = NULL, 
                                     pruning = TRUE){
   ### total length
   l <- nrow(target.mat)
@@ -29,13 +28,13 @@ fit_and_score <- structure(function(target.mat, feature.mat,
   fold_tree <- NULL
   for(i in 1:n_folds){
     fold_tree[[i]] <- mmit(target.mat[fold_split_idx$train[i,],], feature.mat[fold_split_idx$train[i,],],  
-                                       maxdepth = as.numeric(parameters$maxdepth), margin = as.numeric(parameters$margin), 
+                                       max_depth = as.numeric(parameters$max_depth), margin = as.numeric(parameters$margin), 
                                        loss = parameters$loss, min_sample = as.numeric(parameters$min_sample))
   }
   
   ### master tree
   master_tree <- mmit(target.mat, feature.mat,  
-                      maxdepth = as.numeric(parameters$maxdepth), margin = as.numeric(parameters$margin), 
+                      max_depth = as.numeric(parameters$max_depth), margin = as.numeric(parameters$margin), 
                       loss = parameters$loss, min_sample = as.numeric(parameters$min_sample))
   
  
@@ -162,16 +161,16 @@ fit_and_score <- structure(function(target.mat, feature.mat,
   best_params$alpha <- best_alpha
   
   ### Generate a big dictionnary of all HP combinations considered (including alpha) and their CV scores
-  cv_results <- cbind(parameters$maxdepth, parameters$margin, parameters$min_sample, parameters$loss,
+  cv_results <- cbind(parameters$max_depth, parameters$margin, parameters$min_sample, parameters$loss,
                       alphas, alpha_cv_scores, alpha_train_scores, alpha_train_objective_values)
-  colnames(cv_results) <- c("maxdepth", "margin", "min_sample", "loss", "alpha", " cv_score", "train_score", "train_objective_value")
+  colnames(cv_results) <- c("max_depth", "margin", "min_sample", "loss", "alpha", " cv_score", "train_score", "train_objective_value")
   cv_results <- as.data.frame(cv_results)
   
   output <- NULL
   output$best_score <- best_score
   output$best_estimator <- best_tree
   output$best_params <- best_params
-  output$cv_result <- cv_results
+  output$cv_results <- cv_results
   
   return(output)
   
@@ -183,7 +182,7 @@ fit_and_score <- structure(function(target.mat, feature.mat,
   target.mat <- neuroblastomaProcessed$target.mat[1:45,]
 
   parameters <- NULL
-  parameters$maxdepth <- Inf
+  parameters$max_depth <- Inf
   parameters$margin <- 2
   parameters$min_sample <- 2
   parameters$loss <- c("hinge")

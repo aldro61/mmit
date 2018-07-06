@@ -1,4 +1,4 @@
-growtree <- structure(function(target.mat, feature.mat, depth=0, maxdepth = Inf,
+growtree <- structure(function(target.mat, feature.mat, depth=0, max_depth = Inf,
                                margin = 0.0, loss="hinge", id = 1L, min_sample = 1,
                                pred=NULL, side = NULL, weights = NULL) {
   
@@ -28,7 +28,7 @@ growtree <- structure(function(target.mat, feature.mat, depth=0, maxdepth = Inf,
   }
   
   ### if depth exceeds we stop the further growth of tree
-  if (depth >= maxdepth) return(partynode(id = id, info = node_info_print))
+  if (depth >= max_depth) return(partynode(id = id, info = node_info_print))
   
 
   ### if sample per node is less than minimum, we stop tree growth
@@ -64,7 +64,7 @@ growtree <- structure(function(target.mat, feature.mat, depth=0, maxdepth = Inf,
     
     # 1 is left side, 2 is right side 
     kids[[kidid]] <- growtree(target.mat, feature.mat, pred = splt, side = kidid, depth = depth + 1,
-                              maxdepth = maxdepth, margin = margin, loss = loss, 
+                              max_depth = max_depth, margin = margin, loss = loss, 
                               id = as.integer(myid + 1), min_sample = min_sample, weights = w)
   }
   
