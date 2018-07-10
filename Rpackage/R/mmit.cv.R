@@ -7,7 +7,7 @@
 #' @param param_grid the list of paramaters
 #' @param n_folds The number of folds
 #' @param scorer The Loss calculation function 
-#' @param n_cpu The number of cores to register for parallel programing of the code, default value is 1 and ncpu = -1 to select all cores.
+#' @param n_cpu The number of cores to register for parallel programing of the code, default value is 1 and n_cpu = -1 to select all cores.
 #' @param pruning Boolean whether pruning is to be done or not.
 #' 
 #' @return The list consist of best score, best tree, best parameters and list of all parameter values with cross validation score . 
@@ -41,6 +41,15 @@ mmit.cv <- structure(function(target.mat, feature.mat,
                               scorer = NULL, n_cpu = 1, 
                               pruning = TRUE){
   
+  ### add default value to parameters
+  if(is.null(param_grid$max_depth)) param_grid$max_depth <- Inf
+  if(is.null(param_grid$margin)) param_grid$margin <- 0.0
+  if(is.null(param_grid$min_sample)) param_grid$min_sample <- 0.0
+  if(is.null(param_grid$loss)) param_grid$loss <- "hinge"
+  
+  ### check for unwanted parameters
+  assert_that(length(param_grid) <= 4, msg = "unexpected parameters as arguement")
+  
   ### combinations of all parameters grid
   parameters <- expand.grid(max_depth = param_grid$max_depth, margin = param_grid$margin, min_sample = param_grid$min_sample, loss = param_grid$loss)
   parameters <- as.data.frame(parameters)
@@ -52,7 +61,7 @@ mmit.cv <- structure(function(target.mat, feature.mat,
   
   ### parallelize using foreach, see all permutation combination of param grid values
   ### register parallel backend
-  if(ncpu == -1) n_cpu <- detectCores() 
+  if(n_cpu == -1) n_cpu <- detectCores() 
   assert_that(detectCores() >= n_cpu)
   
   cl <- makeCluster(n_cpu)
@@ -65,6 +74,7 @@ mmit.cv <- structure(function(target.mat, feature.mat,
                                            n_folds = n_folds, scorer = scorer,
                                            pruning = pruning)
   stopCluster(cl)  
+
   
   for(i in 1:nrow(parameters)){
     if(attr(scorer, "direction")(best_result$best_score, cv_result[[i]]$best_score) == cv_result[[i]]$best_score){
