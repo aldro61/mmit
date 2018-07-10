@@ -11,7 +11,7 @@ fit_and_score <- structure(function(target.mat, feature.mat,
   
   
   ### Create n equally size folds
-  folds <- cut(seq(1,nrow(target.mat)), breaks=n_folds, labels=FALSE)
+  folds <- cut(seq(1,nrow(target.mat)), breaks = n_folds, labels = FALSE)
   
   ### train and test index for each fold
   fold_split_idx <- NULL
@@ -19,8 +19,8 @@ fit_and_score <- structure(function(target.mat, feature.mat,
   ### segment the data into test and train
   for(i in 1:n_folds){
     #Segement your data by fold using the which() function 
-    fold_split_idx$test <- rbind(fold_split_idx$test, which(folds==i, arr.ind=TRUE))
-    fold_split_idx$train <- rbind(fold_split_idx$train, which(folds!=i, arr.ind=TRUE))
+    fold_split_idx$test <- rbind(fold_split_idx$test, which(folds == i, arr.ind = TRUE))
+    fold_split_idx$train <- rbind(fold_split_idx$train, which(folds != i, arr.ind = TRUE))
     
   }
   
@@ -47,6 +47,7 @@ fit_and_score <- structure(function(target.mat, feature.mat,
     # Get the pruned master and cross-validation trees
     master_data <- mmit.pruning(master_tree)
     master_alphas <- rev(unlist(lapply(master_data, function(x) x$alpha)))
+    master_alphas <- master_alphas[!duplicated(master_alphas)]
     master_pruned_trees <- rev(lapply(master_data, function(x) x$tree))
     
     fold_alphas <- NULL
@@ -54,18 +55,20 @@ fit_and_score <- structure(function(target.mat, feature.mat,
     for(i in 1 : n_folds){
       fold_data <- mmit.pruning(fold_tree[[i]])
       fold_alphas[[i]] <- rev(unlist(lapply(fold_data, function(x) x$alpha)))
-      fold_prune_trees[[i]] <- rev(lapply(fold_data, function(x) x$tree))
+      fold_prune_trees[[i]] <- rev(lapply(fold_data, function(x) x$tree)) 
+      
+      ### alphas list should not contain repeating alpha
+      fold_alphas[[i]] <- fold_alphas[[i]][!duplicated(fold_alphas)]
     }
-    
-    ### alphas list should not contain repeating alpha
-    master_alphas <- master_alphas[!duplicated(master_alphas)]
-    fold_alphas <- fold_alphas[!duplicated(fold_alphas)]
-    
     
     # Compute the test risk for all pruned trees of each fold
     alpha_path_score <- NULL
     for(i in 1 : n_folds){
-      for(j in 1 : length(fold_prune_trees[[i]])){
+      
+      #dummy value initialised to form dataframe, removed later
+      alpha_path_score[[i]] <- c(0, 0, 0)   
+      
+      for(j in 1 : length(fold_alphas[[i]])){
         ### convert pruned tree list to partynode
         node <- fold_prune_trees[[i]][[j]]
         
@@ -78,17 +81,17 @@ fit_and_score <- structure(function(target.mat, feature.mat,
         ### creating a dataframe with init alpha, final alpha, score value
         if(j < length(fold_alphas[[i]])){
           data <- c(fold_alphas[[i]][j], fold_alphas[[i]][j + 1], fold_test_scores)
-          if(length(alpha_path_score)<i) alpha_path_score[[i]] <- data
-          else alpha_path_score[[i]] <- rbind(alpha_path_score[[i]], data)
-          }
+          alpha_path_score[[i]] <- rbind(data, alpha_path_score[[i]])
+        }
         else{
           data <- c(fold_alphas[[i]][j], Inf, fold_test_scores)
-          if(length(alpha_path_score)<i) alpha_path_score[[i]] <- data
-          else alpha_path_score[[i]] <- rbind(alpha_path_score[[i]], data)
+          alpha_path_score[[i]] <- rbind(data, alpha_path_score[[i]])
         }
       }
+      
       colnames(alpha_path_score[[i]]) <- c("init alpha", " final alpha", "score")
-      alpha_path_score[[i]] <- as.data.frame(alpha_path_score[[i]])
+      alpha_path_score[[i]] <- as.data.frame(alpha_path_score[[i]], row.names = "")
+      alpha_path_score[[i]] <- head(alpha_path_score[[i]], -1)
     }
     
     # Prune the master tree based on the CV estimates
@@ -108,10 +111,11 @@ fit_and_score <- structure(function(target.mat, feature.mat,
       
       ### compute cv_score as mean of each fold scores
       cv_score <- 0
-      for(i in 1 : n_folds){
-        for(j in 1 : nrow(alpha_path_score[[i]])){
-          if((geo_mean_alpha_k < alpha_path_score[[i]][j,]$` final alpha`) && (geo_mean_alpha_k >= alpha_path_score[[i]][j, ]$`init alpha`)){
-            cv_score <- cv_score + alpha_path_score[[i]][j, ]$score
+      for(j in 1 : n_folds){
+        for(k in 1 : nrow(alpha_path_score[[j]])){
+          print(alpha_path_score[[j]][k, ])   ####Final value as NA why???
+          if((geo_mean_alpha_k < alpha_path_score[[j]][k, ]$` final alpha`) && (geo_mean_alpha_k >= alpha_path_score[[j]][k, ]$`init alpha`)){
+            cv_score <- cv_score + alpha_path_score[[j]][k, ]$score
             break
           }
         }
