@@ -104,6 +104,18 @@ fit_and_score <- structure(function(target.mat, feature.mat,
       else{
         geo_mean_alpha_k <- Inf
       }
+
+      ### calc train score
+      prediction <- mmit.predict(master_pruned_trees[[i]], feature.mat)
+      train_score <- scorer(target.mat, prediction)
+      
+      ### calc cost of all leaves
+      ter_id <- nodeids(master_pruned_trees[[i]], terminal = TRUE)
+      n <- nodeapply(master_pruned_trees[[i]], ids = ter_id, info_node)
+      train_objective <- sum(matrix(unlist(n), nrow = length(n), byrow = T)[, 2])
+      
+      alpha_train_scores <- c(alpha_train_scores, train_score)
+      alpha_train_objective_values <- c(alpha_train_objective_values, train_objective)
       
       ### compute cv_score as mean of each fold scores
       cv_score <- 0
@@ -142,18 +154,17 @@ fit_and_score <- structure(function(target.mat, feature.mat,
     alphas <- c(0.)
     alpha_cv_scores <- c(best_score)
     
+    
+    ### calc train score
+    prediction <- mmit.predict(master_tree, feature.mat)
+    alpha_train_scores <- scorer(target.mat, prediction)
+    
+    ### calc cost of all leaves
+    ter_id <- nodeids(master_tree, terminal = TRUE)
+    n <- nodeapply(master_tree, ids = ter_id, info_node)
+    alpha_train_objective_values <- sum(matrix(unlist(n), nrow = length(n), byrow = T)[, 2])
+
   }
-  ### calc train score
-  prediction <- mmit.predict(master_tree, feature.mat)
-  train_score <- scorer(target.mat, prediction)
-  
-  ### calc cost of all leaves
-  ter_id <- nodeids(master_tree, terminal = TRUE)
-  n <- nodeapply(master_tree, ids = ter_id, info_node)
-  train_objective <- sum(matrix(unlist(n), nrow = length(n), byrow = T)[, 2])
-  
-  alpha_train_scores <- c(alpha_train_scores, train_score)
-  alpha_train_objective_values <- c(alpha_train_objective_values, train_objective)
   
   ### Append alpha to the parameters
   best_params <- parameters
