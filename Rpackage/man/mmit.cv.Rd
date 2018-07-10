@@ -18,7 +18,7 @@ mmit.cv(target.mat, feature.mat, param_grid, n_folds = 3, scorer = NULL,
 
 \item{scorer}{The Loss calculation function}
 
-\item{n_cpu}{The number of cores to register for parallel programing of the code, default value is 1 and ncpu = -1 to select all cores.}
+\item{n_cpu}{The number of cores to register for parallel programing of the code, default value is 1 and n_cpu = -1 to select all cores.}
 
 \item{pruning}{Boolean whether pruning is to be done or not.}
 }

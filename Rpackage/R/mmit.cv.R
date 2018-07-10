@@ -55,7 +55,7 @@ mmit.cv <- structure(function(target.mat, feature.mat,
   parameters <- as.data.frame(parameters)
   
   ### for param grid run loop to check best value
-  cv_result <- NULL
+  cv_results <- NULL
   best_result <- NULL
   best_result$best_score <- attr(scorer, "worst")
   
@@ -67,22 +67,24 @@ mmit.cv <- structure(function(target.mat, feature.mat,
   cl <- makeCluster(n_cpu)
   registerDoParallel(cl)
   
-  cv_result <- foreach(i = 1:nrow(parameters), 
-              .packages = c("mmit", "assertthat")) %dopar% 
+  fitscore_result <- foreach(i = 1:nrow(parameters), 
+              .packages = "mmit") %dopar% 
               fit_and_score(target.mat = target.mat, feature.mat = feature.mat, 
                                            parameters = parameters[i,], 
                                            n_folds = n_folds, scorer = scorer,
                                            pruning = pruning)
   stopCluster(cl)  
-
   
   for(i in 1:nrow(parameters)){
-    if(attr(scorer, "direction")(best_result$best_score, cv_result[[i]]$best_score) == cv_result[[i]]$best_score){
-      best_result <- cv_result[[i]]
+    cv_results <- rbind(cv_results, fitscore_result[[i]]$cv_results)
+    if(attr(scorer, "direction")(best_result$best_score, fitscore_result[[i]]$best_score) == fitscore_result[[i]]$best_score){
+      best_result <- fitscore_result[[i]]
     }
   }    
   
-  return(list(best = best_result, cv_results = cv_result))
+  best_result$cv_results <- cv_results
+  
+  return(best_result)
   
 }, ex=function(){
   
