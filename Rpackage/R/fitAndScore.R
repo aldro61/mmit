@@ -47,7 +47,6 @@ fit_and_score <- structure(function(target.mat, feature.mat,
     # Get the pruned master and cross-validation trees
     master_data <- mmit.pruning(master_tree)
     master_alphas <- rev(unlist(lapply(master_data, function(x) x$alpha)))
-    master_alphas <- master_alphas[!duplicated(master_alphas)]
     master_pruned_trees <- rev(lapply(master_data, function(x) x$tree))
     
     fold_alphas <- NULL
@@ -56,9 +55,6 @@ fit_and_score <- structure(function(target.mat, feature.mat,
       fold_data <- mmit.pruning(fold_tree[[i]])
       fold_alphas[[i]] <- rev(unlist(lapply(fold_data, function(x) x$alpha)))
       fold_prune_trees[[i]] <- rev(lapply(fold_data, function(x) x$tree)) 
-      
-      ### alphas list should not contain repeating alpha
-      fold_alphas[[i]] <- fold_alphas[[i]][!duplicated(fold_alphas)]
     }
     
     # Compute the test risk for all pruned trees of each fold
@@ -113,7 +109,6 @@ fit_and_score <- structure(function(target.mat, feature.mat,
       cv_score <- 0
       for(j in 1 : n_folds){
         for(k in 1 : nrow(alpha_path_score[[j]])){
-          print(alpha_path_score[[j]][k, ])   ####Final value as NA why???
           if((geo_mean_alpha_k < alpha_path_score[[j]][k, ]$` final alpha`) && (geo_mean_alpha_k >= alpha_path_score[[j]][k, ]$`init alpha`)){
             cv_score <- cv_score + alpha_path_score[[j]][k, ]$score
             break
