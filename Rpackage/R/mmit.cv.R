@@ -42,13 +42,13 @@ mmit.cv <- structure(function(target.mat, feature.mat,
                               pruning = TRUE){
   
   ### add default value to parameters
-  if(is.null(param_grid$max_depth)) param_grid$max_depth <- Inf
-  if(is.null(param_grid$margin)) param_grid$margin <- 0.0
-  if(is.null(param_grid$min_sample)) param_grid$min_sample <- 0.0
-  if(is.null(param_grid$loss)) param_grid$loss <- "hinge"
+  if(is.null(param_grid[["max_depth"]])) param_grid$max_depth <- Inf
+  if(is.null(param_grid[["margin"]])) param_grid$margin <- 0.0
+  if(is.null(param_grid[["min_sample"]])) param_grid$min_sample <- 0.0
+  if(is.null(param_grid[["loss"]])) param_grid$loss <- "hinge"
   
   ### check for unwanted parameters
-  assert_that(length(param_grid) <= 4, msg = "unexpected parameters as arguement")
+  assert_that(length(param_grid) <= 4, msg = "unexpected parameters as argument")
   
   ### combinations of all parameters grid
   parameters <- expand.grid(max_depth = param_grid$max_depth, margin = param_grid$margin, min_sample = param_grid$min_sample, loss = param_grid$loss)
@@ -90,14 +90,14 @@ mmit.cv <- structure(function(target.mat, feature.mat,
   
   library(survival)
   data(neuroblastomaProcessed, package="penaltyLearning")
-  feature.mat <- data.frame(neuroblastomaProcessed$feature.mat)[1:45,]
-  target.mat <- neuroblastomaProcessed$target.mat[1:45,]
+  feature.mat <- data.frame(neuroblastomaProcessed$feature.mat)
+  target.mat <- neuroblastomaProcessed$target.mat
   
   param_grid <- NULL
   param_grid$max_depth <- c(Inf, 4, 3)
   param_grid$margin <- c(2, 3, 5)
   param_grid$min_sample <- c(2, 5, 10)
-  param_grid$loss <- c("hinge")
+  param_grid$loss <- c("hinge", "square")
   
   result <- mmit.cv(target.mat, feature.mat, param_grid, scorer = mse)
   
