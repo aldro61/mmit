@@ -68,7 +68,7 @@ weakest_link <- structure(function(tree){
       }
       ### if current gt larger than child's and child's gt same
       else if(isTRUE(all.equal(left_min_gt, right_min_gt))){
-        wlink <- rbind(c(left_min_gt, node_id), c(left_min_gt, right_weakest_links))
+        wlink <- rbind(c(left_min_gt, left_weakest_links), c(left_min_gt, right_weakest_links))
         return(wlink)
       }
       ### if current gt larger than child's and left > right
