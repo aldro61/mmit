@@ -52,10 +52,10 @@ mmit.pruning <- structure(function(tree){
     if(length(sorted_wlink)>1){
       wlink <- wlink[sorted_wlink,]
     }
-
-    for(n in nrow(wlink):1){
-      tree <- nodeprune(tree, ids = wlink[n, 2])
-    }
+    
+    ### pruning the tree
+    tree <- nodeprune(tree, ids = wlink[, 2])
+    
     
     ### if terminal root return current tree
     if(is.terminal(nodeapply(tree, ids = 1)[[1]])){

@@ -4,8 +4,7 @@
 #'
 #' @param tree The Max Margin Interval Tree obtained from \code{"mmit()"}
 #' @param newdata an optional data frame containing the testing data which is to be predicted.
-#' @param perm an optional character vector of variable names. Splits of nodes with a primary split in any of these variables will be permuted (after dealing with surrogates). 
-#' Note that surrogate split in the perm variables will no be permuted. 
+#' @param perm an optional character vector of variable names. 
 #' 
 #' @return The learned regression tree as an object of class party.
 #' 
