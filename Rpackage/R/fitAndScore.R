@@ -51,10 +51,12 @@ fit_and_score <- structure(function(target.mat, feature.mat,
     fold_prune_trees <- NULL
     for(i in 1 : n_folds){
       fold_data <- mmit.pruning(fold_tree[[i]])
+      
+      ### as mmit.pruning gives the alphas in descending order we need to reverse the list.
       fold_alphas[[i]] <- rev(unlist(lapply(fold_data, function(x) x$alpha)))
       fold_prune_trees[[i]] <- rev(lapply(fold_data, function(x) x$tree)) 
     }
-    
+
     # Compute the test risk for all pruned trees of each fold
     alpha_path_score <- NULL
     for(i in 1 : n_folds){
@@ -75,17 +77,17 @@ fit_and_score <- structure(function(target.mat, feature.mat,
         ### creating a dataframe with init alpha, final alpha, score value
         if(j < length(fold_alphas[[i]])){
           data <- c(fold_alphas[[i]][j], fold_alphas[[i]][j + 1], fold_test_scores)
-          alpha_path_score[[i]] <- rbind(data, alpha_path_score[[i]])
+          alpha_path_score[[i]] <- rbind(alpha_path_score[[i]], data)
         }
         else{
           data <- c(fold_alphas[[i]][j], Inf, fold_test_scores)
-          alpha_path_score[[i]] <- rbind(data, alpha_path_score[[i]])
+          alpha_path_score[[i]] <- rbind(alpha_path_score[[i]], data)
         }
       }
       
       colnames(alpha_path_score[[i]]) <- c("init alpha", " final alpha", "score")
+      alpha_path_score[[i]] <- tail(alpha_path_score[[i]], -1)
       alpha_path_score[[i]] <- as.data.frame(alpha_path_score[[i]], row.names = "")
-      alpha_path_score[[i]] <- head(alpha_path_score[[i]], -1)
     }
     
     # Prune the master tree based on the CV estimates
@@ -94,7 +96,7 @@ fit_and_score <- structure(function(target.mat, feature.mat,
     best_alpha <- -1
     best_score <- attr(scorer, "worst")
     best_tree <- NULL
-    
+
     for(i in 1 : length(master_alphas)){
       if(i < length(master_alphas)){
         geo_mean_alpha_k <- sqrt(master_alphas[[i]] * master_alphas[[i + 1]])
@@ -117,16 +119,20 @@ fit_and_score <- structure(function(target.mat, feature.mat,
       
       ### compute cv_score as mean of each fold scores
       cv_score <- 0
+      flag <- 0
       for(j in 1 : n_folds){
         for(k in 1 : nrow(alpha_path_score[[j]])){
-          if((geo_mean_alpha_k < alpha_path_score[[j]][k, ]$` final alpha`) && (geo_mean_alpha_k >= alpha_path_score[[j]][k, ]$`init alpha`)){
+          if((geo_mean_alpha_k <= alpha_path_score[[j]][k, ]$` final alpha`) && (geo_mean_alpha_k >= alpha_path_score[[j]][k, ]$`init alpha`)){
             cv_score <- cv_score + alpha_path_score[[j]][k, ]$score
+            flag <- 1
             break
           }
         }
       }
+
+      assert_that(flag == 1, msg = "cv_score not updated")
       cv_score <- cv_score/n_folds
-      
+
       # Log metrics for this alpha value
       alphas <- c(alphas, geo_mean_alpha_k)
       alpha_cv_scores <- c(alpha_cv_scores, cv_score)
@@ -196,7 +202,6 @@ fit_and_score <- structure(function(target.mat, feature.mat,
   parameters$loss <- c("hinge")
   
   result <- fit_and_score(target.mat, feature.mat, parameters, scorer = mse)
-  
   
 })
     
