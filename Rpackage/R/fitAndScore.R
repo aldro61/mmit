@@ -122,7 +122,12 @@ fit_and_score <- structure(function(target.mat, feature.mat,
       flag <- 0
       for(j in 1 : n_folds){
         for(k in 1 : nrow(alpha_path_score[[j]])){
-          if((geo_mean_alpha_k <= alpha_path_score[[j]][k, ]$` final alpha`) && (geo_mean_alpha_k >= alpha_path_score[[j]][k, ]$`init alpha`)){
+          if(is.infinite(geo_mean_alpha_k) || is.infinite(alpha_path_score[[j]][k, ]$` final alpha`)){
+            cv_score <- cv_score + alpha_path_score[[j]][k, ]$score
+            flag <- 1
+            break
+          }
+          else if((geo_mean_alpha_k < alpha_path_score[[j]][k, ]$` final alpha`) && (geo_mean_alpha_k >= alpha_path_score[[j]][k, ]$`init alpha`)){
             cv_score <- cv_score + alpha_path_score[[j]][k, ]$score
             flag <- 1
             break
