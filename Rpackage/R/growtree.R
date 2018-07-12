@@ -35,12 +35,15 @@ growtree <- structure(function(target.mat, feature.mat, depth=0, max_depth = Inf
   if(sum(weights) <= min_sample) return(partynode(id = id, info = node_info_print))
 
   ### split the tree at the node.
-  sp <- bestsplit(target.mat, feature.mat, weights, margin, loss, pred)
+  sp <- bestsplit(target.mat, feature.mat, weights, margin, loss, node_info_print)
   splt <- sp
-
+  
   ### if no split, we stop
   if (is.null(sp)) return(partynode(id = id, info = node_info_print))
-
+  
+  ### tree cant grows if splitting cost is more than current node cost
+  assert_that(node_info_print$cost >= (sp$leftcost + sp$rightcost))
+  
   ### partysplit object
   sp <- partysplit(varid = sp$varid, breaks = sp$br)
 
