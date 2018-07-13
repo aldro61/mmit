@@ -195,7 +195,6 @@ fit_and_score <- structure(function(target.mat, feature.mat,
   
 }, ex=function(){
   
-  library(survival)
   data(neuroblastomaProcessed, package="penaltyLearning")
   feature.mat <- data.frame(neuroblastomaProcessed$feature.mat)[1:45,]
   target.mat <- neuroblastomaProcessed$target.mat[1:45,]

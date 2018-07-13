@@ -63,7 +63,6 @@ test_that("predicting the tree mmit() with square loss", {
 })
 
 ### test for depth 
-library(survival)
 data(neuroblastomaProcessed, package="penaltyLearning")
 feature.mat <- data.frame(neuroblastomaProcessed$feature.mat)[1:45,]
 target.mat <- neuroblastomaProcessed$target.mat[1:45,]

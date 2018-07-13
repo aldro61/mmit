@@ -88,17 +88,16 @@ mmit.cv <- structure(function(target.mat, feature.mat,
   
 }, ex=function(){
   
-  library(survival)
   data(neuroblastomaProcessed, package="penaltyLearning")
-  feature.mat <- data.frame(neuroblastomaProcessed$feature.mat)
-  target.mat <- neuroblastomaProcessed$target.mat
+  feature.mat <- data.frame(neuroblastomaProcessed$feature.mat)[1:45,]
+  target.mat <- neuroblastomaProcessed$target.mat[1:45,]
   
   param_grid <- NULL
-  param_grid$max_depth <- c(Inf, 4, 3)
+  param_grid$max_depth <- c(Inf, 4, 3, 2, 1, 0)
   param_grid$margin <- c(2, 3, 5)
-  param_grid$min_sample <- c(2, 5, 10)
+  param_grid$min_sample <- c(2, 5, 10, 20)
   param_grid$loss <- c("hinge", "square")
   
-  result <- mmit.cv(target.mat, feature.mat, param_grid, scorer = mse)
+  result <- mmit.cv(target.mat, feature.mat, param_grid, scorer = mse, n_cpu = 4)
   
 })

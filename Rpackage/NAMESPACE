@@ -1,7 +1,7 @@
 useDynLib(mmit)
 exportPattern("^[[:alpha:]]")
 import(partykit)
-import(survival)
+import(penaltyLearning)
 import(assertthat)
 import(doParallel)
 import(parallel)
