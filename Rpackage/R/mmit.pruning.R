@@ -37,7 +37,7 @@
 mmit.pruning <- structure(function(tree){
   ### T1 is the tree after initital pruning of Tmax
   T1 <- init_pruning(tree)
-  alpha_trees <- NULL
+  alpha_trees <- list()
   
   sequential_prune <- function(tree){
     ### find weakest links

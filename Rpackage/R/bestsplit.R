@@ -3,7 +3,7 @@ bestsplit <- structure(function
 ### We have the feature and target value of the data that is to be splitted.
 (target.mat, feature.mat, weights, margin=0.0, loss="hinge",pred = NULL){
   ### We keep track of the following values for each optimal split
-  best_split <- NULL
+  best_split <- list()
   best_split$cost <- Inf
   best_split$leftcost <- Inf
   best_split$rightcost <- Inf

@@ -67,6 +67,7 @@ mmit.cv <- structure(function(target.mat, feature.mat,
   cl <- makeCluster(n_cpu)
   registerDoParallel(cl)
   
+  fitscore_result <- list()
   fitscore_result <- foreach(i = 1:nrow(parameters), 
               .packages = "mmit") %dopar% 
               fit_and_score(target.mat = target.mat, feature.mat = feature.mat, 

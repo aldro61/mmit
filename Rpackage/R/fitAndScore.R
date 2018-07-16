@@ -12,7 +12,7 @@ fit_and_score <- structure(function(target.mat, feature.mat,
   folds <- cut(seq(1,nrow(target.mat)), breaks = n_folds, labels = FALSE)
   
   ### train and test index for each fold
-  fold_split_idx <- NULL
+  fold_split_idx <- list()
   
   ### segment the data into test and train
   for(i in 1:n_folds){
@@ -23,7 +23,7 @@ fit_and_score <- structure(function(target.mat, feature.mat,
   }
   
   ### fold trees
-  fold_tree <- NULL
+  fold_tree <- list()
   for(i in 1:n_folds){
     fold_tree[[i]] <- mmit(target.mat[fold_split_idx$train[i,],], feature.mat[fold_split_idx$train[i,],],  
                                        max_depth = as.numeric(parameters$max_depth), margin = as.numeric(parameters$margin), 
@@ -47,8 +47,8 @@ fit_and_score <- structure(function(target.mat, feature.mat,
     master_alphas <- rev(unlist(lapply(master_data, function(x) x$alpha)))
     master_pruned_trees <- rev(lapply(master_data, function(x) x$tree))
     
-    fold_alphas <- NULL
-    fold_prune_trees <- NULL
+    fold_alphas <- list()
+    fold_prune_trees <- list()
     for(i in 1 : n_folds){
       fold_data <- mmit.pruning(fold_tree[[i]])
       
@@ -58,7 +58,7 @@ fit_and_score <- structure(function(target.mat, feature.mat,
     }
 
     # Compute the test risk for all pruned trees of each fold
-    alpha_path_score <- NULL
+    alpha_path_score <- list()
     for(i in 1 : n_folds){
       
       #dummy value initialised to form dataframe, removed later
@@ -180,7 +180,7 @@ fit_and_score <- structure(function(target.mat, feature.mat,
   colnames(cv_results) <- c("max_depth", "margin", "min_sample", "loss", "alpha", " cv_score", "train_score", "train_objective_value")
   cv_results <- as.data.frame(cv_results)
   
-  output <- NULL
+  output <- list()
   output$best_score <- best_score
   output$best_estimator <- best_tree
   output$best_params <- best_params
@@ -194,7 +194,7 @@ fit_and_score <- structure(function(target.mat, feature.mat,
   feature.mat <- data.frame(neuroblastomaProcessed$feature.mat)[1:45,]
   target.mat <- neuroblastomaProcessed$target.mat[1:45,]
 
-  parameters <- NULL
+  parameters <- list()
   parameters$max_depth <- Inf
   parameters$margin <- 2
   parameters$min_sample <- 2
