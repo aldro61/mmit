@@ -8,16 +8,16 @@ from mmit.model_selection import GridSearchCV
 from mmit.metrics import mean_squared_error
 
 o = []
-filename = ['mmit_data/auto93/features.csv', 'mmit_data/auto93/targets.csv', 
-			'mmit_data/autohorse/features.csv', 'mmit_data/autohorse/targets.csv',
-			'mmit_data/autompg/features.csv', 'mmit_data/autompg/targets.csv',
-			'mmit_data/autoprice/features.csv', 'mmit_data/autoprice/targets.csv',
-			'mmit_data/baskball/features.csv', 'mmit_data/baskball/targets.csv',
-			'mmit_data/bodyfat/features.csv', 'mmit_data/bodyfat/targets.csv',
-			'mmit_data/cloud/features.csv', 'mmit_data/cloud/targets.csv',
-			'mmit_data/cpu/features.csv', 'mmit_data/cpu/targets.csv',
-			'mmit_data/meta/features.csv', 'mmit_data/meta/targets.csv' ,
-			'mmit_data/sleep/features.csv', 'mmit_data/sleep/targets.csv']
+filename = ['/home/parismita/mmit_data/auto93/features.csv', '/home/parismita/mmit_data/auto93/targets.csv', 
+			'/home/parismita/mmit_data/autohorse/features.csv', '/home/parismita/mmit_data/autohorse/targets.csv',
+			'/home/parismita/mmit_data/autompg/features.csv', '/home/parismita/mmit_data/autompg/targets.csv',
+			'/home/parismita/mmit_data/autoprice/features.csv', '/home/parismita/mmit_data/autoprice/targets.csv',
+			'/home/parismita/mmit_data/baskball/features.csv', '/home/parismita/mmit_data/baskball/targets.csv',
+			'/home/parismita/mmit_data/bodyfat/features.csv', '/home/parismita/mmit_data/bodyfat/targets.csv',
+			'/home/parismita/mmit_data/cloud/features.csv', '/home/parismita/mmit_data/cloud/targets.csv',
+			'/home/parismita/mmit_data/cpu/features.csv', '/home/parismita/mmit_data/cpu/targets.csv',
+			'/home/parismita/mmit_data/meta/features.csv', '/home/parismita/mmit_data/meta/targets.csv' ,
+			'/home/parismita/mmit_data/sleep/features.csv', '/home/parismita/mmit_data/sleep/targets.csv']
 
 
 for i in xrange(20):
@@ -30,8 +30,8 @@ for i in xrange(0,20,2):
 	x = o[i]
 	y = o[i + 1]
 
-	trainx = x[:4*len(x)/5,]
-	trainy = y[:4*len(y)/5,]
+	trainx = x[:len(x)/2,]
+	trainy = y[:len(y)/2,]
 	testx = x[len(x)/2:,]
 	testy = y[len(y)/2:,]
 
