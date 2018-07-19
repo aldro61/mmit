@@ -11,8 +11,7 @@ mmit.predict(tree, newdata = NULL, perm = NULL)
 
 \item{newdata}{an optional data frame containing the testing data which is to be predicted.}
 
-\item{perm}{an optional character vector of variable names. Splits of nodes with a primary split in any of these variables will be permuted (after dealing with surrogates). 
-Note that surrogate split in the perm variables will no be permuted.}
+\item{perm}{an optional character vector of variable names.}
 }
 \value{
 The learned regression tree as an object of class party.
