@@ -1,6 +1,6 @@
 #' Random Forest of Max Margin Interval Tree
 #'
-#' Performing grid search to select the best parameters via cross validation on the  a regression tree for censored data.
+#' Performing random forest on ensemble of Max Margin Interval Tree.
 #' 
 #' @param target.mat The response variable of the model
 #' @param feature.mat a data frame containing the feature variables in the model.
@@ -42,13 +42,13 @@ mmif <- structure(function(target.mat, feature.mat, test_feature.mat = feature.m
    ### create n_trees
   all_trees <- list()
   all_pred <- NULL
-  for(i in 1:n_trees){
+  for(i in 1 : n_trees){
     
     ### sample n_exalple elements of dataset
     new_target.mat <- NULL
     new_feature.mat <- NULL
-    for(j in 1:n_example){
-      x <- sample(nrow(target.mat),1)
+    for(j in 1 : n_example){
+      x <- sample(nrow(target.mat), 1)
       new_target.mat <- rbind(new_target.mat, target.mat[x,])
       new_feature.mat <- rbind(new_feature.mat, feature.mat[x,])
     }
