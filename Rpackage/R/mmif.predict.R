@@ -22,12 +22,10 @@
 #' colnames(feature.mat) <- c("a", "b", "c")
 #' feature.mat <- data.frame(feature.mat)
 #' 
-#' testx <- data.frame(neuroblastomaProcessed$feature.mat)[45:90,]
-#' testy <- neuroblastomaProcessed$target.mat[45:90,]
 #' parameters <- list(max_depth = Inf, margin = 2.0, loss = "hinge", min_sample = 1)
 #' 
 #' trees <- mmif(target.mat, feature.mat, test, parameters = parameters)
-#' pred <- mmif.predict(trees, testx)
+#' pred <- mmif.predict(trees, feature.mat)
 #' 
 #' @export
 mmif <- structure(function(trees, test_feature.mat = NULL){
