@@ -1,5 +1,6 @@
 fit_and_score <- structure(function(target.mat, feature.mat, 
                                     parameters, n_folds = 3, scorer = NULL, 
+                                    learner = NULL, predict = NULL,
                                     pruning = TRUE){
   
   ### shuffle the data 
@@ -25,17 +26,14 @@ fit_and_score <- structure(function(target.mat, feature.mat,
   ### fold trees
   fold_tree <- list()
   for(i in 1:n_folds){
-    fold_tree[[i]] <- mmit(target.mat[fold_split_idx$train[i,],], feature.mat[fold_split_idx$train[i,],],  
-                                       max_depth = as.numeric(parameters$max_depth), margin = as.numeric(parameters$margin), 
-                                       loss = parameters$loss, min_sample = as.numeric(parameters$min_sample))
+    arguments <- list(target.mat= target.mat[fold_split_idx$train[i,],], feature.mat = feature.mat[fold_split_idx$train[i,],]) 
+    fold_tree[[i]] <- do.call(learner, c(arguments, parameters))
   }
   
   ### master tree
-  master_tree <- mmit(target.mat, feature.mat,  
-                      max_depth = as.numeric(parameters$max_depth), margin = as.numeric(parameters$margin), 
-                      loss = parameters$loss, min_sample = as.numeric(parameters$min_sample))
+  arguments <- list(target.mat = target.mat, feature.mat = feature.mat)
+  master_tree <- do.call(learner, c(arguments, parameters))
   
- 
   ### for traning data
   alpha_train_scores <- NULL
   alpha_train_objective_values <- NULL
@@ -69,7 +67,7 @@ fit_and_score <- structure(function(target.mat, feature.mat,
         node <- fold_prune_trees[[i]][[j]]
         
         ### predictions of the tree for test data
-        prediction <- mmit.predict(node, feature.mat[fold_split_idx$test[i,],])
+        prediction <- predict(node, feature.mat[fold_split_idx$test[i,],])
 
         ###error calc
         fold_test_scores <- scorer(target.mat[fold_split_idx$test[i,],], prediction)
@@ -106,7 +104,7 @@ fit_and_score <- structure(function(target.mat, feature.mat,
       }
 
       ### calc train score
-      prediction <- mmit.predict(master_pruned_trees[[i]], feature.mat)
+      prediction <- predict(master_pruned_trees[[i]], feature.mat)
       train_score <- scorer(target.mat, prediction)
       
       ### calc cost of all leaves
@@ -148,7 +146,7 @@ fit_and_score <- structure(function(target.mat, feature.mat,
     ### For each fold, build a decision tree
     fold_test_scores <- NULL
     for(i in 1 : n_folds){
-      prediction <- mmit.predict(fold_tree[[i]], feature.mat[fold_split_idx$test[i,],])
+      prediction <- predict(fold_tree[[i]], feature.mat[fold_split_idx$test[i,],])
       fold_test_scores <- c(fold_test_scores, scorer(target.mat, prediction))
     }
       
@@ -160,7 +158,7 @@ fit_and_score <- structure(function(target.mat, feature.mat,
     
     
     ### calc train score
-    prediction <- mmit.predict(master_tree, feature.mat)
+    prediction <- predict(master_tree, feature.mat)
     alpha_train_scores <- scorer(target.mat, prediction)
     
     ### calc cost of all leaves
@@ -200,7 +198,7 @@ fit_and_score <- structure(function(target.mat, feature.mat,
   parameters$min_sample <- 2
   parameters$loss <- c("hinge")
   
-  result <- fit_and_score(target.mat, feature.mat, parameters, scorer = mse)
+  result <- fit_and_score(target.mat, feature.mat, parameters, learner = mmit, predict = mmit.predict, scorer = mse, pruning = FALSE)
   
 })
     
