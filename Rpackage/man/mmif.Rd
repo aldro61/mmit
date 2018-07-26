@@ -4,30 +4,34 @@
 \alias{mmif}
 \title{Random Forest of Max Margin Interval Tree}
 \usage{
-mmif(target.mat, feature.mat, test_feature.mat = feature.mat, parameters,
-  n_trees = 10, n_example = 100,
-  n_features = as.integer(ncol(feature.mat)^0.5))
+mmif(target.mat, feature.mat, max_depth = Inf, margin = 0, loss = "hinge",
+  min_sample = 1, n_trees = 10,
+  n_features = as.integer(ncol(feature.mat)^0.5), n_cpu = 1)
 }
 \arguments{
 \item{target.mat}{The response variable of the model}
 
 \item{feature.mat}{a data frame containing the feature variables in the model.}
 
-\item{test_feature.mat}{The testing data table.}
+\item{max_depth}{The maximum depth criteia}
 
-\item{parameters}{the list of paramaters such as max_depth, margin, loss, min_sample}
+\item{margin}{margin paramaters}
+
+\item{loss}{The type of loss; (\code{"hinge"}, \code{"square"})}
+
+\item{min_sample}{The minimum number of sample required}
 
 \item{n_trees}{The Number of trees}
 
-\item{n_example}{The number of data elements to be sampled from dataset.}
-
 \item{n_features}{The number of features to be sampled.}
+
+\item{n_cpu}{The number of cores to register for parallel programing of the code, default value is 1 and n_cpu = -1 to select all cores.}
 }
 \value{
-predicted values of random forest
+List of ensemble of trees.
 }
 \description{
-Performing grid search to select the best parameters via cross validation on the  a regression tree for censored data.
+Performing random forest on ensemble of Max Margin Interval Tree.
 }
 \examples{
 library(mmit)
@@ -42,11 +46,7 @@ feature.mat <- rbind(
 colnames(feature.mat) <- c("a", "b", "c")
 feature.mat <- data.frame(feature.mat)
 
-testx <- data.frame(neuroblastomaProcessed$feature.mat)[45:90,]
-testy <- neuroblastomaProcessed$target.mat[45:90,]
-parameters <- list(max_depth = Inf, margin = 2.0, loss = "hinge", min_sample = 1)
-
-pred <- mmif(target.mat, feature.mat, test, parameters = parameters)
+trees <- mmif(target.mat, feature.mat, max_depth = Inf, margin = 2.0, loss = "hinge", min_sample = 1)
 
 }
 \author{
