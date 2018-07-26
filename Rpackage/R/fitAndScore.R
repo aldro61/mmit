@@ -156,15 +156,25 @@ fit_and_score <- structure(function(target.mat, feature.mat,
     alphas <- c(0.)
     alpha_cv_scores <- c(best_score)
     
-    
     ### calc train score
     prediction <- predict(master_tree, feature.mat)
     alpha_train_scores <- scorer(target.mat, prediction)
     
     ### calc cost of all leaves
-    ter_id <- nodeids(master_tree, terminal = TRUE)
-    n <- nodeapply(master_tree, ids = ter_id, info_node)
-    alpha_train_objective_values <- sum(matrix(unlist(n), nrow = length(n), byrow = T)[, 2])
+    if(class(master_tree) == "list"){
+      for(i in 1:length(master_tree)){
+        ter_id <- nodeids(master_tree[[i]], terminal = TRUE)
+        n <- nodeapply(master_tree[[i]], ids = ter_id, info_node)
+        alpha_train_objective_values <- alpha_train_objective_values + sum(matrix(unlist(n), nrow = length(n), byrow = T)[, 2])
+      }
+      alpha_train_objective_values <-  alpha_train_objective_values/ length(master_tree)
+    }
+    else{
+      ter_id <- nodeids(master_tree, terminal = TRUE)
+      n <- nodeapply(master_tree, ids = ter_id, info_node)
+      alpha_train_objective_values <- sum(matrix(unlist(n), nrow = length(n), byrow = T)[, 2])
+    }
+    
 
   }
   
@@ -175,7 +185,7 @@ fit_and_score <- structure(function(target.mat, feature.mat,
   ### Generate a big dictionnary of all HP combinations considered (including alpha) and their CV scores
   cv_results <- cbind(parameters$max_depth, parameters$margin, parameters$min_sample, parameters$loss,
                       alphas, alpha_cv_scores, alpha_train_scores, alpha_train_objective_values)
-  colnames(cv_results) <- c("max_depth", "margin", "min_sample", "loss", "alpha", " cv_score", "train_score", "train_objective_value")
+  #colnames(cv_results) <- c("max_depth", "margin", "min_sample", "loss", "alpha", " cv_score", "train_score", "train_objective_value")
   cv_results <- as.data.frame(cv_results)
   
   output <- list()
