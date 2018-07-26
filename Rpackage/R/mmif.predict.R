@@ -28,7 +28,7 @@
 #' pred <- mmif.predict(trees, feature.mat)
 #' 
 #' @export
-mmif <- structure(function(trees, test_feature.mat = NULL){
+mmif.predict <- structure(function(trees, test_feature.mat = NULL){
   
   all_pred <- NULL
   for(i in 1 : length(trees)){
