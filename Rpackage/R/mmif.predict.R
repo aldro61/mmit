@@ -2,7 +2,7 @@
 #'
 #' Predictions as average of all predictions of the random forest.
 #' 
-#' @param trees Ensembe of trees
+#' @param forest Ensembe of forest
 #' @param test_feature.mat a data frame containing the test feature variables in the model.
 #' 
 #' @return Prediction values
@@ -24,15 +24,15 @@
 #' 
 #' parameters <- list(max_depth = Inf, margin = 2.0, loss = "hinge", min_sample = 1)
 #' 
-#' trees <- mmif(target.mat, feature.mat, test, parameters = parameters)
-#' pred <- mmif.predict(trees, feature.mat)
+#' forest <- mmif(target.mat, feature.mat, test, parameters = parameters)
+#' pred <- mmif.predict(forest, feature.mat)
 #' 
 #' @export
-mmif.predict <- structure(function(trees, test_feature.mat = NULL){
+mmif.predict <- structure(function(forest, test_feature.mat = NULL){
   
   all_pred <- NULL
-  for(i in 1 : length(trees)){
-    prediction <- mmit.predict(trees[[i]], test_feature.mat)
+  for(i in 1 : length(forest)){
+    prediction <- mmit.predict(forest[[i]], test_feature.mat)
     all_pred <- rbind(all_pred, prediction)
   }
   
