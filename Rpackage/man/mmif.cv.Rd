@@ -5,7 +5,7 @@
 \title{The Cross Validation of Random Forest}
 \usage{
 mmif.cv(target.mat, feature.mat, param_grid, n_folds = 3, scorer = NULL,
-  n_cpu = 1, pruning = TRUE)
+  n_cpu = 1)
 }
 \arguments{
 \item{target.mat}{The response variable of the model}
@@ -19,8 +19,6 @@ mmif.cv(target.mat, feature.mat, param_grid, n_folds = 3, scorer = NULL,
 \item{scorer}{The Loss calculation function}
 
 \item{n_cpu}{The number of cores to register for parallel programing of the code, default value is 1 and n_cpu = -1 to select all cores.}
-
-\item{pruning}{Boolean whether pruning is to be done or not.}
 }
 \value{
 The list consist of best score, best parameters and list of all parameter values with cross validation score .
@@ -49,7 +47,7 @@ param_grid$loss <- c("hinge")
 param_grid$n_trees <- c(10, 20, 30)
 param_grid$n_features <- c(as.integer(ncol(feature.mat)**0.5))
 
-result <- mmit.cv(target.mat, feature.mat, param_grid, scorer = mse)
+result <- mmit.cv(target.mat, feature.mat, param_grid, scorer = mse, n_cpu = -1)
 
 }
 \author{

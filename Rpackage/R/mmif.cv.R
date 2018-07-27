@@ -34,7 +34,7 @@
 #' param_grid$n_trees <- c(10, 20, 30)
 #' param_grid$n_features <- c(as.integer(ncol(feature.mat)**0.5))
 #' 
-#' result <- mmit.cv(target.mat, feature.mat, param_grid, scorer = mse)
+#' result <- mmit.cv(target.mat, feature.mat, param_grid, scorer = mse, n_cpu = -1)
 #' 
 #' @export
 mmif.cv <- structure(function(target.mat, feature.mat, 

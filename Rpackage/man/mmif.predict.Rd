@@ -4,10 +4,10 @@
 \alias{mmif.predict}
 \title{Prediction for Random Forest}
 \usage{
-mmif.predict(trees, test_feature.mat = NULL)
+mmif.predict(forest, test_feature.mat = NULL)
 }
 \arguments{
-\item{trees}{Ensembe of trees}
+\item{forest}{Ensembe of forest}
 
 \item{test_feature.mat}{a data frame containing the test feature variables in the model.}
 }
@@ -32,8 +32,8 @@ feature.mat <- data.frame(feature.mat)
 
 parameters <- list(max_depth = Inf, margin = 2.0, loss = "hinge", min_sample = 1)
 
-trees <- mmif(target.mat, feature.mat, test, parameters = parameters)
-pred <- mmif.predict(trees, feature.mat)
+forest <- mmif(target.mat, feature.mat, test, parameters = parameters)
+pred <- mmif.predict(forest, feature.mat)
 
 }
 \author{
