@@ -53,7 +53,9 @@ mmif.cv <- structure(function(target.mat, feature.mat,
   assert_that(length(param_grid) <= 6, msg = "unexpected parameters as argument")
   
   ### combinations of all parameters grid
-  parameters <- expand.grid(max_depth = param_grid$max_depth, margin = param_grid$margin, min_sample = param_grid$min_sample, loss = param_grid$loss)
+  parameters <- expand.grid(max_depth = param_grid$max_depth, margin = param_grid$margin, 
+                            min_sample = param_grid$min_sample, loss = param_grid$loss,
+                            n_trees = param_grid$n_trees, n_features = param_grid$n_features)
   parameters <- as.data.frame(parameters)
   
   ### for param grid run loop to check best value
@@ -70,20 +72,13 @@ mmif.cv <- structure(function(target.mat, feature.mat,
   registerDoParallel(cl)
   
   fitscore_result <- list()
-  #fitscore_result <- foreach(i = 1:nrow(parameters), 
-  #                           .packages = "mmit") %dopar% 
-  #  fit_and_score(target.mat = target.mat, feature.mat = feature.mat, 
-  #                parameters = parameters[i,], learner = mmif, predict = mmif.predict,
-  #                n_folds = n_folds, scorer = scorer,
-  #                pruning = FALSE)
+  fitscore_result <- foreach(i = 1:nrow(parameters), 
+                             .packages = "mmit") %dopar% 
+    fit_and_score(target.mat = target.mat, feature.mat = feature.mat, 
+                  parameters = parameters[i,], learner = "mmif", predict = mmif.predict,
+                  n_folds = n_folds, scorer = scorer, pruning = FALSE)
   stopCluster(cl)  
-  
-  for(i in 1:nrow(parameters)){fit_and_score(target.mat = target.mat, feature.mat = feature.mat, 
-                                            parameters = parameters[i,], learner = mmif, predict = mmif.predict,
-                                            n_folds = n_folds, scorer = scorer,
-                                            pruning = FALSE)}
-    
-  
+
   for(i in 1:nrow(parameters)){
     cv_results <- rbind(cv_results, fitscore_result[[i]]$cv_results)
     if(attr(scorer, "direction")(best_result$best_score, fitscore_result[[i]]$best_score) == fitscore_result[[i]]$best_score){
@@ -102,11 +97,11 @@ mmif.cv <- structure(function(target.mat, feature.mat,
   target.mat <- neuroblastomaProcessed$target.mat[1:45,]
   
   param_grid <- NULL
-  param_grid$max_depth <- c(Inf, 4, 3, 2, 1, 0)
-  param_grid$margin <- c(2, 3, 5)
-  param_grid$min_sample <- c(2, 5, 10, 20)
+  param_grid$max_depth <- c(4, 3)
+  param_grid$margin <- c(2, 3)
+  param_grid$min_sample <- c(5, 20)
   param_grid$loss <- c("hinge", "square")
-  param_grid$n_trees <- c(10, 20, 30)
+  param_grid$n_trees <- c(10)
   param_grid$n_features <- c(as.integer(ncol(feature.mat)**0.5))
   
   result <- mmif.cv(target.mat, feature.mat, param_grid, scorer = mse, n_cpu = 4)

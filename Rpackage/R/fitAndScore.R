@@ -35,8 +35,8 @@ fit_and_score <- structure(function(target.mat, feature.mat,
   master_tree <- do.call(learner, c(arguments, parameters))
   
   ### for traning data
-  alpha_train_scores <- NULL
-  alpha_train_objective_values <- NULL
+  alpha_train_scores <- 0.0
+  alpha_train_objective_values <- 0.0
   
   ### if pruning
   if(pruning){
@@ -91,7 +91,7 @@ fit_and_score <- structure(function(target.mat, feature.mat,
     # Prune the master tree based on the CV estimates
     alphas <- NULL
     alpha_cv_scores <- NULL
-    best_alpha <- -1
+    best_alpha <- -1.0
     best_score <- attr(scorer, "worst")
     best_tree <- NULL
 
@@ -161,13 +161,13 @@ fit_and_score <- structure(function(target.mat, feature.mat,
     alpha_train_scores <- scorer(target.mat, prediction)
     
     ### calc cost of all leaves
-    if(class(master_tree) == "list"){
+    if(learner == "mmif"){
       for(i in 1:length(master_tree)){
         ter_id <- nodeids(master_tree[[i]], terminal = TRUE)
         n <- nodeapply(master_tree[[i]], ids = ter_id, info_node)
         alpha_train_objective_values <- alpha_train_objective_values + sum(matrix(unlist(n), nrow = length(n), byrow = T)[, 2])
       }
-      alpha_train_objective_values <-  alpha_train_objective_values/ length(master_tree)
+      alpha_train_objective_values <- alpha_train_objective_values/length(master_tree)
     }
     else{
       ter_id <- nodeids(master_tree, terminal = TRUE)
@@ -178,15 +178,23 @@ fit_and_score <- structure(function(target.mat, feature.mat,
 
   }
   
+  ### Generate a big dictionnary of all HP combinations considered (including alpha) and their CV scores
   ### Append alpha to the parameters
   best_params <- parameters
-  best_params$alpha <- best_alpha
   
-  ### Generate a big dictionnary of all HP combinations considered (including alpha) and their CV scores
-  cv_results <- cbind(parameters$max_depth, parameters$margin, parameters$min_sample, parameters$loss,
-                      alphas, alpha_cv_scores, alpha_train_scores, alpha_train_objective_values)
-  #colnames(cv_results) <- c("max_depth", "margin", "min_sample", "loss", "alpha", " cv_score", "train_score", "train_objective_value")
-  cv_results <- as.data.frame(cv_results)
+  if(learner == "mmit"){
+    best_params$alpha <- best_alpha
+    cv_results <- cbind(parameters$max_depth, parameters$margin, parameters$min_sample, parameters$loss,
+                        alphas, alpha_cv_scores, alpha_train_scores, alpha_train_objective_values)
+    colnames(cv_results) <- c("max_depth", "margin", "min_sample", "loss", "alpha", " cv_score", "train_score", "train_objective_value")
+    cv_results <- as.data.frame(cv_results)
+  }
+  else{
+    cv_results <- cbind(parameters$max_depth, parameters$margin, parameters$min_sample, parameters$loss,
+                        parameters$n_trees, parameters$n_features, alpha_train_scores, alpha_train_objective_values)
+    colnames(cv_results) <- c("max_depth", "margin", "min_sample", "loss", "n_trees", " n_features", "train_score", "train_objective_value")
+    cv_results <- as.data.frame(cv_results)
+  }
   
   output <- list()
   output$best_score <- best_score
@@ -208,7 +216,7 @@ fit_and_score <- structure(function(target.mat, feature.mat,
   parameters$min_sample <- 2
   parameters$loss <- c("hinge")
   
-  result <- fit_and_score(target.mat, feature.mat, parameters, learner = mmit, predict = mmit.predict, scorer = mse, pruning = FALSE)
+  result <- fit_and_score(target.mat, feature.mat, parameters, learner = "mmit", predict = mmit.predict, scorer = mse, pruning = FALSE)
   
 })
     
