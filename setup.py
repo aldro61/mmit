@@ -42,7 +42,7 @@ solver_module = Extension('mmit.core.solver',
                                    'mmit/core/coefficients.cpp'],
                           extra_compile_args=["-std=c++0x"] + os_compile_flags)
 
-dependencies = ["joblib", "numpy", "scikit-learn", "six"]
+dependencies = ["joblib", "numpy", "scikit-learn", "six", "future"]
 
 setup(
     name = "mmit",

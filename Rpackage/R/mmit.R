@@ -6,7 +6,7 @@
 #' @param feature.mat a data frame containing the feature variables in the model.
 #' @param margin margin paramaters 
 #' @param loss The type of loss; (\code{"hinge"}, \code{"square"})
-#' @param maxdepth The maximum depth criteia
+#' @param max_depth The maximum depth criteia
 #' @param min_sample The minimum number of sample required 
 #' 
 #' @return The learned regression tree as an object of class party.
@@ -31,7 +31,7 @@
 #' 
 #' @export
 mmit <- structure(function(target.mat, feature.mat,  
-                           maxdepth = Inf, margin=0.0, loss="hinge",
+                           max_depth = Inf, margin=0.0, loss="hinge",
                            min_sample = 1) {
   ### partynode id and initial depth
   id = 1L
@@ -44,7 +44,7 @@ mmit <- structure(function(target.mat, feature.mat,
   stopifnot(length(weights) == nrow(feature.mat) & max(abs(weights - floor(weights))) < .Machine$double.eps)
   
   ### tree
-  node<- growtree(target.mat, feature.mat, maxdepth = maxdepth, margin = margin, weights = weights)
+  node<- growtree(target.mat, feature.mat, max_depth = max_depth, margin = margin, weights = weights)
   
   ### compute terminal node number for each observation
   tree <- party(node, data = feature.mat, fitted = data.frame("(fitted)" = fitted_node(node, data = feature.mat),
@@ -55,11 +55,10 @@ mmit <- structure(function(target.mat, feature.mat,
   return(tree)
 }, ex=function(){
   
-  library(survival)
   data(neuroblastomaProcessed, package="penaltyLearning")
   feature.mat <- data.frame(neuroblastomaProcessed$feature.mat)[1:45,]
   target.mat <- neuroblastomaProcessed$target.mat[1:45,]
-  tree <- mmit(target.mat, feature.mat, maxdepth = Inf, margin = 2.0)
+  tree <- mmit(target.mat, feature.mat, max_depth = Inf, margin = 2.0)
   plot(tree)
   
 })

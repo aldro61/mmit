@@ -3,11 +3,15 @@ bestsplit <- structure(function
 ### We have the feature and target value of the data that is to be splitted.
 (target.mat, feature.mat, weights, margin=0.0, loss="hinge",pred = NULL){
   ### We keep track of the following values for each optimal split
-  best_split <- NULL
+  best_split <- list()
   best_split$cost <- Inf
+  best_split$leftcost <- Inf
+  best_split$rightcost <- Inf
   best_split$br <- NULL
   best_split$varid <- NULL
   best_split$row <- NULL
+  best_split$leftpred <- NULL
+  best_split$rightpred <- NULL
   
   ### initialise pred$cost with root node's cost.
   if(is.null(pred)){
@@ -21,7 +25,7 @@ bestsplit <- structure(function
   target.mat <- cbind(dummy_tar_1,dummy_tar_2)
   
   ### loop for every feature
-  for (index in 1:(length(feature.mat[1,]))){
+  for (index in 1:(ncol(feature.mat))){
     feat <- feature.mat[, index]
     
     ### extract data value as per weight
@@ -49,7 +53,7 @@ bestsplit <- structure(function
 
     ### unique and removing cases where all examples are in one leaf
     leftleaf <- leftleaf[last_idx,]
-    leftleaf <- leftleaf[-length(leftleaf[, 1]),]
+    leftleaf <- leftleaf[-nrow(leftleaf),]
     rightleaf$moves <- rev(rightleaf[, 1])
     rightleaf$pred <- rev(rightleaf[, 2])
     rightleaf$cost <- rev(rightleaf[, 3])
@@ -66,6 +70,8 @@ bestsplit <- structure(function
 
     if(min(split_cost) < best_split$cost){
       best_split$cost <- min(split_cost)
+      best_split$leftcost <- leftleaf$cost[which.min(split_cost)]
+      best_split$rightcost <- rightleaf$cost[which.min(split_cost)]
       best_split$br <- feat[which.min(split_cost)]
       best_split$varid <- index
       best_split$row <- which.min(split_cost)

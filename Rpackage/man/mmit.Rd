@@ -4,15 +4,15 @@
 \alias{mmit}
 \title{The Max Margin Interval Tree}
 \usage{
-mmit(formula, target.mat, feature.mat, weights = NULL, depth = 0,
-  maxdepth = Inf, margin = 0, loss = "hinge", id = 1L, min_sample = 1)
+mmit(target.mat, feature.mat, max_depth = Inf, margin = 0, loss = "hinge",
+  min_sample = 1)
 }
 \arguments{
 \item{target.mat}{The response variable of the model}
 
 \item{feature.mat}{a data frame containing the feature variables in the model.}
 
-\item{maxdepth}{The maximum depth criteia}
+\item{max_depth}{The maximum depth criteia}
 
 \item{margin}{margin paramaters}
 
