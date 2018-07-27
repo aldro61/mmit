@@ -1,17 +1,15 @@
--*~
--*.so
--*.o
--symbols.rds
--*.Rcheck
--Rpackage.check
--*.tar.gz
--.Rhistory
--*.pyc
--*.egg-info
--build
--dist
-
-
+*~
+*.so
+*.o
+symbols.rds
+*.Rcheck
+Rpackage.check
+*.tar.gz
+.Rhistory
+*.pyc
+*.egg-info
+build
+dist
 
 # History files
 .Rhistory
@@ -31,8 +29,6 @@
 
 # RStudio files
 .Rproj.user/
--.Rproj.user
-
 
 # produced vignettes
 vignettes/*.html
