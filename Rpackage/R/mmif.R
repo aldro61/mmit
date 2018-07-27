@@ -29,13 +29,14 @@
 #' colnames(feature.mat) <- c("a", "b", "c")
 #' feature.mat <- data.frame(feature.mat)
 #' 
-#' trees <- mmif(target.mat, feature.mat, max_depth = Inf, margin = 2.0, loss = "hinge", min_sample = 1)
+#' trees <- mmif(target.mat, feature.mat, margin = 2.0, n_cpu = -1)
 #' 
 #' @export
 mmif <- structure(function(target.mat, feature.mat, 
                            max_depth = Inf, margin=0.0, loss="hinge",
                            min_sample = 1, n_trees = 10,
                            n_features = as.integer(ncol(feature.mat)**0.5), n_cpu = 1){
+ 
  
   ### parallelize using foreach, see all permutation combination of param grid values
   ### register parallel backend
@@ -47,29 +48,12 @@ mmif <- structure(function(target.mat, feature.mat,
   
   ### create n_trees
   all_trees <- list()
-  all_pred <- NULL
-  all_trees <- foreach(i = 1 : n_trees, .packages = "mmit") %dopar% {
-    
-    ### sample n_exalple elements of dataset
-    new_target.mat <- NULL
-    new_feature.mat <- NULL
-    for(j in 1 : nrow(feature.mat)){
-      x <- sample(nrow(target.mat), 1)
-      new_target.mat <- rbind(new_target.mat, target.mat[x,])
-      new_feature.mat <- rbind(new_feature.mat, feature.mat[x,])
-    }
-    
-    ### sample features
-    w <- rep(1, ncol(feature.mat))
-    x <- sample(ncol(feature.mat), n_features)
-    new_feature.mat <- new_feature.mat[, x]
-    new_target.mat <- data.matrix(new_target.mat)
-    
-    ### tree
-    tree <- mmit(new_target.mat, new_feature.mat, margin = margin, loss = loss, 
-                 min_sample = min_sample, max_depth = max_depth)
-    return(tree)
-  }
+  all_trees <- foreach(i = 1 : n_trees, .packages = "mmit") %dopar% 
+                       random_tree(target.mat, feature.mat, 
+                                     max_depth = Inf, margin=0.0, loss="hinge",
+                                     min_sample = 1, n_trees = 10,
+                                     n_features = as.integer(ncol(feature.mat)**0.5))
+  
   
   stopCluster(cl)
   return(all_trees)
@@ -82,3 +66,30 @@ mmif <- structure(function(target.mat, feature.mat,
   trees <- mmif(target.mat, feature.mat, max_depth = Inf, margin = 2.0, loss = "hinge", min_sample = 1)
 
 })
+
+
+random_tree <- function(target.mat, feature.mat, 
+                          max_depth = Inf, margin=0.0, loss="hinge",
+                          min_sample = 1, n_trees = 10,
+                          n_features = as.integer(ncol(feature.mat)**0.5)){
+      
+  ### sample n_exalple elements of dataset
+  new_target.mat <- NULL
+  new_feature.mat <- NULL 
+  for(j in 1 : nrow(feature.mat)){
+    x <- sample(nrow(target.mat), 1)
+    new_target.mat <- rbind(new_target.mat, target.mat[x,])
+    new_feature.mat <- rbind(new_feature.mat, feature.mat[x,])
+  }
+  
+  ### sample features
+  w <- rep(1, ncol(feature.mat))
+  x <- sample(ncol(feature.mat), n_features)
+  new_feature.mat <- new_feature.mat[, x]
+  new_target.mat <- data.matrix(new_target.mat)
+  
+  ### tree
+  tree <- mmit(new_target.mat, new_feature.mat, margin = margin, loss = loss, 
+               min_sample = min_sample, max_depth = max_depth)
+  return(tree)
+}

@@ -46,7 +46,7 @@ feature.mat <- rbind(
 colnames(feature.mat) <- c("a", "b", "c")
 feature.mat <- data.frame(feature.mat)
 
-trees <- mmif(target.mat, feature.mat, max_depth = Inf, margin = 2.0, loss = "hinge", min_sample = 1)
+trees <- mmif(target.mat, feature.mat, margin = 2.0, n_cpu = -1)
 
 }
 \author{
