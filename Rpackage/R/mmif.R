@@ -50,9 +50,9 @@ mmif <- structure(function(target.mat, feature.mat,
   all_trees <- list()
   all_trees <- foreach(i = 1 : n_trees, .packages = "mmit") %dopar% 
                        random_tree(target.mat, feature.mat, 
-                                     max_depth = Inf, margin=0.0, loss="hinge",
-                                     min_sample = 1, n_trees = 10,
-                                     n_features = as.integer(ncol(feature.mat)**0.5))
+                                     max_depth = max_depth, margin = margin, loss = loss,
+                                     min_sample = min_sample, n_trees = n_trees,
+                                     n_features = n_features)
   
   
   stopCluster(cl)
