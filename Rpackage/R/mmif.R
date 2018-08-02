@@ -91,10 +91,20 @@ random_tree <- function(target.mat, feature.mat,
   new_target.mat <- target.mat[x,]
   new_target.mat <- data.matrix(new_target.mat)
   
+  ### if default n_feature value is 1 and no of columns is greater than 1
+  if((as.integer(ncol(feature.mat)**0.5) <= 1) && (n_features <= 1) && (ncol(feature.mat) > 1)){
+    n_features = 2
+  }
+  
+  ### if user assigned n_feature value is one
+  assert_that(n_features > 1)
+  assert_that(ncol(feature.mat) >= n_features)
+  
   ### sample features
-  x <- sample(ncol(feature.mat), n_features)
-  new_feature.mat <- new_feature.mat[, x]
-  new_target.mat <- data.matrix(new_target.mat)
+  y <- sample(ncol(feature.mat), n_features)
+  new_feature.mat <- new_feature.mat[, y]
+  colnames(new_feature.mat) <- c(names(feature.mat)[y])
+  new_feature.mat <- data.frame(new_feature.mat)
   
   ### tree
   tree <- mmit(new_target.mat, new_feature.mat, margin = margin, loss = loss, 
