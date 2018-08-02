@@ -72,11 +72,6 @@ mmif.cv <- structure(function(target.mat, feature.mat,
   registerDoParallel(cl)
   
   fitscore_result <- list()
-  #for(i in 1:nrow(parameters)){print(i)
-  #  fitscore_result[[i]] <- fit_and_score(target.mat = target.mat, feature.mat = feature.mat, 
-  #                                          parameters = parameters[i,], learner = "mmif", 
-  #                                          n_folds = n_folds, scorer = scorer, pruning = FALSE) }
-  #  
   fitscore_result <- foreach(i = 1:nrow(parameters), .packages = "mmit") %dopar% 
     fit_and_score(target.mat = target.mat, feature.mat = feature.mat, 
                   parameters = parameters[i,], learner = "mmif", 
