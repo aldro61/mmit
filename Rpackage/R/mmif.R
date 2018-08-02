@@ -44,7 +44,7 @@ mmif <- structure(function(target.mat, feature.mat,
   assert_that(detectCores() >= n_cpu)
   
   all_trees <- list()
-  if(n_cpu != 1){
+  if(n_cpu > 1){
     cl <- makeCluster(n_cpu)
     registerDoParallel(cl)
     

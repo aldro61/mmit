@@ -46,7 +46,7 @@ mmif.cv <- structure(function(target.mat, feature.mat,
   if(is.null(param_grid[["margin"]])) param_grid$margin <- 0.0
   if(is.null(param_grid[["min_sample"]])) param_grid$min_sample <- 0.0
   if(is.null(param_grid[["loss"]])) param_grid$loss <- "hinge"
-  if(is.null(param_grid[["n_trees"]])) param_grid$ntrees <- 10
+  if(is.null(param_grid[["n_trees"]])) param_grid$n_trees <- 10
   if(is.null(param_grid[["n_features"]])) param_grid$n_features <- c(as.integer(ncol(feature.mat)**0.5))
   
   ### check for unwanted parameters
@@ -72,8 +72,12 @@ mmif.cv <- structure(function(target.mat, feature.mat,
   registerDoParallel(cl)
   
   fitscore_result <- list()
-  fitscore_result <- foreach(i = 1:nrow(parameters), 
-                             .packages = "mmit") %dopar% 
+  #for(i in 1:nrow(parameters)){print(i)
+  #  fitscore_result[[i]] <- fit_and_score(target.mat = target.mat, feature.mat = feature.mat, 
+  #                                          parameters = parameters[i,], learner = "mmif", 
+  #                                          n_folds = n_folds, scorer = scorer, pruning = FALSE) }
+  #  
+  fitscore_result <- foreach(i = 1:nrow(parameters), .packages = "mmit") %dopar% 
     fit_and_score(target.mat = target.mat, feature.mat = feature.mat, 
                   parameters = parameters[i,], learner = "mmif", 
                   n_folds = n_folds, scorer = scorer, pruning = FALSE)

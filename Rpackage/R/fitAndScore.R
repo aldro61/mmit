@@ -1,10 +1,13 @@
 fit_and_score <- structure(function(target.mat, feature.mat, 
                                     parameters, n_folds = 3, scorer = NULL, 
                                     learner = NULL, pruning = TRUE){
-  predict = get(paste(learner, ".predict", sep = ""))
+  learner.predict = paste(learner, ".predict", sep = "")
   
   ### if pruning is true then learner should be mmit
-  assert_that(pruning==FALSE && learner != "mmit")
+  if(pruning==TRUE){
+    assert_that(learner == "mmit")
+  }
+  
   ### shuffle the data 
   rand <- sample(nrow(target.mat))
   target.mat <- target.mat[rand,]
@@ -37,8 +40,9 @@ fit_and_score <- structure(function(target.mat, feature.mat,
   master_model <- do.call(learner, c(arguments, parameters))
   
   ### for traning data
-  alpha_train_scores <- 0.0
-  alpha_train_objective_values <- 0.0
+  alpha_train_scores <- NULL
+  alpha_train_objective_values <- NULL
+  
   
   ### if pruning
   if(pruning){
@@ -69,7 +73,7 @@ fit_and_score <- structure(function(target.mat, feature.mat,
         node <- fold_prune_models[[i]][[j]]
         
         ### predictions of the model for test data
-        prediction <- predict(node, feature.mat[fold_split_idx$test[i,],])
+        prediction <- do.call(learner.predict, list(node, feature.mat[fold_split_idx$test[i,],]))
 
         ###error calc
         fold_test_scores <- scorer(target.mat[fold_split_idx$test[i,],], prediction)
@@ -106,7 +110,7 @@ fit_and_score <- structure(function(target.mat, feature.mat,
       }
 
       ### calc train score
-      prediction <- predict(master_pruned_models[[i]], feature.mat)
+      prediction <- do.call(learner.predict, list(master_pruned_models[[i]], feature.mat))
       train_score <- scorer(target.mat, prediction)
       
       ### calc cost of all leaves
@@ -145,10 +149,12 @@ fit_and_score <- structure(function(target.mat, feature.mat,
     }
   }
   else{
+    alpha_train_scores <- 0.0
+    alpha_train_objective_values <- 0.0
     ### For each fold, build a decision model
     fold_test_scores <- NULL
     for(i in 1 : n_folds){
-      prediction <- predict(fold_model[[i]], feature.mat[fold_split_idx$test[i,],])
+      prediction <- do.call(learner.predict, list(fold_model[[i]], feature.mat[fold_split_idx$test[i,],]))
       fold_test_scores <- c(fold_test_scores, scorer(target.mat, prediction))
     }
       
@@ -159,7 +165,7 @@ fit_and_score <- structure(function(target.mat, feature.mat,
     alpha_cv_scores <- c(best_score)
     
     ### calc train score
-    prediction <- predict(master_model, feature.mat)
+    prediction <- do.call(learner.predict, list(master_model, feature.mat))
     alpha_train_scores <- scorer(target.mat, prediction)
     
     ### calc cost of all leaves
@@ -193,8 +199,8 @@ fit_and_score <- structure(function(target.mat, feature.mat,
   }
   else if(learner == "mmif"){
     cv_results <- cbind(parameters$max_depth, parameters$margin, parameters$min_sample, parameters$loss,
-                        parameters$n_models, parameters$n_features, alpha_cv_scores, alpha_train_scores, alpha_train_objective_values)
-    colnames(cv_results) <- c("max_depth", "margin", "min_sample", "loss", "n_models", " n_features", "cv_score", "train_score", "train_objective_value")
+                        parameters$n_trees, parameters$n_features, alpha_cv_scores, alpha_train_scores, alpha_train_objective_values)
+    colnames(cv_results) <- c("max_depth", "margin", "min_sample", "loss", "n_trees", " n_features", "cv_score", "train_score", "train_objective_value")
     cv_results <- as.data.frame(cv_results)
   }
   
@@ -218,7 +224,7 @@ fit_and_score <- structure(function(target.mat, feature.mat,
   parameters$min_sample <- 2
   parameters$loss <- c("hinge")
   
-  result <- fit_and_score(target.mat, feature.mat, parameters, learner = "mmit", scorer = mse, pruning = FALSE)
+  result <- fit_and_score(target.mat, feature.mat, parameters, learner = "mmit", scorer = mse, pruning = TRUE)
   
 })
     
