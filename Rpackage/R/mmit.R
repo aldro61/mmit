@@ -46,9 +46,18 @@ mmit <- structure(function(target.mat, feature.mat,
   ### tree
   node<- growtree(target.mat, feature.mat, max_depth = max_depth, margin = margin, weights = weights)
   
+  ### for node == root
+  if(is.null(model.response(feature.mat))){
+    response <- tail(compute_optimal_costs(target.mat, margin, loss)$pred, 1)
+    response <- rep(response, nrow(feature.mat))
+  }
+  else{
+    response <- model.response(feature.mat)
+  }
+  
   ### compute terminal node number for each observation
   tree <- party(node, data = feature.mat, fitted = data.frame("(fitted)" = fitted_node(node, data = feature.mat),
-                                                          "(response)" = model.response(feature.mat),
+                                                          "(response)" = response,
                                                           "(weights)" = weights,
                                                           check.names = FALSE), terms = terms(feature.mat))
 
