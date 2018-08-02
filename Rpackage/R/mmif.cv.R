@@ -108,12 +108,3 @@ mmif.cv <- structure(function(target.mat, feature.mat,
   
 })
 
-Things to check
-
-* cv score not in cv_results dataframe
-
-/tutorials/r
-
-/tutorials/r/README.md
-
-https://aldro61.github.io/mmit/tutorials/r

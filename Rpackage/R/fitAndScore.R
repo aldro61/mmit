@@ -3,6 +3,8 @@ fit_and_score <- structure(function(target.mat, feature.mat,
                                     learner = NULL, pruning = TRUE){
   predict = get(paste(learner, ".predict", sep = ""))
   
+  ### if pruning is true then learner should be mmit
+  assert_that(pruning==FALSE && learner != "mmit")
   ### shuffle the data 
   rand <- sample(nrow(target.mat))
   target.mat <- target.mat[rand,]
@@ -23,16 +25,16 @@ fit_and_score <- structure(function(target.mat, feature.mat,
     
   }
   
-  ### fold trees
-  fold_tree <- list()
+  ### fold models
+  fold_model <- list()
   for(i in 1:n_folds){
     arguments <- list(target.mat= target.mat[fold_split_idx$train[i,],], feature.mat = feature.mat[fold_split_idx$train[i,],]) 
-    fold_tree[[i]] <- do.call(learner, c(arguments, parameters))
+    fold_model[[i]] <- do.call(learner, c(arguments, parameters))
   }
   
-  ### master tree
+  ### master model
   arguments <- list(target.mat = target.mat, feature.mat = feature.mat)
-  master_tree <- do.call(learner, c(arguments, parameters))
+  master_model <- do.call(learner, c(arguments, parameters))
   
   ### for traning data
   alpha_train_scores <- 0.0
@@ -40,22 +42,22 @@ fit_and_score <- structure(function(target.mat, feature.mat,
   
   ### if pruning
   if(pruning){
-    # Get the pruned master and cross-validation trees
-    master_data <- mmit.pruning(master_tree)
+    # Get the pruned master and cross-validation models
+    master_data <- mmit.pruning(master_model)
     master_alphas <- rev(unlist(lapply(master_data, function(x) x$alpha)))
-    master_pruned_trees <- rev(lapply(master_data, function(x) x$tree))
+    master_pruned_models <- rev(lapply(master_data, function(x) x$tree))
     
     fold_alphas <- list()
-    fold_prune_trees <- list()
+    fold_prune_models <- list()
     for(i in 1 : n_folds){
-      fold_data <- mmit.pruning(fold_tree[[i]])
+      fold_data <- mmit.pruning(fold_model[[i]])
       
       ### as mmit.pruning gives the alphas in descending order we need to reverse the list.
       fold_alphas[[i]] <- rev(unlist(lapply(fold_data, function(x) x$alpha)))
-      fold_prune_trees[[i]] <- rev(lapply(fold_data, function(x) x$tree)) 
+      fold_prune_models[[i]] <- rev(lapply(fold_data, function(x) x$tree)) 
     }
 
-    # Compute the test risk for all pruned trees of each fold
+    # Compute the test risk for all pruned models of each fold
     alpha_path_score <- list()
     for(i in 1 : n_folds){
       
@@ -63,10 +65,10 @@ fit_and_score <- structure(function(target.mat, feature.mat,
       alpha_path_score[[i]] <- c(0, 0, 0)   
       
       for(j in 1 : length(fold_alphas[[i]])){
-        ### convert pruned tree list to partynode
-        node <- fold_prune_trees[[i]][[j]]
+        ### convert pruned model list to partynode
+        node <- fold_prune_models[[i]][[j]]
         
-        ### predictions of the tree for test data
+        ### predictions of the model for test data
         prediction <- predict(node, feature.mat[fold_split_idx$test[i,],])
 
         ###error calc
@@ -88,12 +90,12 @@ fit_and_score <- structure(function(target.mat, feature.mat,
       alpha_path_score[[i]] <- as.data.frame(alpha_path_score[[i]], row.names = "")
     }
     
-    # Prune the master tree based on the CV estimates
+    # Prune the master model based on the CV estimates
     alphas <- NULL
     alpha_cv_scores <- NULL
     best_alpha <- -1.0
     best_score <- attr(scorer, "worst")
-    best_tree <- NULL
+    best_model <- NULL
 
     for(i in 1 : length(master_alphas)){
       if(i < length(master_alphas)){
@@ -104,12 +106,12 @@ fit_and_score <- structure(function(target.mat, feature.mat,
       }
 
       ### calc train score
-      prediction <- predict(master_pruned_trees[[i]], feature.mat)
+      prediction <- predict(master_pruned_models[[i]], feature.mat)
       train_score <- scorer(target.mat, prediction)
       
       ### calc cost of all leaves
-      ter_id <- nodeids(master_pruned_trees[[i]], terminal = TRUE)
-      n <- nodeapply(master_pruned_trees[[i]], ids = ter_id, info_node)
+      ter_id <- nodeids(master_pruned_models[[i]], terminal = TRUE)
+      n <- nodeapply(master_pruned_models[[i]], ids = ter_id, info_node)
       train_objective <- sum(matrix(unlist(n), nrow = length(n), byrow = T)[, 2])
       
       alpha_train_scores <- c(alpha_train_scores, train_score)
@@ -138,40 +140,40 @@ fit_and_score <- structure(function(target.mat, feature.mat,
       if(attr(scorer, "direction")(cv_score, best_score) == cv_score){
         best_score <- cv_score
         best_alpha <- geo_mean_alpha_k
-        best_tree <- master_pruned_trees[[i]]
+        best_model <- master_pruned_models[[i]]
       }
     }
   }
   else{
-    ### For each fold, build a decision tree
+    ### For each fold, build a decision model
     fold_test_scores <- NULL
     for(i in 1 : n_folds){
-      prediction <- predict(fold_tree[[i]], feature.mat[fold_split_idx$test[i,],])
+      prediction <- predict(fold_model[[i]], feature.mat[fold_split_idx$test[i,],])
       fold_test_scores <- c(fold_test_scores, scorer(target.mat, prediction))
     }
       
     best_alpha <-  0.
     best_score <- mean(fold_test_scores)
-    best_tree <- master_tree
+    best_model <- master_model
     alphas <- c(0.)
     alpha_cv_scores <- c(best_score)
     
     ### calc train score
-    prediction <- predict(master_tree, feature.mat)
+    prediction <- predict(master_model, feature.mat)
     alpha_train_scores <- scorer(target.mat, prediction)
     
     ### calc cost of all leaves
     if(learner == "mmif"){
-      for(i in 1:length(master_tree)){
-        ter_id <- nodeids(master_tree[[i]], terminal = TRUE)
-        n <- nodeapply(master_tree[[i]], ids = ter_id, info_node)
+      for(i in 1:length(master_model)){
+        ter_id <- nodeids(master_model[[i]], terminal = TRUE)
+        n <- nodeapply(master_model[[i]], ids = ter_id, info_node)
         alpha_train_objective_values <- alpha_train_objective_values + sum(matrix(unlist(n), nrow = length(n), byrow = T)[, 2])
       }
-      alpha_train_objective_values <- alpha_train_objective_values/length(master_tree)
+      alpha_train_objective_values <- alpha_train_objective_values/length(master_model)
     }
     else{
-      ter_id <- nodeids(master_tree, terminal = TRUE)
-      n <- nodeapply(master_tree, ids = ter_id, info_node)
+      ter_id <- nodeids(master_model, terminal = TRUE)
+      n <- nodeapply(master_model, ids = ter_id, info_node)
       alpha_train_objective_values <- sum(matrix(unlist(n), nrow = length(n), byrow = T)[, 2])
     }
     
@@ -189,16 +191,16 @@ fit_and_score <- structure(function(target.mat, feature.mat,
     colnames(cv_results) <- c("max_depth", "margin", "min_sample", "loss", "alpha", " cv_score", "train_score", "train_objective_value")
     cv_results <- as.data.frame(cv_results)
   }
-  else{
+  else if(learner == "mmif"){
     cv_results <- cbind(parameters$max_depth, parameters$margin, parameters$min_sample, parameters$loss,
-                        parameters$n_trees, parameters$n_features, alpha_train_scores, alpha_train_objective_values)
-    colnames(cv_results) <- c("max_depth", "margin", "min_sample", "loss", "n_trees", " n_features", "train_score", "train_objective_value")
+                        parameters$n_models, parameters$n_features, alpha_cv_scores, alpha_train_scores, alpha_train_objective_values)
+    colnames(cv_results) <- c("max_depth", "margin", "min_sample", "loss", "n_models", " n_features", "cv_score", "train_score", "train_objective_value")
     cv_results <- as.data.frame(cv_results)
   }
   
   output <- list()
   output$best_score <- best_score
-  output$best_estimator <- best_tree
+  output$best_estimator <- best_model
   output$best_params <- best_params
   output$cv_results <- cv_results
   
@@ -216,7 +218,7 @@ fit_and_score <- structure(function(target.mat, feature.mat,
   parameters$min_sample <- 2
   parameters$loss <- c("hinge")
   
-  result <- fit_and_score(target.mat, feature.mat, parameters, learner = "mmit", predict = mmit.predict, scorer = mse, pruning = FALSE)
+  result <- fit_and_score(target.mat, feature.mat, parameters, learner = "mmit", scorer = mse, pruning = FALSE)
   
 })
     
