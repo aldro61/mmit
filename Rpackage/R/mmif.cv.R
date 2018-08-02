@@ -34,7 +34,7 @@
 #' param_grid$n_trees <- c(10, 20, 30)
 #' param_grid$n_features <- c(as.integer(ncol(feature.mat)**0.5))
 #' 
-#' result <- mmit.cv(target.mat, feature.mat, param_grid, scorer = mse, n_cpu = -1)
+#' result <- mmif.cv(target.mat, feature.mat, param_grid, scorer = mse, n_cpu = -1)
 #' 
 #' @export
 mmif.cv <- structure(function(target.mat, feature.mat, 
@@ -75,7 +75,7 @@ mmif.cv <- structure(function(target.mat, feature.mat,
   fitscore_result <- foreach(i = 1:nrow(parameters), 
                              .packages = "mmit") %dopar% 
     fit_and_score(target.mat = target.mat, feature.mat = feature.mat, 
-                  parameters = parameters[i,], learner = "mmif", predict = mmif.predict,
+                  parameters = parameters[i,], learner = "mmif", 
                   n_folds = n_folds, scorer = scorer, pruning = FALSE)
   stopCluster(cl)  
 
@@ -107,3 +107,13 @@ mmif.cv <- structure(function(target.mat, feature.mat,
   result <- mmif.cv(target.mat, feature.mat, param_grid, scorer = mse, n_cpu = 4)
   
 })
+
+Things to check
+
+* cv score not in cv_results dataframe
+
+/tutorials/r
+
+/tutorials/r/README.md
+
+https://aldro61.github.io/mmit/tutorials/r

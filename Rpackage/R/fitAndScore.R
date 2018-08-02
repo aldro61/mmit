@@ -1,7 +1,7 @@
 fit_and_score <- structure(function(target.mat, feature.mat, 
                                     parameters, n_folds = 3, scorer = NULL, 
-                                    learner = NULL, predict = NULL,
-                                    pruning = TRUE){
+                                    learner = NULL, pruning = TRUE){
+  predict = get(paste(learner, ".predict", sep = ""))
   
   ### shuffle the data 
   rand <- sample(nrow(target.mat))

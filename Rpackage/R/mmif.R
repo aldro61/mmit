@@ -43,19 +43,31 @@ mmif <- structure(function(target.mat, feature.mat,
   if(n_cpu == -1) n_cpu <- detectCores() 
   assert_that(detectCores() >= n_cpu)
   
-  cl <- makeCluster(n_cpu)
-  registerDoParallel(cl)
-  
-  ### create n_trees
   all_trees <- list()
-  all_trees <- foreach(i = 1 : n_trees, .packages = "mmit") %dopar% 
-                       random_tree(target.mat, feature.mat, 
-                                     max_depth = max_depth, margin = margin, loss = loss,
-                                     min_sample = min_sample, n_trees = n_trees,
-                                     n_features = n_features)
+  if(n_cpu != 1){
+    cl <- makeCluster(n_cpu)
+    registerDoParallel(cl)
+    
+    ### create n_trees
+    all_trees <- foreach(i = 1 : n_trees, .packages = "mmit") %dopar% 
+      random_tree(target.mat, feature.mat, 
+                  max_depth = max_depth, margin = margin, loss = loss,
+                  min_sample = min_sample, n_trees = n_trees,
+                  n_features = n_features)
+    
+    
+    stopCluster(cl)
+  }
+  else{
+    for(i in 1 : n_trees) {
+      all_trees[[i]] = random_tree(target.mat, feature.mat, 
+                                   max_depth = max_depth, margin = margin, loss = loss,
+                                   min_sample = min_sample, n_trees = n_trees,
+                                   n_features = n_features)
+    }
+      
+  }
   
-  
-  stopCluster(cl)
   return(all_trees)
   
 }, ex=function(){
@@ -74,16 +86,12 @@ random_tree <- function(target.mat, feature.mat,
                           n_features = as.integer(ncol(feature.mat)**0.5)){
       
   ### sample n_exalple elements of dataset
-  new_target.mat <- NULL
-  new_feature.mat <- NULL 
-  for(j in 1 : nrow(feature.mat)){
-    x <- sample(nrow(target.mat), 1)
-    new_target.mat <- rbind(new_target.mat, target.mat[x,])
-    new_feature.mat <- rbind(new_feature.mat, feature.mat[x,])
-  }
+  x <- sample(nrow(feature.mat), nrow(feature.mat), replace = TRUE)
+  new_feature.mat <- feature.mat[x, ]
+  new_target.mat <- target.mat[x,]
+  new_target.mat <- data.matrix(new_target.mat)
   
   ### sample features
-  w <- rep(1, ncol(feature.mat))
   x <- sample(ncol(feature.mat), n_features)
   new_feature.mat <- new_feature.mat[, x]
   new_target.mat <- data.matrix(new_target.mat)
