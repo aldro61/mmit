@@ -7,6 +7,13 @@
 *Mentors : Alexandre Drouin, Torsten Hothorn and Toby Dylan Hocking*
 
 ---------------------------------------------------------------
+
+## Table of contents
+
+* [Abstract](#abstract)
+* [Introduction](#introduction)
+* [First Evaluation](#first-evaluation)
+
 ## Abstract
 
 There are few R packages available for interval regression, a machine learning problem 
