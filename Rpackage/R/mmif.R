@@ -1,23 +1,24 @@
 #' Random Forest of Max Margin Interval Tree
 #'
-#' Performing random forest on ensemble of Max Margin Interval Tree.
+#' Learning a random forest of Max Margin Interval Tree.
 #' 
 #' @param target.mat The response variable of the model
 #' @param feature.mat a data frame containing the feature variables in the model.
-#' @param margin margin paramaters 
+#' @param margin margin hyperparameter
 #' @param loss The type of loss; (\code{"hinge"}, \code{"square"})
-#' @param max_depth The maximum depth criteia
-#' @param min_sample The minimum number of sample required 
-#' @param n_trees The Number of trees
-#' @param n_features The number of features to be sampled.
-#' @param n_cpu The number of cores to register for parallel programing of the code, default value is 1 and n_cpu = -1 to select all cores.
+#' @param max_depth The maximum depth of each tree
+#' @param min_sample The minimum number of samples required to partition a leaf in a tree
+#' @param n_trees The number of trees in the ensemble (forest)
+#' @param n_features The number of features to be used to train each tree
+#' @param n_cpu The number of cores to distribute the training of the trees, default value is 1 and n_cpu = -1 to select all cores.
 #' 
-#' @return List of ensemble of trees.
+#' @return List of trees containing each tree in the random forest.
 #' 
 #' @author Toby Dylan Hocking, Alexandre Drouin, Torsten Hothorn, Parismita Das
 #' 
 #' @examples
 #' library(mmit)
+#'
 #' target.mat <- rbind(
 #'   c(0,1), c(0,1), c(0,1),
 #'   c(2,3), c(2,3), c(2,3))
