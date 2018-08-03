@@ -1,20 +1,21 @@
-#' The Cross Validation of Random Forest
+#' Cross-validation for model selection with Random Forests of Max Margin Interval Trees
 #'
-#' Performing grid search to select the best parameters via cross validation on the random forest.
+#' Performing grid search to select the best hyperparameters of mmif via cross-validation.
 #' 
 #' @param target.mat The response variable of the model
-#' @param feature.mat a data frame containing the feature variables in the model.
-#' @param param_grid the list of paramaters
-#' @param n_folds The number of folds
-#' @param scorer The Loss calculation function 
-#' @param n_cpu The number of cores to register for parallel programing of the code, default value is 1 and n_cpu = -1 to select all cores.
+#' @param feature.mat A data frame containing the feature variables in the model.
+#' @param param_grid A list with values to try for each hyperparameter (max_depth, margin, min_sample, loss, n_trees, n_features).
+#' @param n_folds The number of folds for k-fold cross-validation
+#' @param scorer The function used to calculate the cross-validation score (e.g., mse, zero_one_loss)
+#' @param n_cpu The number of cores used to explore hyperparameter combinations in parallel, default value is 1 and n_cpu = -1 to select all cores.
 #' 
-#' @return The list consist of best score, best parameters and list of all parameter values with cross validation score . 
+#' @return The best score, best model (trained with best parameters), best parameters, and list of all parameter values with cross validation score. 
 #' 
 #' @author Toby Dylan Hocking, Alexandre Drouin, Torsten Hothorn, Parismita Das
 #' 
 #' @examples
 #' library(mmit)
+#'
 #' target.mat <- rbind(
 #'   c(0,1), c(0,1), c(0,1),
 #'   c(2,3), c(2,3), c(2,3))
