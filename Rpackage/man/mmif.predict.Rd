@@ -30,9 +30,7 @@ feature.mat <- rbind(
 colnames(feature.mat) <- c("a", "b", "c")
 feature.mat <- data.frame(feature.mat)
 
-parameters <- list(max_depth = Inf, margin = 2.0, loss = "hinge", min_sample = 1)
-
-forest <- mmif(target.mat, feature.mat, test, parameters = parameters)
+forest <- mmif(target.mat, feature.mat)
 pred <- mmif.predict(forest, feature.mat)
 
 }
