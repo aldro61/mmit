@@ -86,10 +86,24 @@ imagined, as the main code used for Cross Validation is common for all modules o
 
 ----------------------------------------------------------------------------------------------------------
 
-## Future Scopes
+## Future Work
+
+The Implementation of Adaboost is currently under progress ([link](1)). The future work for the project is to improve the time 
+taken for each module and write the vignettes no make it submittable to CRAN.
 
 -----------------------------------------------------------------------------------------------------------
 
 ## Link to commits
+
+The links to all the commits are given below:
+ MMIT: [Link](https://github.com/aldro61/mmit/pull/24/commits)
+ Pruning and Cross-Validation: [Link](https://github.com/aldro61/mmit/pull/25/commits)
+ Random Forest: [Link](https://github.com/aldro61/mmit/pull/26/commits)
  
+ The links for documentation and benchmark
+ Documentation: [Link](https://github.com/aldro61/mmit/tree/master/Rpackage/man)
+ Benchmark: [Link](https://github.com/aldro61/mmit/blob/master/benchmark/pred_score.md)
+  
+  -------------------------------------------------------------------------------------------------------
+  
  
