@@ -35,38 +35,27 @@
 mmif <- structure(function(target.mat, feature.mat, 
                            max_depth = Inf, margin=0.0, loss="hinge",
                            min_sample = 1, n_trees = 10,
-                           n_features = as.integer(ncol(feature.mat)**0.5), n_cpu = 1){
- 
- 
+                           n_features =  ceiling(ncol(feature.mat)**0.5), n_cpu = 1){
+  
+  
   ### parallelize using foreach, see all permutation combination of param grid values
   ### register parallel backend
   if(n_cpu == -1) n_cpu <- detectCores() 
   assert_that(detectCores() >= n_cpu)
   
   all_trees <- list()
-  if(n_cpu > 1){
-    cl <- makeCluster(n_cpu)
-    registerDoParallel(cl)
-    
-    ### create n_trees
-    all_trees <- foreach(i = 1 : n_trees, .packages = "mmit") %dopar% 
-      random_tree(target.mat, feature.mat, 
-                  max_depth = max_depth, margin = margin, loss = loss,
-                  min_sample = min_sample, n_trees = n_trees,
-                  n_features = n_features)
-    
-    
-    stopCluster(cl)
-  }
-  else{
-    for(i in 1 : n_trees) {
-      all_trees[[i]] = random_tree(target.mat, feature.mat, 
-                                   max_depth = max_depth, margin = margin, loss = loss,
-                                   min_sample = min_sample, n_trees = n_trees,
-                                   n_features = n_features)
-    }
-      
-  }
+  cl <- makeCluster(n_cpu)
+  registerDoParallel(cl)
+  
+  ### create n_trees
+  all_trees <- foreach(i = 1 : n_trees, .packages = "mmit") %dopar% 
+    random_tree(target.mat, feature.mat, 
+                max_depth = max_depth, margin = margin, loss = loss,
+                min_sample = min_sample, n_trees = n_trees,
+                n_features = n_features)
+  
+  
+  stopCluster(cl)
   
   return(all_trees)
   
@@ -76,25 +65,20 @@ mmif <- structure(function(target.mat, feature.mat,
   feature.mat <- data.frame(neuroblastomaProcessed$feature.mat)[1:45,]
   target.mat <- neuroblastomaProcessed$target.mat[1:45,]
   trees <- mmif(target.mat, feature.mat, max_depth = Inf, margin = 2.0, loss = "hinge", min_sample = 1)
-
+  
 })
 
 
 random_tree <- function(target.mat, feature.mat, 
-                          max_depth = Inf, margin=0.0, loss="hinge",
-                          min_sample = 1, n_trees = 10,
-                          n_features = as.integer(ncol(feature.mat)**0.5)){
-      
-  ### sample n_exalple elements of dataset
+                        max_depth, margin, loss,
+                        min_sample, n_trees ,
+                        n_features){
+  
+  ### sample n_examlple elements of dataset
   x <- sample(nrow(feature.mat), nrow(feature.mat), replace = TRUE)
   new_feature.mat <- feature.mat[x, ]
   new_target.mat <- target.mat[x,]
   new_target.mat <- data.matrix(new_target.mat)
-  
-  ### if default n_feature value is 1 and no of columns is greater than 1
-  if((as.integer(ncol(feature.mat)**0.5) <= 1) && (n_features <= 1) && (ncol(feature.mat) > 1)){
-    n_features = 2
-  }
   
   ### if user assigned n_feature value is one
   assert_that(n_features > 1)
