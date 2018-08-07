@@ -220,7 +220,10 @@ pruned_tree <- mmit.pruning(tree)
 alpha : 0, 3
 
 tree :  
+For alpha = 0
 ![alt text](https://github.com/parismita/mmit/blob/gsoc_doc/tutorials/R/Selection_016.png "Pruning tree, alpha = 0")
+
+for alpha = 3
 ![alt text](https://github.com/parismita/mmit/blob/gsoc_doc/tutorials/R/Selection_015.png "Pruning tree, alpha = 3")
 
 ### mmit.cv()
@@ -297,6 +300,8 @@ print(trees)
 
 #### Output:
 
+The collection of trees are :  
+![alt text](https://github.com/parismita/mmit/blob/gsoc_doc/tutorials/R/Selection_017.png "Random Forest")
 ![alt text](https://github.com/parismita/mmit/blob/gsoc_doc/tutorials/R/Selection_017.png "Random Forest")
 
 ### mmif.predict()
