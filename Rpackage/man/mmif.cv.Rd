@@ -2,7 +2,7 @@
 % Please edit documentation in R/mmif.cv.R
 \name{mmif.cv}
 \alias{mmif.cv}
-\title{The Cross Validation of Random Forest}
+\title{Cross-validation for model selection with Random Forests of Max Margin Interval Trees}
 \usage{
 mmif.cv(target.mat, feature.mat, param_grid, n_folds = 3, scorer = NULL,
   n_cpu = 1)
@@ -10,24 +10,25 @@ mmif.cv(target.mat, feature.mat, param_grid, n_folds = 3, scorer = NULL,
 \arguments{
 \item{target.mat}{The response variable of the model}
 
-\item{feature.mat}{a data frame containing the feature variables in the model.}
+\item{feature.mat}{A data frame containing the feature variables in the model.}
 
-\item{param_grid}{the list of paramaters}
+\item{param_grid}{A list with values to try for each hyperparameter (max_depth, margin, min_sample, loss, n_trees, n_features).}
 
-\item{n_folds}{The number of folds}
+\item{n_folds}{The number of folds for k-fold cross-validation}
 
-\item{scorer}{The Loss calculation function}
+\item{scorer}{The function used to calculate the cross-validation score (e.g., mse, zero_one_loss)}
 
-\item{n_cpu}{The number of cores to register for parallel programing of the code, default value is 1 and n_cpu = -1 to select all cores.}
+\item{n_cpu}{The number of cores used to explore hyperparameter combinations in parallel, default value is 1 and n_cpu = -1 to select all cores.}
 }
 \value{
-The list consist of best score, best parameters and list of all parameter values with cross validation score .
+The best score, best model (trained with best parameters), best parameters, and list of all parameter values with cross validation score.
 }
 \description{
-Performing grid search to select the best parameters via cross validation on the random forest.
+Performing grid search to select the best hyperparameters of mmif via cross-validation.
 }
 \examples{
 library(mmit)
+
 target.mat <- rbind(
   c(0,1), c(0,1), c(0,1),
   c(2,3), c(2,3), c(2,3))
