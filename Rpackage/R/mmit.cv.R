@@ -73,7 +73,7 @@ mmit.cv <- structure(function(target.mat, feature.mat,
               fit_and_score(target.mat = target.mat, feature.mat = feature.mat, 
                                            parameters = parameters[i,], 
                                            n_folds = n_folds, scorer = scorer,
-                                           pruning = pruning)
+                                           pruning = pruning, learner = "mmit")
   stopCluster(cl)  
   
   for(i in 1:nrow(parameters)){

@@ -1,23 +1,24 @@
 #' Random Forest of Max Margin Interval Tree
 #'
-#' Performing random forest on ensemble of Max Margin Interval Tree.
+#' Learning a random forest of Max Margin Interval Tree.
 #' 
 #' @param target.mat The response variable of the model
 #' @param feature.mat a data frame containing the feature variables in the model.
-#' @param margin margin paramaters 
+#' @param margin margin hyperparameter
 #' @param loss The type of loss; (\code{"hinge"}, \code{"square"})
-#' @param max_depth The maximum depth criteia
-#' @param min_sample The minimum number of sample required 
-#' @param n_trees The Number of trees
-#' @param n_features The number of features to be sampled.
-#' @param n_cpu The number of cores to register for parallel programing of the code, default value is 1 and n_cpu = -1 to select all cores.
+#' @param max_depth The maximum depth of each tree
+#' @param min_sample The minimum number of samples required to partition a leaf in a tree
+#' @param n_trees The number of trees in the ensemble (forest)
+#' @param n_features The number of features to be used to train each tree
+#' @param n_cpu The number of cores to distribute the training of the trees, default value is 1 and n_cpu = -1 to select all cores.
 #' 
-#' @return List of ensemble of trees.
+#' @return List of trees containing each tree in the random forest.
 #' 
 #' @author Toby Dylan Hocking, Alexandre Drouin, Torsten Hothorn, Parismita Das
 #' 
 #' @examples
 #' library(mmit)
+#'
 #' target.mat <- rbind(
 #'   c(0,1), c(0,1), c(0,1),
 #'   c(2,3), c(2,3), c(2,3))
@@ -35,27 +36,39 @@
 mmif <- structure(function(target.mat, feature.mat, 
                            max_depth = Inf, margin=0.0, loss="hinge",
                            min_sample = 1, n_trees = 10,
-                           n_features = as.integer(ncol(feature.mat)**0.5), n_cpu = 1){
- 
- 
+                           n_features =  ceiling(ncol(feature.mat)**0.5), n_cpu = 1){
+  
+  
   ### parallelize using foreach, see all permutation combination of param grid values
   ### register parallel backend
   if(n_cpu == -1) n_cpu <- detectCores() 
   assert_that(detectCores() >= n_cpu)
   
-  cl <- makeCluster(n_cpu)
-  registerDoParallel(cl)
-  
-  ### create n_trees
   all_trees <- list()
-  all_trees <- foreach(i = 1 : n_trees, .packages = "mmit") %dopar% 
-                       random_tree(target.mat, feature.mat, 
-                                     max_depth = max_depth, margin = margin, loss = loss,
-                                     min_sample = min_sample, n_trees = n_trees,
-                                     n_features = n_features)
+  if(n_cpu > 1){
+    cl <- makeCluster(n_cpu)
+    registerDoParallel(cl)
+    
+    ### create n_trees
+    all_trees <- foreach(i = 1 : n_trees, .packages = "mmit") %dopar% 
+      random_tree(target.mat, feature.mat, 
+                  max_depth = max_depth, margin = margin, loss = loss,
+                  min_sample = min_sample, n_trees = n_trees,
+                  n_features = n_features)
+    
+    
+    stopCluster(cl)
+  }
+  else{
+    for(i in 1 : n_trees) {
+      all_trees[[i]] = random_tree(target.mat, feature.mat, 
+                                   max_depth = max_depth, margin = margin, loss = loss,
+                                   min_sample = min_sample, n_trees = n_trees,
+                                   n_features = n_features)
+    }
+    
+  }
   
-  
-  stopCluster(cl)
   return(all_trees)
   
 }, ex=function(){
@@ -64,29 +77,30 @@ mmif <- structure(function(target.mat, feature.mat,
   feature.mat <- data.frame(neuroblastomaProcessed$feature.mat)[1:45,]
   target.mat <- neuroblastomaProcessed$target.mat[1:45,]
   trees <- mmif(target.mat, feature.mat, max_depth = Inf, margin = 2.0, loss = "hinge", min_sample = 1)
-
+  
 })
 
 
 random_tree <- function(target.mat, feature.mat, 
-                          max_depth = Inf, margin=0.0, loss="hinge",
-                          min_sample = 1, n_trees = 10,
-                          n_features = as.integer(ncol(feature.mat)**0.5)){
-      
-  ### sample n_exalple elements of dataset
-  new_target.mat <- NULL
-  new_feature.mat <- NULL 
-  for(j in 1 : nrow(feature.mat)){
-    x <- sample(nrow(target.mat), 1)
-    new_target.mat <- rbind(new_target.mat, target.mat[x,])
-    new_feature.mat <- rbind(new_feature.mat, feature.mat[x,])
-  }
+                        max_depth, margin, loss,
+                        min_sample, n_trees ,
+                        n_features){
+  
+  ### sample n_examlple elements of dataset
+  x <- sample(nrow(feature.mat), nrow(feature.mat), replace = TRUE)
+  new_feature.mat <- feature.mat[x, ]
+  new_target.mat <- target.mat[x,]
+  new_target.mat <- data.matrix(new_target.mat)
+  
+  ### if user assigned n_feature value is one
+  assert_that(n_features > 1)
+  assert_that(ncol(feature.mat) >= n_features)
   
   ### sample features
-  w <- rep(1, ncol(feature.mat))
-  x <- sample(ncol(feature.mat), n_features)
-  new_feature.mat <- new_feature.mat[, x]
-  new_target.mat <- data.matrix(new_target.mat)
+  y <- sample(ncol(feature.mat), n_features)
+  new_feature.mat <- new_feature.mat[, y]
+  colnames(new_feature.mat) <- c(names(feature.mat)[y])
+  new_feature.mat <- data.frame(new_feature.mat)
   
   ### tree
   tree <- mmit(new_target.mat, new_feature.mat, margin = margin, loss = loss, 

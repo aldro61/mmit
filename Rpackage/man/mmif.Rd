@@ -6,35 +6,36 @@
 \usage{
 mmif(target.mat, feature.mat, max_depth = Inf, margin = 0, loss = "hinge",
   min_sample = 1, n_trees = 10,
-  n_features = as.integer(ncol(feature.mat)^0.5), n_cpu = 1)
+  n_features = ceiling(ncol(feature.mat)^0.5), n_cpu = 1)
 }
 \arguments{
 \item{target.mat}{The response variable of the model}
 
 \item{feature.mat}{a data frame containing the feature variables in the model.}
 
-\item{max_depth}{The maximum depth criteia}
+\item{max_depth}{The maximum depth of each tree}
 
-\item{margin}{margin paramaters}
+\item{margin}{margin hyperparameter}
 
 \item{loss}{The type of loss; (\code{"hinge"}, \code{"square"})}
 
-\item{min_sample}{The minimum number of sample required}
+\item{min_sample}{The minimum number of samples required to partition a leaf in a tree}
 
-\item{n_trees}{The Number of trees}
+\item{n_trees}{The number of trees in the ensemble (forest)}
 
-\item{n_features}{The number of features to be sampled.}
+\item{n_features}{The number of features to be used to train each tree}
 
-\item{n_cpu}{The number of cores to register for parallel programing of the code, default value is 1 and n_cpu = -1 to select all cores.}
+\item{n_cpu}{The number of cores to distribute the training of the trees, default value is 1 and n_cpu = -1 to select all cores.}
 }
 \value{
-List of ensemble of trees.
+List of trees containing each tree in the random forest.
 }
 \description{
-Performing random forest on ensemble of Max Margin Interval Tree.
+Learning a random forest of Max Margin Interval Tree.
 }
 \examples{
 library(mmit)
+
 target.mat <- rbind(
   c(0,1), c(0,1), c(0,1),
   c(2,3), c(2,3), c(2,3))

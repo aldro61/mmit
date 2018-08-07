@@ -1,20 +1,21 @@
-#' The Cross Validation of Random Forest
+#' Cross-validation for model selection with Random Forests of Max Margin Interval Trees
 #'
-#' Performing grid search to select the best parameters via cross validation on the random forest.
+#' Performing grid search to select the best hyperparameters of mmif via cross-validation.
 #' 
 #' @param target.mat The response variable of the model
-#' @param feature.mat a data frame containing the feature variables in the model.
-#' @param param_grid the list of paramaters
-#' @param n_folds The number of folds
-#' @param scorer The Loss calculation function 
-#' @param n_cpu The number of cores to register for parallel programing of the code, default value is 1 and n_cpu = -1 to select all cores.
+#' @param feature.mat A data frame containing the feature variables in the model.
+#' @param param_grid A list with values to try for each hyperparameter (max_depth, margin, min_sample, loss, n_trees, n_features).
+#' @param n_folds The number of folds for k-fold cross-validation
+#' @param scorer The function used to calculate the cross-validation score (e.g., mse, zero_one_loss)
+#' @param n_cpu The number of cores used to explore hyperparameter combinations in parallel, default value is 1 and n_cpu = -1 to select all cores.
 #' 
-#' @return The list consist of best score, best parameters and list of all parameter values with cross validation score . 
+#' @return The best score, best model (trained with best parameters), best parameters, and list of all parameter values with cross validation score. 
 #' 
 #' @author Toby Dylan Hocking, Alexandre Drouin, Torsten Hothorn, Parismita Das
 #' 
 #' @examples
 #' library(mmit)
+#'
 #' target.mat <- rbind(
 #'   c(0,1), c(0,1), c(0,1),
 #'   c(2,3), c(2,3), c(2,3))
@@ -32,9 +33,9 @@
 #' param_grid$min_sample <- c(2, 5, 10)
 #' param_grid$loss <- c("hinge")
 #' param_grid$n_trees <- c(10, 20, 30)
-#' param_grid$n_features <- c(as.integer(ncol(feature.mat)**0.5))
+#' param_grid$n_features <- c(ceiling(ncol(feature.mat)**0.5))
 #' 
-#' result <- mmit.cv(target.mat, feature.mat, param_grid, scorer = mse, n_cpu = -1)
+#' result <- mmif.cv(target.mat, feature.mat, param_grid, scorer = mse, n_cpu = -1)
 #' 
 #' @export
 mmif.cv <- structure(function(target.mat, feature.mat, 
@@ -46,7 +47,7 @@ mmif.cv <- structure(function(target.mat, feature.mat,
   if(is.null(param_grid[["margin"]])) param_grid$margin <- 0.0
   if(is.null(param_grid[["min_sample"]])) param_grid$min_sample <- 0.0
   if(is.null(param_grid[["loss"]])) param_grid$loss <- "hinge"
-  if(is.null(param_grid[["n_trees"]])) param_grid$ntrees <- 10
+  if(is.null(param_grid[["n_trees"]])) param_grid$n_trees <- 10
   if(is.null(param_grid[["n_features"]])) param_grid$n_features <- c(as.integer(ncol(feature.mat)**0.5))
   
   ### check for unwanted parameters
@@ -72,10 +73,9 @@ mmif.cv <- structure(function(target.mat, feature.mat,
   registerDoParallel(cl)
   
   fitscore_result <- list()
-  fitscore_result <- foreach(i = 1:nrow(parameters), 
-                             .packages = "mmit") %dopar% 
+  fitscore_result <- foreach(i = 1:nrow(parameters), .packages = "mmit") %dopar% 
     fit_and_score(target.mat = target.mat, feature.mat = feature.mat, 
-                  parameters = parameters[i,], learner = "mmif", predict = mmif.predict,
+                  parameters = parameters[i,], learner = "mmif", 
                   n_folds = n_folds, scorer = scorer, pruning = FALSE)
   stopCluster(cl)  
 
@@ -107,3 +107,4 @@ mmif.cv <- structure(function(target.mat, feature.mat,
   result <- mmif.cv(target.mat, feature.mat, param_grid, scorer = mse, n_cpu = 4)
   
 })
+
