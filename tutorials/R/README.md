@@ -185,7 +185,7 @@ print(pred)
 
 #### Output:
 
-0.5 0.5 0.5 2.5 2.5 2.5
+pred : 0.5 0.5 0.5 2.5 2.5 2.5
 
 ### mmit.pruning()
   
@@ -219,7 +219,7 @@ pruned_tree <- mmit.pruning(tree)
 
 alpha : 0, 3
 
-tree: 
+tree : 
 
 ### mmit.cv()
   
@@ -255,7 +255,14 @@ result <- mmit.cv(target.mat, feature.mat, param_grid, scorer = mse)
 plot(result$best_estimator)
 print(result$cv_results)
 ```
- 
+#### Output:
+
+Best parameters : 
+
+max_depth | margin |min_sample | loss |alpha |
+| ---- |:------: | ---------:|---: |---: |
+3         |5       |          10|  hinge|      Inf|
+
 ### mmif()
   
 Learning a random forest of Max Margin Interval Tree.
@@ -289,6 +296,7 @@ print(trees)
 #### Output:
 
 
+
 ### mmif.predict()
   
 Predictions with random forests of Max Margin Interval Trees
@@ -320,7 +328,7 @@ print(pred)
 
 #### Output:
 
-0.75 0.95 1.95 2.15 2.15 2.15
+pred : 0.75 0.95 1.95 2.15 2.15 2.15
 
 ### mmif.cv()
   
@@ -360,9 +368,10 @@ result <- mmif.cv(target.mat, feature.mat, param_grid, scorer = mse, n_cpu = -1)
 
 #### Output:
 
-Best param:
+Best parameters :
 
 max_depth | margin |min_sample | loss |n_trees |n_features|
+| ---- |:------: | ---------:|---: |---: |---: |
 3         |5       |          2|  hinge|      10|          2|
 
 ### mse()
@@ -388,7 +397,7 @@ out <- mse(y_true, y_pred)
 
 #### Output:
 
-0.25
+out : 0.25
 
 ### zero_one_loss()
   
@@ -413,4 +422,4 @@ out <- zero_one_loss(y_true, y_pred)
 
 #### Output:
 
-0.5
+out : 0.5
