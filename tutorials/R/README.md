@@ -151,6 +151,10 @@ out <- mmit(target.mat, feature.mat)
 plot(out)
 ```
 
+#### Output:
+
+
+
 ### mmit.predict()
   
   Fits the new data into the MMIT model to give prediction values
@@ -179,6 +183,10 @@ pred <- mmit.predict(tree)
 print(pred)
 ```
 
+#### Output:
+
+0.5 0.5 0.5 2.5 2.5 2.5
+
 ### mmit.pruning()
   
 Pruning the regression tree for censored data.
@@ -206,6 +214,12 @@ feature.mat <- data.frame(feature.mat)
 tree <- mmit(target.mat, feature.mat)
 pruned_tree <- mmit.pruning(tree)
 ```
+
+#### Output:
+
+alpha : 0, 3
+
+tree: 
 
 ### mmit.cv()
   
@@ -268,6 +282,135 @@ feature.mat <- rbind(
 colnames(feature.mat) <- c("a", "b", "c")
 feature.mat <- data.frame(feature.mat)
 
-trees <- mmif(target.mat, feature.mat, margin = 2.0, n_cpu = -1)
+trees <- mmif(target.mat, feature.mat, margin = 2.0, n_trees = 2, n_cpu = -1)
 print(trees)
 ```
+
+#### Output:
+
+
+### mmif.predict()
+  
+Predictions with random forests of Max Margin Interval Trees
+  
+  #### Usage:
+  
+  `mmif.predict(forest, test_feature.mat = NULL)`
+  
+  #### Example:
+  
+```R
+library(mmit)
+
+target.mat <- rbind(
+  c(0,1), c(0,1), c(0,1),
+  c(2,3), c(2,3), c(2,3))
+
+feature.mat <- rbind(
+  c(1,0,0), c(1,1,0), c(1,2,0),
+  c(1,3,0), c(1,4,0), c(1,5,0))
+
+colnames(feature.mat) <- c("a", "b", "c")
+feature.mat <- data.frame(feature.mat)
+
+forest <- mmif(target.mat, feature.mat)
+pred <- mmif.predict(forest, feature.mat)
+print(pred)
+```
+
+#### Output:
+
+0.75 0.95 1.95 2.15 2.15 2.15
+
+### mmif.cv()
+  
+Performing grid search to select the best hyperparameters of mmif via cross-validation.
+  
+  #### Usage:
+  
+  `mmif.cv(target.mat, feature.mat, param_grid, n_folds = 3, scorer = NULL,
+  n_cpu = 1)`
+  
+  #### Example:
+  
+```R
+library(mmit)
+
+target.mat <- rbind(
+  c(0,1), c(0,1), c(0,1),
+  c(2,3), c(2,3), c(2,3))
+
+feature.mat <- rbind(
+  c(1,0,0), c(1,1,0), c(1,2,0),
+  c(1,3,0), c(1,4,0), c(1,5,0))
+
+colnames(feature.mat) <- c("a", "b", "c")
+feature.mat <- data.frame(feature.mat)
+
+param_grid <- NULL
+param_grid$max_depth <- c(Inf, 4, 3)
+param_grid$margin <- c(2, 3, 5)
+param_grid$min_sample <- c(2, 5, 10)
+param_grid$loss <- c("hinge")
+param_grid$n_trees <- c(10, 20, 30)
+param_grid$n_features <- c(ceiling(ncol(feature.mat)**0.5))
+
+result <- mmif.cv(target.mat, feature.mat, param_grid, scorer = mse, n_cpu = -1)
+```
+
+#### Output:
+
+Best param:
+
+max_depth | margin |min_sample | loss |n_trees |n_features|
+3         |5       |          2|  hinge|      10|          2|
+
+### mse()
+  
+Metric for mean aquare error calculation.
+  
+  #### Usage:
+  
+  `mse(y_true, y_pred)`
+  
+  #### Example:
+  
+```R
+library(mmit)
+y_true <- rbind(
+  c(0,1), c(0,1), c(0,1),
+  c(2,3), c(2,3), c(2,3))
+
+y_pred <- c(0.5, 2, 0, 1.5, 3.5, 2.5)
+
+out <- mse(y_true, y_pred)
+```
+
+#### Output:
+
+0.25
+
+### zero_one_loss()
+  
+Metric for error calculation where the function gives zero value inside the interval else one.
+  
+  #### Usage:
+  
+  `zero_one_loss(y_true, y_pred)`
+  
+  #### Example:
+  
+```R
+library(mmit)
+y_true <- rbind(
+  c(0,1), c(0,1), c(0,1),
+  c(2,3), c(2,3), c(2,3))
+
+y_pred <- c(0.5, 2, 0, 1.5, 3.5, 2.5)
+
+out <- zero_one_loss(y_true, y_pred)
+```
+
+#### Output:
+
+0.5
