@@ -13,6 +13,11 @@
 * [Abstract](#abstract)
 * [Introduction](#introduction)
 * [First Evaluation](#first-evaluation)
+* [Second Evaluation](#second-evaluation)
+* [Final Evaluation](#final-evaluation)
+* [Future Work](#future-work)
+* [Link to commits](#link-to-commits)
+* [Tutorials](#tutorials)
 
 ## Abstract
 
@@ -113,4 +118,156 @@ The links to all the commits are given below:
   
   -------------------------------------------------------------------------------------------------------
   
+  ## Tutorials
+  
+  Here is a tutorial how to use the package.
+  
+  ### mmit()
+  
+  This function is used to create the maximum margin interval trees. It returns party object as the tree.
+  
+  #### Usage:
+  
+  `mmit(target.mat, feature.mat, max_depth = Inf, margin = 0, loss = "hinge",
+  min_sample = 1)`
+  
+  #### Example:
+  
+```R
+library(mmit)
+target.mat <- rbind(
+  c(0,1), c(0,1), c(0,1),
+  c(2,3), c(2,3), c(2,3))
+
+feature.mat <- rbind(
+  c(1,0,0), c(1,1,0), c(1,2,0),
+  c(1,3,0), c(1,4,0), c(1,5,0))
+
+colnames(feature.mat) <- c("a", "b", "c")
+feature.mat <- data.frame(feature.mat)
+
+
+out <- mmit(target.mat, feature.mat)
+plot(out)
+```
+
+### mmit.predict()
+  
+  Fits the new data into the MMIT model to give prediction values
+  
+  #### Usage:
+  
+  `mmit.predict(tree, newdata = NULL, perm = NULL)`
+  
+  #### Example:
+  
+```R
+library(mmit)
+target.mat <- rbind(
+  c(0,1), c(0,1), c(0,1),
+  c(2,3), c(2,3), c(2,3))
+
+feature.mat <- rbind(
+  c(1,0,0), c(1,1,0), c(1,2,0),
+  c(1,3,0), c(1,4,0), c(1,5,0))
+
+colnames(feature.mat) <- c("a", "b", "c")
+feature.mat <- data.frame(feature.mat)
+
+tree <- mmit(target.mat, feature.mat)
+pred <- mmit.predict(tree)
+print(pred)
+```
+
+### mmit.pruning()
+  
+Pruning the regression tree for censored data.
+  
+  #### Usage:
+  
+  `mmit.pruning(tree)`
+  
+  #### Example:
+  
+```R
+library(mmit)
+target.mat <- rbind(
+  c(0,1), c(0,1), c(0,1),
+  c(2,3), c(2,3), c(2,3))
+
+feature.mat <- rbind(
+  c(1,0,0), c(1,1,0), c(1,2,0),
+  c(1,3,0), c(1,4,0), c(1,5,0))
+
+colnames(feature.mat) <- c("a", "b", "c")
+feature.mat <- data.frame(feature.mat)
+
+
+tree <- mmit(target.mat, feature.mat)
+pruned_tree <- mmit.pruning(tree)
+```
+
+### mmit.cv()
+  
+Performing grid search to select the best parameters via cross validation on the a regression tree for censored data.
+  
+  #### Usage:
+  
+  `mmit.cv(target.mat, feature.mat, param_grid, n_folds = 3, scorer = NULL,
+  n_cpu = 1, pruning = TRUE)`
+  
+  #### Example:
+  
+```R
+library(mmit)
+target.mat <- rbind(
+  c(0,1), c(0,1), c(0,1),
+  c(2,3), c(2,3), c(2,3))
+
+feature.mat <- rbind(
+  c(1,0,0), c(1,1,0), c(1,2,0),
+  c(1,3,0), c(1,4,0), c(1,5,0))
+
+colnames(feature.mat) <- c("a", "b", "c")
+feature.mat <- data.frame(feature.mat)
+
+param_grid <- NULL
+param_grid$max_depth <- c(Inf, 4, 3)
+param_grid$margin <- c(2, 3, 5)
+param_grid$min_sample <- c(2, 5, 10)
+param_grid$loss <- c("hinge")
+
+result <- mmit.cv(target.mat, feature.mat, param_grid, scorer = mse)
+plot(result$best_estimator)
+print(result$cv_results)
+```
  
+### mmif()
+  
+Learning a random forest of Max Margin Interval Tree.
+  
+  #### Usage:
+  
+  `mmif(target.mat, feature.mat, max_depth = Inf, margin = 0, loss = "hinge",
+  min_sample = 1, n_trees = 10,
+  n_features = ceiling(ncol(feature.mat)^0.5), n_cpu = 1)`
+  
+  #### Example:
+  
+```R
+library(mmit)
+
+target.mat <- rbind(
+  c(0,1), c(0,1), c(0,1),
+  c(2,3), c(2,3), c(2,3))
+
+feature.mat <- rbind(
+  c(1,0,0), c(1,1,0), c(1,2,0),
+  c(1,3,0), c(1,4,0), c(1,5,0))
+
+colnames(feature.mat) <- c("a", "b", "c")
+feature.mat <- data.frame(feature.mat)
+
+trees <- mmif(target.mat, feature.mat, margin = 2.0, n_cpu = -1)
+print(trees)
+```
