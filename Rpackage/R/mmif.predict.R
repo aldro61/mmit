@@ -1,16 +1,15 @@
-#' Prediction for Random Forest
-#'
-#' Predictions as average of all predictions of the random forest.
+#' Predictions with random forests of Max Margin Interval Trees
 #' 
-#' @param forest Ensembe of forest
-#' @param test_feature.mat a data frame containing the test feature variables in the model.
+#' @param forest Ensemble of MMITs
+#' @param test_feature.mat A data frame containing the features of the examples for which predictions must be computed.
 #' 
-#' @return Prediction values
+#' @return Predictions Average output of each tree in the forest
 #' 
 #' @author Toby Dylan Hocking, Alexandre Drouin, Torsten Hothorn, Parismita Das
 #' 
 #' @examples
 #' library(mmit)
+#'
 #' target.mat <- rbind(
 #'   c(0,1), c(0,1), c(0,1),
 #'   c(2,3), c(2,3), c(2,3))
