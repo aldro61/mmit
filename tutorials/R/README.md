@@ -189,7 +189,7 @@ pred : 0.5 0.5 0.5 2.5 2.5 2.5
 
 ### mmit.pruning()
   
-Pruning the regression tree for censored data.
+Pruning the regression tree for censored data to give all the alpha values and trees as output.
   
   #### Usage:
   
@@ -229,6 +229,7 @@ for alpha = 3
 ### mmit.cv()
   
 Performing grid search to select the best parameters via cross validation on the a regression tree for censored data.
+It outputs all the CV results, the best model and best parameters.
   
   #### Usage:
   
@@ -270,7 +271,7 @@ max_depth | margin |min_sample | loss |alpha |
 
 ### mmif()
   
-Learning a random forest of Max Margin Interval Tree.
+Learning a random forest of Max Margin Interval Tree. And giving list of trees as output.
   
   #### Usage:
   
