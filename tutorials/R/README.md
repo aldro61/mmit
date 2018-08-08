@@ -267,26 +267,17 @@ Learning a random forest of Max Margin Interval Tree and giving list of trees as
 ```R
 library(mmit)
 
-target.mat <- rbind(
-  c(0,1), c(0,1), c(0,1),
-  c(2,3), c(2,3), c(2,3))
-
-feature.mat <- rbind(
-  c(1,0,0), c(1,1,0), c(1,2,0),
-  c(1,3,0), c(1,4,0), c(1,5,0))
-
-colnames(feature.mat) <- c("a", "b", "c")
-feature.mat <- data.frame(feature.mat)
-
-trees <- mmif(target.mat, feature.mat, margin = 2.0, n_trees = 2, n_cpu = -1)
-print(trees)
+  data(neuroblastomaProcessed, package="penaltyLearning")
+  feature.mat <- data.frame(neuroblastomaProcessed$feature.mat)[1:45,]
+  target.mat <- neuroblastomaProcessed$target.mat[1:45,]
+  trees <- mmif(target.mat, feature.mat, max_depth = Inf, margin = 2.0, loss = "hinge", min_sample = 1)
 ```
 
 #### Output:
 
 The collection of trees are :  
 ![alt text](./Selection_017.png "Random Forest")
-![alt text](./Selection_017.png "Random Forest")
+![alt text](./Selection_018.png "Random Forest")
 
 ### mmif.predict()
   
