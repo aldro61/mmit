@@ -10,16 +10,16 @@
 
 ## Table of contents
 
-* [Abstract](#abstract)
 * [Introduction](#introduction)
-* [First Evaluation](#first-evaluation)
-* [Second Evaluation](#second-evaluation)
-* [Final Evaluation](#final-evaluation)
+* [Evaluations](#evaluations)
+  * [First Evaluation](#first-evaluation)
+  * [Second Evaluation](#second-evaluation)
+  * [Final Evaluation](#final-evaluation)
+* [Contributions](#contributions)
 * [Future Work](#future-work)
-* [Link to commits](#link-to-commits)
 * [Tutorials](#tutorials)
-
-## Abstract
+* 
+ ## Introduction
 
 There are few R packages available for interval regression, a machine learning problem 
 which is important in genomics and medicine. Like usual regression, the goal is to learn 
@@ -28,77 +28,50 @@ Unlike usual regression, each response in the training set is an interval of acc
 values (rather than one value). In the terminology of the survival analysis literature, 
 this is regression with “left, right, and interval censored” output/response data.
 
-Max margin interval trees is a new nonlinear model for this problem (Drouin et al., 2017). 
-A dynamic programming algorithm is used to find the optimal split point for each feature. 
-The dynamic programming algorithm has been implemented in C++ and there are wrappers to this 
-solver in R and Python (https://github.com/aldro61/mmit). 
-The Python package includes a decision tree learner. 
+Max margin interval trees are a new type of nonlinear model for this problem ([Drouin et al., 2017](https://papers.nips.cc/paper/7080-maximum-margin-interval-trees)). 
+This algorithm has previously been implemented in Python and the objective of this Google Summer of Code project was to implement it in R using the *partykit* library.
+ 
+Specifically, we implemented the following learning algorithms:
+  * Max margin interval trees
+  * Max margin interval random forests
+  * Max margin interval Adaboost (in progress) 
+  
 
+For each algorithm, we implemented the following:
+* Learning: input examples represented by their features and interval label and output a model (single party object or list of party objects)
+* Cross-validation: grid seach k-fold cross-validation to select the hyperparameters
+* Prediction: input examples represented by their features and output predictions
+* Minimum cost-complexity pruning (for MMIT only): reduce the size of trees by cutting branches
+ 
+We also created documentation for each of these functions.
 
- ----------------------------------------------------------------------
- ## Introduction
- 
- The main goal of this GSOC project is to build the R package that implements the decision tree learner in R, using <b> partykit </b>.
- 
- This project consist of:
- 
- * Max margin interval tree, which take the interval censored data and its parameters as input and give <b> party </b> object 
- of the learned tree as output.
- 
- * A predict function that predicts the Testing data on the MMIT.
- 
- * Pruning of the MMIT.
- 
- * Cross Validation of MMIT to return the best parameters using grid search.
- 
- * The random forest Implementation on the MMIT trees, which outputs the ensemble of trees 
- 
- * A predict function for Random Forest that outputs the average of the predicted values of each tree.
- 
- * Cross Validation for the Random forest.
- 
- The MMIT R package would be useful for predicting all kinds of censored data such as left\right\censored, to give real value prediction.
- with super fast speed due to the use of dynamic programming. 
  
  -------------------------------------------------------------------------------------------------
- ## First Evaluation
+ ## Evaluations
+
+ ### First Evaluation
  
- For the major part of the first coding period, the main aim was to build the maximum margin interval tree(mmit) 
- along with its  K-fold cross validation and pruning tree. 
+ For the major part of the first coding period, the main aim was to build the maximum margin interval tree (mmit) 
+ along with its k-fold cross validation and minimum cost-complexity pruning functions. 
  The tree model was build using partykit which made it very easy to visualize the tree structure 
  and get its prediction values. The tree model and pruning was done to a large extent including 
  appropriate documentation and unit tests which helped later on in the project. 
- Although the Cross validation part too longer time than expected.
- 
----------------------------------------------------------------------------------------------------
- 
-## Second Evaluation
+ Although the implementation of cross validation took longer than expected.
+  
+### Second Evaluation
 
-After building the MMIT model, most of the second coding phase went on bug fixing and building unit tests and examples, along with completing the cross validation for the MMIT. The cross validation function consist of 
+After building the MMIT model, most of the second coding phase was spent on bug fixing and building unit tests and examples, along with completing the cross validation for the MMIT. The cross validation function consist of 
 option for enabling and disabling the pruning of MMIT. It does Grid search on all the parameters and gives the best parameters 
 along with the list of CV results for all parameters.
-To validate the work, Benchmark was created to compare the mmit and pruning model to the python results. The results were almost 
-similar for larger datasets, thus validation the models.
+To validate the work, a benchmark was created to compare the mmit and pruning model to the python results. The results were similar for larger datasets (variability is expected for small datasets), thus we believe that the implementation is correct.
 
---------------------------------------------------------------------------------------------------------
+### Final Evaluation
 
-## Final Evaluation
-
-The final phase work consist of building the Random forest and Adaboost for the MMIT, Along with its Cross validation.
-As The aim by the end of GSoc is to build a working package , hence before adding new features to the package, testing, bug 
-fixing and documentation are completed. Getting the code to work proved to be suprisingly (and notoriously) more complicated than 
-imagined, as the main code used for Cross Validation is common for all modules of the package, thus it has to be made easy to incorporate new features. Thus it took a lot of time to debug the code to perfection.
+The final phase work consisted of implementing the Random forest and Adaboost algorithms based on MMIT, along with their cross validation and prediction functions. Since the ultimate goal of GSoC is to build a working package, testing, bug fixing and documentation were completed before adding more features to the package. Getting the code to work proved to be suprisingly (and notoriously) more complicated than imagined, as the main code used for cross validation is common for all modules of the package and had to designed to allow the easy incorporation of new features. Thus it took a lot of time to debug the code to perfection.
 
 ----------------------------------------------------------------------------------------------------------
 
-## Future Work
-
-The Implementation of Adaboost is currently under progress ([link](https://github.com/aldro61/mmit/pull/28)). The future work for the project is to improve the time 
-taken for each module and write the vignettes no make it submittable to CRAN.
-
------------------------------------------------------------------------------------------------------------
-
-## Link to commits
+## Contributions
 
 The links to all the commits are given below:
 
@@ -117,14 +90,21 @@ The links to all the commits are given below:
  * Benchmark: [Link](https://github.com/aldro61/mmit/blob/master/benchmark/pred_score.md)
   
   -------------------------------------------------------------------------------------------------------
+
+
+## Future Work
+
+The implementation of Adaboost is currently in progress ([link](https://github.com/aldro61/mmit/pull/28)). As future work, we would like to improve the running time of each function and write the vignettes with the objective of submitting to CRAN.
+
+-----------------------------------------------------------------------------------------------------------
   
   ## Tutorials
   
-  Here is a tutorial how to use the package.
+  Here is a tutorial on how to use the package.
   
   ### mmit()
   
-  This function is used to create the maximum margin interval trees. It returns party object as the tree.
+  This function is used to create the maximum margin interval trees. It returns the learned tree as a party object.
   
   #### Usage:
   
@@ -153,7 +133,7 @@ plot(out)
 
 #### Output:
 
-![alt text](https://github.com/parismita/mmit/blob/gsoc_doc/tutorials/R/Selection_014.png "MMIT model")
+![alt text](./Selection_014.png "MMIT model")
 
 ### mmit.predict()
   
@@ -217,14 +197,17 @@ pruned_tree <- mmit.pruning(tree)
 
 #### Output:
 
-alpha : 0, 3
+alpha values: [0, 3]
 
-tree :  
-For alpha = 0
-![alt text](https://github.com/parismita/mmit/blob/gsoc_doc/tutorials/R/Selection_016.png "Pruning tree, alpha = 0")
+pruned trees :  
+
+for alpha = 0
+
+![alt text](./Selection_016.png "Pruning tree, alpha = 0")
 
 for alpha = 3
-![alt text](https://github.com/parismita/mmit/blob/gsoc_doc/tutorials/R/Selection_015.png "Pruning tree, alpha = 3")
+
+![alt text](./Selection_015.png "Pruning tree, alpha = 3")
 
 ### mmit.cv()
   
@@ -271,7 +254,7 @@ max_depth | margin |min_sample | loss |alpha |
 
 ### mmif()
   
-Learning a random forest of Max Margin Interval Tree. And giving list of trees as output.
+Learning a random forest of Max Margin Interval Tree and giving list of trees as output.
   
   #### Usage:
   
@@ -302,8 +285,8 @@ print(trees)
 #### Output:
 
 The collection of trees are :  
-![alt text](https://github.com/parismita/mmit/blob/gsoc_doc/tutorials/R/Selection_017.png "Random Forest")
-![alt text](https://github.com/parismita/mmit/blob/gsoc_doc/tutorials/R/Selection_017.png "Random Forest")
+![alt text](./Selection_017.png "Random Forest")
+![alt text](./Selection_017.png "Random Forest")
 
 ### mmif.predict()
   
@@ -384,7 +367,7 @@ max_depth | margin |min_sample | loss |n_trees |n_features|
 
 ### mse()
   
-Metric for mean aquare error calculation.
+Calculation of the mean square error for intervals.
   
   #### Usage:
   
@@ -409,7 +392,7 @@ out : 0.25
 
 ### zero_one_loss()
   
-Metric for error calculation where the function gives zero value inside the interval else one.
+Calculation of the zero-one loss for interval, i.e., zero error if the prediction is inside the interval and one error if it is ouside.
   
   #### Usage:
   
@@ -431,3 +414,4 @@ out <- zero_one_loss(y_true, y_pred)
 #### Output:
 
 out : 0.5
+
