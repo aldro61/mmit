@@ -19,7 +19,8 @@
 * [Future Work](#future-work)
 * [Tutorials](#tutorials)
 
-
+ 
+ 
  ## Introduction
 
 There are few R packages available for interval regression, a machine learning problem 
@@ -48,8 +49,10 @@ We also created documentation for each of these functions.
 
  
  -------------------------------------------------------------------------------------------------
+ 
  ## Evaluations
-
+ 
+ 
  ### First Evaluation
  
  For the major part of the first coding period, the main aim was to build the maximum margin interval tree (mmit) 
