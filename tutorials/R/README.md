@@ -18,7 +18,8 @@
 * [Contributions](#contributions)
 * [Future Work](#future-work)
 * [Tutorials](#tutorials)
-* 
+
+
  ## Introduction
 
 There are few R packages available for interval regression, a machine learning problem 
