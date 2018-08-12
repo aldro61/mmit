@@ -114,8 +114,7 @@ The implementation of Adaboost is currently in progress ([link](https://github.c
 
 ## Installation
 
-The source code of the `mmit` R package is located in the
-[Rpackage](Rpackage) sub-directory, and can be installed via the following R
+The `mmit` R package can be installed via the following R
 commands.
 
 ```
