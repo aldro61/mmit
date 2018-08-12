@@ -28,8 +28,11 @@
   * [mmif.cv](#mmifcv)
   * [mse](#mse)
   * [zero_one_loss](#zero_one_loss)
+  
+ -----------------------------------------------------------------------------------------------------
 
- ## Introduction
+## Introduction
+
 
 There are few R packages available for interval regression, a machine learning problem 
 which is important in genomics and medicine. Like usual regression, the goal is to learn 
@@ -57,9 +60,10 @@ We also created documentation for each of these functions.
 
  
  -------------------------------------------------------------------------------------------------
- ## Evaluations
-
- ### First Evaluation
+ 
+## Evaluations 
+  
+### First Evaluation
  
  For the major part of the first coding period, the main aim was to build the maximum margin interval tree (mmit) 
  along with its k-fold cross validation and minimum cost-complexity pruning functions. 
@@ -123,18 +127,18 @@ devtools::install_github("aldro61/mmit/Rpackage")
 
 ## Tutorials
   
-  Here is a tutorial on how to use the package.
+Here is a tutorial on how to use the package.
+
+### mmit()
   
-  ### mmit()
+This function is used to create the maximum margin interval trees. It returns the learned tree as a party object.
+
+#### Usage:
   
-  This function is used to create the maximum margin interval trees. It returns the learned tree as a party object.
+`mmit(target.mat, feature.mat, max_depth = Inf, margin = 0, loss = "hinge",
+min_sample = 1)`
   
-  #### Usage:
-  
-  `mmit(target.mat, feature.mat, max_depth = Inf, margin = 0, loss = "hinge",
-  min_sample = 1)`
-  
-  #### Example:
+#### Example:
   
 ```R
 library(mmit)
@@ -162,11 +166,11 @@ plot(out)
   
   Fits the new data into the MMIT model to give prediction values
   
-  #### Usage:
+#### Usage:
   
-  `mmit.predict(tree, newdata = NULL, perm = NULL)`
+`mmit.predict(tree, newdata = NULL, perm = NULL)`
   
-  #### Example:
+#### Example:
   
 ```R
 library(mmit)
@@ -194,11 +198,11 @@ pred : 0.5 0.5 0.5 2.5 2.5 2.5
   
 Pruning the regression tree for censored data to give all the alpha values and trees as output.
   
-  #### Usage:
+#### Usage:
+
+`mmit.pruning(tree)`
   
-  `mmit.pruning(tree)`
-  
-  #### Example:
+#### Example:
   
 ```R
 library(mmit)
@@ -237,12 +241,12 @@ for alpha = 3
 Performing grid search to select the best parameters via cross validation on the a regression tree for censored data.
 It outputs all the CV results, the best model and best parameters.
   
-  #### Usage:
+#### Usage:
   
-  `mmit.cv(target.mat, feature.mat, param_grid, n_folds = 3, scorer = NULL,
-  n_cpu = 1, pruning = TRUE)`
+`mmit.cv(target.mat, feature.mat, param_grid, n_folds = 3, scorer = NULL,
+n_cpu = 1, pruning = TRUE)`
   
-  #### Example:
+#### Example:
   
 ```R
 library(mmit)
@@ -267,6 +271,7 @@ result <- mmit.cv(target.mat, feature.mat, param_grid, scorer = mse)
 plot(result$best_estimator)
 print(result$cv_results)
 ```
+
 #### Output:
 
 Best parameters : 
@@ -279,13 +284,13 @@ max_depth | margin |min_sample | loss |alpha |
   
 Learning a random forest of Max Margin Interval Tree and giving list of trees as output.
   
-  #### Usage:
+#### Usage:
+
+`mmif(target.mat, feature.mat, max_depth = Inf, margin = 0, loss = "hinge",
+min_sample = 1, n_trees = 10,
+n_features = ceiling(ncol(feature.mat)^0.5), n_cpu = 1)`
   
-  `mmif(target.mat, feature.mat, max_depth = Inf, margin = 0, loss = "hinge",
-  min_sample = 1, n_trees = 10,
-  n_features = ceiling(ncol(feature.mat)^0.5), n_cpu = 1)`
-  
-  #### Example:
+#### Example:
   
 ```R
 library(mmit)
@@ -306,11 +311,11 @@ The collection of trees are :
   
 Predictions with random forests of Max Margin Interval Trees
   
-  #### Usage:
-  
-  `mmif.predict(forest, test_feature.mat = NULL)`
-  
-  #### Example:
+#### Usage:
+
+`mmif.predict(forest, test_feature.mat = NULL)`
+
+#### Example:
   
 ```R
 library(mmit)
@@ -339,12 +344,12 @@ pred : 0.75 0.95 1.95 2.15 2.15 2.15
   
 Performing grid search to select the best hyperparameters of mmif via cross-validation.
   
-  #### Usage:
+#### Usage:
+
+`mmif.cv(target.mat, feature.mat, param_grid, n_folds = 3, scorer = NULL,
+n_cpu = 1)`
   
-  `mmif.cv(target.mat, feature.mat, param_grid, n_folds = 3, scorer = NULL,
-  n_cpu = 1)`
-  
-  #### Example:
+#### Example:
   
 ```R
 library(mmit)
@@ -383,11 +388,11 @@ max_depth | margin |min_sample | loss |n_trees |n_features|
   
 Calculation of the mean square error for intervals.
   
-  #### Usage:
-  
-  `mse(y_true, y_pred)`
-  
-  #### Example:
+#### Usage:
+
+`mse(y_true, y_pred)`
+
+#### Example:
   
 ```R
 library(mmit)
@@ -408,11 +413,11 @@ out : 0.25
   
 Calculation of the zero-one loss for interval, i.e., zero error if the prediction is inside the interval and one error if it is ouside.
   
-  #### Usage:
+#### Usage:
+
+`zero_one_loss(y_true, y_pred)`
   
-  `zero_one_loss(y_true, y_pred)`
-  
-  #### Example:
+#### Example:
   
 ```R
 library(mmit)
