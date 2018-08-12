@@ -2,23 +2,24 @@
 % Please edit documentation in R/mmif.predict.R
 \name{mmif.predict}
 \alias{mmif.predict}
-\title{Prediction for Random Forest}
+\title{Predictions with random forests of Max Margin Interval Trees}
 \usage{
 mmif.predict(forest, test_feature.mat = NULL)
 }
 \arguments{
-\item{forest}{Ensembe of forest}
+\item{forest}{Ensemble of MMITs}
 
-\item{test_feature.mat}{a data frame containing the test feature variables in the model.}
+\item{test_feature.mat}{A data frame containing the features of the examples for which predictions must be computed.}
 }
 \value{
-Prediction values
+Predictions Average output of each tree in the forest
 }
 \description{
-Predictions as average of all predictions of the random forest.
+Predictions with random forests of Max Margin Interval Trees
 }
 \examples{
 library(mmit)
+
 target.mat <- rbind(
   c(0,1), c(0,1), c(0,1),
   c(2,3), c(2,3), c(2,3))

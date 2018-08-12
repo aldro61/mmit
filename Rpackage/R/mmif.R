@@ -45,18 +45,29 @@ mmif <- structure(function(target.mat, feature.mat,
   assert_that(detectCores() >= n_cpu)
   
   all_trees <- list()
-  cl <- makeCluster(n_cpu)
-  registerDoParallel(cl)
-  
-  ### create n_trees
-  all_trees <- foreach(i = 1 : n_trees, .packages = "mmit") %dopar% 
-    random_tree(target.mat, feature.mat, 
-                max_depth = max_depth, margin = margin, loss = loss,
-                min_sample = min_sample, n_trees = n_trees,
-                n_features = n_features)
-  
-  
-  stopCluster(cl)
+  if(n_cpu > 1){
+    cl <- makeCluster(n_cpu)
+    registerDoParallel(cl)
+    
+    ### create n_trees
+    all_trees <- foreach(i = 1 : n_trees, .packages = "mmit") %dopar% 
+      random_tree(target.mat, feature.mat, 
+                  max_depth = max_depth, margin = margin, loss = loss,
+                  min_sample = min_sample, n_trees = n_trees,
+                  n_features = n_features)
+    
+    
+    stopCluster(cl)
+  }
+  else{
+    for(i in 1 : n_trees) {
+      all_trees[[i]] = random_tree(target.mat, feature.mat, 
+                                   max_depth = max_depth, margin = margin, loss = loss,
+                                   min_sample = min_sample, n_trees = n_trees,
+                                   n_features = n_features)
+    }
+    
+  }
   
   return(all_trees)
   
