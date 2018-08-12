@@ -24,7 +24,7 @@
   * [mmit.pruning](#mmitpruning)
   * [mmit.cv](#mmitcv)
   * [mmif](#mmif)
-  * [mmif.predict](#mmitpredict)
+  * [mmif.predict](#mmifpredict)
   * [mmif.cv](#mmifcv)
   * [mse](#mse)
   * [zero_one_loss](#zero_one_loss)
