@@ -32,4 +32,6 @@
 #' @export
 mmitboost <- structure(function(target.mat, feature.mat,  
                            max_depth = Inf, margin=0.0, loss="hinge",
-                           min_sample = 1) {}
+                           min_sample = 1) {
+  return(0)
+})
