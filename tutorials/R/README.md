@@ -95,7 +95,7 @@ The links to all the commits are given below:
  
  * Random Forest: [Link](https://github.com/aldro61/mmit/pull/26/commits)
  
- * Adaboost: [Link](https://github.com/aldro61/mmit/pull/28)
+ * Adaboost: [Link](https://github.com/aldro61/mmit/pull/30/)
  
  The links for documentation and benchmark
  
@@ -108,7 +108,7 @@ The links to all the commits are given below:
 
 ## Future Work
 
-The implementation of Adaboost is currently in progress ([link](https://github.com/aldro61/mmit/pull/28)). As future work, we would like to improve the running time of each function and write the vignettes with the objective of submitting to CRAN.
+The implementation of Adaboost is currently in progress ([link](https://github.com/aldro61/mmit/pull/30)). As future work, we would like to improve the running time of each function and write the vignettes with the objective of submitting to CRAN.
 
 -----------------------------------------------------------------------------------------------------------
 
