@@ -17,8 +17,18 @@
   * [Final Evaluation](#final-evaluation)
 * [Contributions](#contributions)
 * [Future Work](#future-work)
+* [Installation](#installation)
 * [Tutorials](#tutorials)
-* 
+  * [mmit](#mmit)
+  * [mmit.predict](#mmit.predict)
+  * [mmit.pruning](#mmit.pruning)
+  * [mmit.cv](#mmit.cv)
+  * [mmif](#mmif)
+  * [mmif.predict](#mmit.predict)
+  * [mmif.cv](#mmif.cv)
+  * [mse](#mse)
+  * [zero_one_loss](#zero_one_loss)
+
  ## Introduction
 
 There are few R packages available for interval regression, a machine learning problem 
@@ -32,8 +42,8 @@ Max margin interval trees are a new type of nonlinear model for this problem ([D
 This algorithm has previously been implemented in Python and the objective of this Google Summer of Code project was to implement it in R using the *partykit* library.
  
 Specifically, we implemented the following learning algorithms:
-  * Max margin interval trees
-  * Max margin interval random forests
+  * Max margin interval trees (mmit, mmit.predict, mmit.pruning, mmit.cv)
+  * Max margin interval random forests (mmif, mmif.predict, mmif.cv)
   * Max margin interval Adaboost (in progress) 
   
 
@@ -97,8 +107,21 @@ The links to all the commits are given below:
 The implementation of Adaboost is currently in progress ([link](https://github.com/aldro61/mmit/pull/28)). As future work, we would like to improve the running time of each function and write the vignettes with the objective of submitting to CRAN.
 
 -----------------------------------------------------------------------------------------------------------
-  
-  ## Tutorials
+
+## Installation
+
+The source code of the `mmit` R package is located in the
+[Rpackage](Rpackage) sub-directory, and can be installed via the following R
+commands.
+
+```
+if(!require(devtools))install.package("devtools")
+devtools::install_github("aldro61/mmit/Rpackage")
+```
+
+----------------------------------------------------------------------------------------------------------
+
+## Tutorials
   
   Here is a tutorial on how to use the package.
   
