@@ -32,7 +32,7 @@
 #' @export
 mmit <- structure(function(target.mat, feature.mat,  
                            max_depth = Inf, margin=0.0, loss="hinge",
-                           min_sample = 1) {
+                           min_sample = 1, weights = rep(1L, nrow(feature.mat))) {
   ### partynode id and initial depth
   id = 1L
   
@@ -40,15 +40,20 @@ mmit <- structure(function(target.mat, feature.mat,
   feature.mat <- model.frame(data = feature.mat)
   
   ### assigning all weights as 1 in the beginning. weights determine which data is to be considered in which node.
-  weights <- rep(1L, nrow(feature.mat))
+  if(weights == rep(1L, nrow(feature.mat))){
+    type = "none"
+  }
+  else{
+    type = "weighted"
+  }
   stopifnot(length(weights) == nrow(feature.mat) & max(abs(weights - floor(weights))) < .Machine$double.eps)
   
   ### tree
-  node<- growtree(target.mat, feature.mat, max_depth = max_depth, margin = margin, weights = weights)
+  node<- growtree(target.mat, feature.mat, max_depth = max_depth, margin = margin, weights = weights, type = type)
   
   ### for node == root
   if(is.null(model.response(feature.mat))){
-    response <- tail(compute_optimal_costs(target.mat, margin, loss)$pred, 1)
+    response <- tail(compute_optimal_costs(target.mat, margin, loss, type, weights)$pred, 1)
     response <- rep(response, nrow(feature.mat))
   }
   else{
