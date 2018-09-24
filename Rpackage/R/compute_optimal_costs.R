@@ -6,7 +6,7 @@ compute_optimal_costs <- structure(function
 ### numeric scalar, margin size parameter.
  loss="hinge",
 ### character scalar, hinge or square.
-type="equal",
+type="none",
 ### type defines if it will compute from non-weighted solver or weighted.
 weights = rep(1, nrow(target.mat))
 ){
