@@ -8,6 +8,7 @@
 #' @param loss The type of loss; (\code{"hinge"}, \code{"square"})
 #' @param max_depth The maximum depth criteia
 #' @param min_sample The minimum number of sample required 
+#' @param weights The weights of feature variables, (default = 1)
 #' 
 #' @return The learned regression tree as an object of class party.
 #' 
@@ -40,13 +41,13 @@ mmit <- structure(function(target.mat, feature.mat,
   feature.mat <- model.frame(data = feature.mat)
   
   ### assigning all weights as 1 in the beginning. weights determine which data is to be considered in which node.
-  if(weights == rep(1L, nrow(feature.mat))){
+  if(all.equal(weights, rep(1L, nrow(feature.mat)))[1] == TRUE){
     type = "none"
   }
   else{
     type = "weighted"
   }
-  stopifnot(length(weights) == nrow(feature.mat) & max(abs(weights - floor(weights))) < .Machine$double.eps)
+  stopifnot(length(weights) == nrow(feature.mat))
   
   ### tree
   node<- growtree(target.mat, feature.mat, max_depth = max_depth, margin = margin, weights = weights, type = type)
