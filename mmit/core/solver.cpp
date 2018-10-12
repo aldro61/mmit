@@ -53,50 +53,18 @@ int compute_optimal_costs(
         int *moves_vec, //array[n_data] of number of pointer moves
         double *pred_vec, //array[n_data] of optimal predicted values
         double *cost_vec // array[n_data] of optimal cost
-) {
-    PiecewiseFunction function;
-    FunctionType loss_type = (loss == 0 ? linear_hinge : squared_hinge);
-
-    // Compute the optimal solution for each interval
-    for(int i = 0; i < n_data; i++){
-
-        moves_vec[i] = 0;
-
-        // Uncensored output
-        if(equal(lower_vec[i], upper_vec[i])) {
-            if (!std::isinf(lower_vec[i])){
-                Coefficients F1 = get_coefficients(lower_vec[i], 0., false, loss_type);
-                Coefficients F2 = get_coefficients(upper_vec[i], 0., true, loss_type);
-                moves_vec[i] += function.insert_point(lower_vec[i], F1, false);
-                moves_vec[i] += function.insert_point(upper_vec[i], F2, true);
-            }
-        }
-
-        // Censored output
-        else {
-            // Add the lower bound
-            if (!std::isinf(lower_vec[i])){
-                Coefficients F = get_coefficients(lower_vec[i], margin, false, loss_type);
-                double b = get_breakpoint(lower_vec[i], margin, false);
-                moves_vec[i] += function.insert_point(b, F, false);
-            }
-
-            // Add the upper bound
-            if (!std::isinf(upper_vec[i])){
-                Coefficients F = get_coefficients(upper_vec[i], margin, true, loss_type);
-                double b = get_breakpoint(upper_vec[i], margin, true);
-                moves_vec[i] += function.insert_point(b, F, true);
-            }
-        }
-
-        pred_vec[i] = function.get_minimum_position();
-        cost_vec[i] = function.get_minimum_value();
+){
+    double weights[n_data];
+    for (int i = 0; i < n_data; ++i)
+    {
+        weights[i] = 1;
     }
-    return 0;
+
+    compute_optimal_costs(n_data, lower_vec, upper_vec, weights, margin, loss, moves_vec, pred_vec, cost_vec);
 }
 
 // return int is an error status code
-int weighted_compute_optimal_costs(
+int compute_optimal_costs(
 //inputs
         int n_data,
         double *lower_vec, // array[n_data] of output lower limits (can be -INFINITY)

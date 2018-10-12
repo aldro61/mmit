@@ -30,7 +30,7 @@ int compute_optimal_costs(
         double *pred_vec, //array[n_data] of optimal predicted values
         double *cost_vec); // array[n_data] of optimal cost
 
-int weighted_compute_optimal_costs(
+int compute_optimal_costs(
 //inputs
         int n_data,
         double *lower_vec, // array[n_data] of output lower limits (can be -INFINITY)
