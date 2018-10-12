@@ -31,7 +31,9 @@
 #' 
 #' @export
 mmitboost <- structure(function(target.mat, feature.mat,  
-                           max_depth = Inf, margin=0.0, loss="hinge",
-                           min_sample = 1) {
+                           max_depth = Inf, margin=0.0, loss="hinge", min_sample = 1, 
+                           weights = rep(1L, nrow(feature.mat))/seq(1L, nrow(feature.mat), 1)) {
+  
+  tree <- mmit(target.mat, feature.mat, max_depth, margin, loss, min_sample, weights)
   return(0)
 })
