@@ -20,8 +20,10 @@ bestsplit <- structure(function
   }
 
   ### extract response values from data
-  dummy_tar_1 <- rep(target.mat[,1], times = weights)
-  dummy_tar_2 <- rep(target.mat[,2], times = weights)
+  times = as.numeric(weights>0.)
+  weights = weights[weights>0.]
+  dummy_tar_1 <- rep(target.mat[,1], times = times)
+  dummy_tar_2 <- rep(target.mat[,2], times = times)
   target.mat <- cbind(dummy_tar_1,dummy_tar_2)
   
   ### loop for every feature
@@ -29,7 +31,7 @@ bestsplit <- structure(function
     feat <- feature.mat[, index]
     
     ### extract data value as per weight
-    feat <- rep(feat, times = weights)
+    feat <- rep(feat, times = times)
     
     ### sorted
     sorted <- order(feat)
