@@ -68,12 +68,10 @@ mmit.cv <- structure(function(target.mat, feature.mat,
   registerDoParallel(cl)
   
   fitscore_result <- list()
-  fitscore_result <- foreach(i = 1:nrow(parameters), 
-              .packages = "mmit") %dopar% 
-              fit_and_score(target.mat = target.mat, feature.mat = feature.mat, 
-                                           parameters = parameters[i,], 
-                                           n_folds = n_folds, scorer = scorer,
-                                           pruning = pruning, learner = "mmit")
+  fitscore_result <- future_lapply(1:nrow(parameters), 
+                    function(x) fit_and_score(target.mat = target.mat, 
+                    feature.mat = feature.mat, parameters = parameters[x,], 
+                    n_folds = n_folds, scorer = scorer, pruning = pruning, learner = "mmit"))
   stopCluster(cl)  
   
   for(i in 1:nrow(parameters)){
