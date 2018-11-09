@@ -44,11 +44,11 @@ mmit <- structure(function(target.mat, feature.mat,
   stopifnot(length(weights) == nrow(feature.mat))
   
   ### tree
-  node<- growtree(target.mat, feature.mat, max_depth = max_depth, margin = margin, weights = weights, type = type)
+  node<- growtree(target.mat, feature.mat, max_depth = max_depth, margin = margin, weights = weights)
   
   ### for node == root
   if(is.null(model.response(feature.mat))){
-    response <- tail(compute_optimal_costs(target.mat, margin, loss, type, weights)$pred, 1)
+    response <- tail(compute_optimal_costs(target.mat, margin, loss, weights)$pred, 1)
     response <- rep(response, nrow(feature.mat))
   }
   else{

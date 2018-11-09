@@ -1,7 +1,7 @@
 bestsplit <- structure(function
 ### Compute vector of optimal prediction and cost.
 ### We have the feature and target value of the data that is to be splitted.
-(target.mat, feature.mat, weights, margin=0.0, loss="hinge",pred = NULL, type = "none"){
+(target.mat, feature.mat, weights, margin=0.0, loss="hinge",pred = NULL){
   ### We keep track of the following values for each optimal split
   best_split <- list()
   best_split$cost <- Inf
@@ -15,7 +15,7 @@ bestsplit <- structure(function
   
   ### initialise pred$cost with root node's cost.
   if(is.null(pred)){
-    pred$cost <- as.numeric(tail(compute_optimal_costs(target.mat, margin, loss, type, weights),1)[3])
+    pred$cost <- as.numeric(tail(compute_optimal_costs(target.mat, margin, loss, weights),1)[3])
     ### as root cost = left + right = left + 0
   }
 
@@ -50,8 +50,8 @@ bestsplit <- structure(function
     }
     
     ### compute cost, prediction
-    leftleaf <- compute_optimal_costs(tar, margin, loss, type, weights)
-    rightleaf <- compute_optimal_costs(rev_tar, margin, loss, type, weights)
+    leftleaf <- compute_optimal_costs(tar, margin, loss, weights)
+    rightleaf <- compute_optimal_costs(rev_tar, margin, loss, weights)
 
     ### unique and removing cases where all examples are in one leaf
     leftleaf <- leftleaf[last_idx,]
