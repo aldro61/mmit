@@ -6,8 +6,7 @@
 \usage{
 mmitboost(target.mat, feature.mat, max_depth = Inf, margin = 0,
   loss = "hinge", min_sample = 1, weights = rep(1L,
-  nrow(feature.mat))/seq(1L, nrow(feature.mat), 1), M = 10,
-  scorer = zero_one_loss)
+  nrow(feature.mat))/seq(1L, nrow(feature.mat), 1), M = 10)
 }
 \arguments{
 \item{target.mat}{The response variable of the model}
@@ -21,9 +20,13 @@ mmitboost(target.mat, feature.mat, max_depth = Inf, margin = 0,
 \item{loss}{The type of loss; (\code{"hinge"}, \code{"square"})}
 
 \item{min_sample}{The minimum number of sample required}
+
+\item{weights}{An importance weight for each learning example, (default = 1)}
+
+\item{M}{An integer for number of iterations of weight update.}
 }
 \value{
-List of trees containing each tree in the adaboost method.
+Predicted Training Data
 }
 \description{
 Learning adaptive boosting for the Max Margin Interval Tree
