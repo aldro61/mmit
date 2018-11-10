@@ -6,7 +6,7 @@ compute_optimal_costs <- structure(function
 ### numeric scalar, margin size parameter.
  loss="hinge",
 ### character scalar, hinge or square.
-weights = rep(1, nrow(target.mat))
+weight = rep(1, nrow(target.mat))
 ){
   fun.vec <- c(hinge=0L, square=1L)
   if(!(is.character(loss) & length(loss)==1 & loss %in% names(fun.vec))){
@@ -32,7 +32,7 @@ weights = rep(1, nrow(target.mat))
     n_data=nrow(target.mat),
     lower_vec=as.double(lower.vec),
     upper_vec=as.double(upper.vec),
-    weights=as.double(weights),
+    weights=as.double(weight),
     margin=as.double(margin),
     loss=as.integer(fun.vec[[loss]]),
     moves_vec=as.integer(neg.vec),

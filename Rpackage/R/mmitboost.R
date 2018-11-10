@@ -8,8 +8,10 @@
 #' @param loss The type of loss; (\code{"hinge"}, \code{"square"})
 #' @param max_depth The maximum depth criteia
 #' @param min_sample The minimum number of sample required 
+#' @param weights An importance weight for each learning example, (default = 1)
+#' @param M An integer for number of iterations of weight update.
 #' 
-#' @return List of trees containing each tree in the adaboost method.
+#' @return Predicted Training Data
 #' 
 #' @author Toby Dylan Hocking, Alexandre Drouin, Torsten Hothorn, Parismita Das
 #' 
@@ -30,10 +32,57 @@
 #' out <- mmitboost(target.mat, feature.mat)
 #' 
 #' @export
-mmitboost <- structure(function(target.mat, feature.mat,  
-                           max_depth = Inf, margin=0.0, loss="hinge", min_sample = 1, 
-                           weights = rep(1L, nrow(feature.mat))/seq(1L, nrow(feature.mat), 1)) {
+mmitboost <- structure(function(target.mat, feature.mat,   
+                                max_depth = Inf, margin=0.0, loss="hinge", min_sample = 1, 
+                                weights = rep(1L, nrow(feature.mat))/seq(1L, nrow(feature.mat),1),
+                                M = 10) {
+  final_scores <- rep(0., times = nrow(target.mat))
+  for(i in 1:M){
+    ### regression tree
+    tree <- mmit(target.mat, feature.mat, max_depth, margin, loss, min_sample, weights)
+    
+    ### predictions of the model
+    prediction <- mmit.predict(tree, feature.mat)
+    if(i==1){
+      final_scores <- prediction
+    }
+    
+    ###error calc
+    scores <- 0.0
+    for(i in 1 : length(prediction)){
+      #if(!((target.mat[i,1] <= prediction[i]) && (prediction[i] <= target.mat[i,2]))){
+      #  scores[i] <- 1.0
+      #}
+      #else{
+      #  scores[i] <- 0.0
+      #}
+      
+      if(target.mat[i,1] > prediction[i]){
+        scores[i] <- (target.mat[i,1] - prediction[i])**2
+      }
+      else if(target.mat[i,2] <= prediction[i]){
+        scores[i] <- (target.mat[i,2] - prediction[i])**2
+      }
+      else{
+        scores[i] <- 0.0
+      }
+    }
+    if(all(scores == 0)){
+      break
+    }
+    error <- sum(weights*scores)/sum(weights)
+    alpha <- 0.5 * log( (1. - error) /error)
+    weights <- weights*exp(alpha*scores)
+    final_scores <- final_scores + alpha*prediction
+  }
+  #plot(tree)
+  #View(cbind(prediction, scores))
+  return(final_scores)
+}, ex=function(){
   
-  tree <- mmit(target.mat, feature.mat, max_depth, margin, loss, min_sample, weights)
-  return(0)
+  data(neuroblastomaProcessed, package="penaltyLearning")
+  feature.mat <- data.frame(neuroblastomaProcessed$feature.mat)[1:45,]
+  target.mat <- neuroblastomaProcessed$target.mat[1:45,]
+  pred <- mmitboost(target.mat, feature.mat, max_depth = Inf, margin = 2.0, weights = rep(1L, nrow(feature.mat)))
+  
 })
