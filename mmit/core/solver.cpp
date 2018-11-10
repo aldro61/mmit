@@ -60,11 +60,11 @@ int compute_optimal_costs(
         weights[i] = 1;
     }
 
-    compute_optimal_costs(n_data, lower_vec, upper_vec, weights, margin, loss, moves_vec, pred_vec, cost_vec);
+    compute_optimal_cost(n_data, lower_vec, upper_vec, weights, margin, loss, moves_vec, pred_vec, cost_vec);
 }
 
 // return int is an error status code
-int compute_optimal_costs(
+int compute_optimal_cost(
 //inputs
         int n_data,
         double *lower_vec, // array[n_data] of output lower limits (can be -INFINITY)
