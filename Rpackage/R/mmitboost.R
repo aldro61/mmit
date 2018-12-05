@@ -37,10 +37,11 @@ mmitboost <- structure(function(target.mat, feature.mat,
                                 weights = rep(1L, nrow(feature.mat))/seq(1L, nrow(feature.mat),1),
                                 M = 10) {
   final_scores <- rep(0., times = nrow(target.mat))
+  trees <- list()
   for(i in 1:M){
     ### regression tree
     tree <- mmit(target.mat, feature.mat, max_depth, margin, loss, min_sample, weights)
-    
+    trees[[i]] <- tree
     ### predictions of the model
     prediction <- mmit.predict(tree, feature.mat)
     if(i==1){
@@ -50,12 +51,6 @@ mmitboost <- structure(function(target.mat, feature.mat,
     ###error calc
     scores <- 0.0
     for(i in 1 : length(prediction)){
-      #if(!((target.mat[i,1] <= prediction[i]) && (prediction[i] <= target.mat[i,2]))){
-      #  scores[i] <- 1.0
-      #}
-      #else{
-      #  scores[i] <- 0.0
-      #}
       
       if(target.mat[i,1] > prediction[i]){
         scores[i] <- (target.mat[i,1] - prediction[i])**2
@@ -77,7 +72,7 @@ mmitboost <- structure(function(target.mat, feature.mat,
   }
   #plot(tree)
   #View(cbind(prediction, scores))
-  return(final_scores)
+  return(trees)
 }, ex=function(){
   
   data(neuroblastomaProcessed, package="penaltyLearning")
