@@ -59,13 +59,13 @@ mmit.cv <- structure(function(target.mat, feature.mat,
   best_result <- NULL
   best_result$best_score <- attr(scorer, "worst")
   
-  ### parallelize using foreach, see all permutation combination of param grid values
+  ### parallelize using future.apply, see all permutation combination of param grid values
   ### register parallel backend
   if(n_cpu == -1) n_cpu <- detectCores() 
   assert_that(detectCores() >= n_cpu)
   
   cl <- makeCluster(n_cpu)
-  registerDoParallel(cl)
+  plan(multiprocess, workers = n_cpu)
   
   fitscore_result <- list()
   fitscore_result <- future_lapply(1:nrow(parameters), 
