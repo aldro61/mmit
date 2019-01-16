@@ -29,7 +29,6 @@
 #' 
 #' out <- mmit(target.mat, feature.mat)
 #' 
-#' @export
 mmit <- structure(function(target.mat, feature.mat,  
                            max_depth = Inf, margin=0.0, loss="hinge",
                            min_sample = 1) {

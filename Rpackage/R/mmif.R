@@ -32,7 +32,6 @@
 #' 
 #' trees <- mmif(target.mat, feature.mat, margin = 2.0, n_cpu = -1)
 #' 
-#' @export
 mmif <- structure(function(target.mat, feature.mat, 
                            max_depth = Inf, margin=0.0, loss="hinge",
                            min_sample = 1, n_trees = 10,
@@ -47,7 +46,7 @@ mmif <- structure(function(target.mat, feature.mat,
   all_trees <- list()
   if(n_cpu > 1){
     cl <- makeCluster(n_cpu)
-    registerDoParallel(cl)
+    plan(multiprocess, workers = n_cpu)
     
     ### create n_trees
     all_trees <- foreach(i = 1 : n_trees, .packages = "mmit") %dopar% 

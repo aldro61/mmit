@@ -37,7 +37,6 @@
 #' 
 #' result <- mmif.cv(target.mat, feature.mat, param_grid, scorer = mse, n_cpu = -1)
 #' 
-#' @export
 mmif.cv <- structure(function(target.mat, feature.mat, 
                               param_grid, n_folds = 3,
                               scorer = NULL, n_cpu = 1){

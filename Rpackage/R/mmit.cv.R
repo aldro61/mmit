@@ -35,7 +35,6 @@
 #' 
 #' result <- mmit.cv(target.mat, feature.mat, param_grid, scorer = mse)
 #' 
-#' @export
 mmit.cv <- structure(function(target.mat, feature.mat, 
                               param_grid, n_folds = 3,
                               scorer = NULL, n_cpu = 1, 

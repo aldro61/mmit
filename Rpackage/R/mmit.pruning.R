@@ -26,13 +26,6 @@
 #' 
 #' pruned_tree <- mmit.pruning(tree)
 #' 
-#' @export
-
-
-
-#### needs work...eturn type
-
-
 
 mmit.pruning <- structure(function(tree){
   ### T1 is the tree after initital pruning of Tmax
