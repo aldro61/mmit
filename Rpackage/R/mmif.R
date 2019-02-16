@@ -49,11 +49,10 @@ mmif <- structure(function(target.mat, feature.mat,
     plan(multiprocess, workers = n_cpu)
     
     ### create n_trees
-    all_trees <- foreach(i = 1 : n_trees, .packages = "mmit") %dopar% 
-      random_tree(target.mat, feature.mat, 
+    all_trees <- future_lapply(1 : n_trees, function(x) random_tree(target.mat, feature.mat, 
                   max_depth = max_depth, margin = margin, loss = loss,
                   min_sample = min_sample, n_trees = n_trees,
-                  n_features = n_features)
+                  n_features = n_features))
     
     
     stopCluster(cl)
@@ -80,7 +79,7 @@ mmif <- structure(function(target.mat, feature.mat,
 })
 
 
-random_tree <- function(target.mat, feature.mat, 
+.random_tree <- function(target.mat, feature.mat, 
                         max_depth, margin, loss,
                         min_sample, n_trees ,
                         n_features){

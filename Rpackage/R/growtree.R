@@ -1,4 +1,4 @@
-growtree <- structure(function(target.mat, feature.mat, depth = 0, max_depth = Inf,
+.growtree <- structure(function(target.mat, feature.mat, depth = 0, max_depth = Inf,
                                margin = 0.0, loss="hinge", id = 1L, min_sample = 1,
                                pred=NULL, side = NULL, weights = NULL) {
   

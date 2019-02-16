@@ -1,4 +1,8 @@
-fit_and_score <- structure(function(target.mat, feature.mat, 
+#' Fit and Score
+#'
+#' Learning a regression tree for censored data.
+#'
+.fit_and_score <- structure(function(target.mat, feature.mat, 
                                     parameters, n_folds = 3, scorer = NULL, 
                                     learner = NULL, pruning = TRUE){
   learner.predict = paste(learner, ".predict", sep = "")
