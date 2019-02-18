@@ -29,6 +29,7 @@
 #' 
 #' out <- mmit(target.mat, feature.mat)
 #' 
+
 mmit <- structure(function(target.mat, feature.mat,  
                            max_depth = Inf, margin=0.0, loss="hinge",
                            min_sample = 1) {
@@ -43,7 +44,7 @@ mmit <- structure(function(target.mat, feature.mat,
   stopifnot(length(weights) == nrow(feature.mat) & max(abs(weights - floor(weights))) < .Machine$double.eps)
   
   ### tree
-  node<- growtree(target.mat, feature.mat, max_depth = max_depth, margin = margin, weights = weights)
+  node<- .growtree(target.mat, feature.mat, max_depth = max_depth, margin = margin, weights = weights)
   
   ### for node == root
   if(is.null(model.response(feature.mat))){

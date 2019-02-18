@@ -60,15 +60,15 @@ mmit.cv <- structure(function(target.mat, feature.mat,
   
   ### parallelize using future.apply, see all permutation combination of param grid values
   ### register parallel backend
-  if(n_cpu == -1) n_cpu <- detectCores() 
-  assert_that(detectCores() >= n_cpu)
+  if(n_cpu == -1) n_cpu <- availableCores()
+  assert_that(availableCores() >= n_cpu)
   
   cl <- makeCluster(n_cpu)
   plan(multiprocess, workers = n_cpu)
   
   fitscore_result <- list()
   fitscore_result <- future_lapply(1:nrow(parameters), 
-                    function(x) fit_and_score(target.mat = target.mat, 
+                    function(x) .fit_and_score(target.mat = target.mat, 
                     feature.mat = feature.mat, parameters = parameters[x,], 
                     n_folds = n_folds, scorer = scorer, pruning = pruning, learner = "mmit"))
   stopCluster(cl)  

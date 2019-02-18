@@ -40,8 +40,8 @@ mmif <- structure(function(target.mat, feature.mat,
   
   ### parallelize using foreach, see all permutation combination of param grid values
   ### register parallel backend
-  if(n_cpu == -1) n_cpu <- detectCores() 
-  assert_that(detectCores() >= n_cpu)
+  if(n_cpu == -1) n_cpu <- availableCores()
+  assert_that(availableCores() >= n_cpu)
   
   all_trees <- list()
   if(n_cpu > 1){
@@ -49,7 +49,7 @@ mmif <- structure(function(target.mat, feature.mat,
     plan(multiprocess, workers = n_cpu)
     
     ### create n_trees
-    all_trees <- future_lapply(1 : n_trees, function(x) random_tree(target.mat, feature.mat, 
+    all_trees <- future_lapply(1 : n_trees, function(x) .random_tree(target.mat, feature.mat, 
                   max_depth = max_depth, margin = margin, loss = loss,
                   min_sample = min_sample, n_trees = n_trees,
                   n_features = n_features))
@@ -59,7 +59,7 @@ mmif <- structure(function(target.mat, feature.mat,
   }
   else{
     for(i in 1 : n_trees) {
-      all_trees[[i]] = random_tree(target.mat, feature.mat, 
+      all_trees[[i]] = .random_tree(target.mat, feature.mat, 
                                    max_depth = max_depth, margin = margin, loss = loss,
                                    min_sample = min_sample, n_trees = n_trees,
                                    n_features = n_features)
