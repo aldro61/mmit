@@ -7,7 +7,6 @@
 #' @param param_grid the list of paramaters
 #' @param n_folds The number of folds
 #' @param scorer The Loss calculation function 
-#' @param n_cpu The number of cores to register for parallel programing of the code, default value is 1 and n_cpu = -1 to select all cores.
 #' @param pruning Boolean whether pruning is to be done or not.
 #' 
 #' @return The list consist of best score, best tree, best parameters and list of all parameter values with cross validation score . 
@@ -58,20 +57,11 @@ mmit.cv <- structure(function(target.mat, feature.mat,
   best_result <- NULL
   best_result$best_score <- attr(scorer, "worst")
   
-  ### parallelize using future.apply, see all permutation combination of param grid values
-  ### register parallel backend
-  if(n_cpu == -1) n_cpu <- availableCores()
-  assert_that(availableCores() >= n_cpu)
-  
-  cl <- makeCluster(n_cpu)
-  plan(multiprocess, workers = n_cpu)
-  
   fitscore_result <- list()
   fitscore_result <- future_lapply(1:nrow(parameters), 
                     function(x) .fit_and_score(target.mat = target.mat, 
                     feature.mat = feature.mat, parameters = parameters[x,], 
                     n_folds = n_folds, scorer = scorer, pruning = pruning, learner = "mmit"))
-  stopCluster(cl)  
   
   for(i in 1:nrow(parameters)){
     cv_results <- rbind(cv_results, fitscore_result[[i]]$cv_results)
@@ -96,6 +86,6 @@ mmit.cv <- structure(function(target.mat, feature.mat,
   param_grid$min_sample <- c(2, 5, 10, 20)
   param_grid$loss <- c("hinge", "square")
   
-  result <- mmit.cv(target.mat, feature.mat, param_grid, scorer = mse, n_cpu = 4)
+  result <- mmit.cv(target.mat, feature.mat, param_grid, scorer = mse)
   
 })
