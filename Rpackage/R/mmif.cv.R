@@ -98,6 +98,13 @@ mmif.cv <- structure(function(target.mat, feature.mat,
   param_grid$n_trees <- c(10)
   param_grid$n_features <- c(as.integer(ncol(feature.mat)**0.5))
   
+  if(require(parallel)){
+    cl <- makeCluster(detectCores())
+    registerDoParallel(cl)
+  }
+  if(require(future)){ plan(multiprocess)}
   result <- mmif.cv(target.mat, feature.mat, param_grid, scorer = mse)
+  if(require(parallel)){ stopCluster(cl)}
+  
 })
 

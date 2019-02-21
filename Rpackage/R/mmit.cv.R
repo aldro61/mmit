@@ -91,6 +91,11 @@ mmit.cv <- structure(function(target.mat, feature.mat,
   param_grid$min_sample <- c(2, 5, 10, 20)
   param_grid$loss <- c("hinge", "square")
   
+  if(require(parallel)){
+    cl <- makeCluster(detectCores())
+    registerDoParallel(cl)
+  }
+  if(require(future)){ plan(multiprocess)}
   result <- mmit.cv(target.mat, feature.mat, param_grid, scorer = mse)
-  
+  if(require(parallel)){ stopCluster(cl)}
 })
