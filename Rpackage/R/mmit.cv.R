@@ -36,8 +36,7 @@
 #' 
 mmit.cv <- structure(function(target.mat, feature.mat, 
                               param_grid, n_folds = 3,
-                              scorer = NULL, n_cpu = 1, 
-                              pruning = TRUE){
+                              scorer = NULL, pruning = TRUE){
   
   ### add default value to parameters
   if(is.null(param_grid[["max_depth"]])) param_grid$max_depth <- Inf
@@ -57,8 +56,14 @@ mmit.cv <- structure(function(target.mat, feature.mat,
   best_result <- NULL
   best_result$best_score <- attr(scorer, "worst")
   
+  #lapply parallel or sequencial
+  Lapply <- if(requireNamespace("future.apply")){ 
+    future.apply::future_lapply 
+  }
+  else{ lapply }
+  
   fitscore_result <- list()
-  fitscore_result <- future_lapply(1:nrow(parameters), 
+  fitscore_result <- Lapply(1:nrow(parameters), 
                     function(x) .fit_and_score(target.mat = target.mat, 
                     feature.mat = feature.mat, parameters = parameters[x,], 
                     n_folds = n_folds, scorer = scorer, pruning = pruning, learner = "mmit"))
@@ -76,7 +81,7 @@ mmit.cv <- structure(function(target.mat, feature.mat,
   
 }, ex=function(){
   
-  data(neuroblastomaProcessed, package="penaltyLearning")
+  data("neuroblastomaProcessed", package="penaltyLearning", envir=environment())
   feature.mat <- data.frame(neuroblastomaProcessed$feature.mat)[1:45,]
   target.mat <- neuroblastomaProcessed$target.mat[1:45,]
   

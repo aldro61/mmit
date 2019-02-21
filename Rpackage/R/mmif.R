@@ -36,11 +36,16 @@ mmif <- structure(function(target.mat, feature.mat,
                            min_sample = 1, n_trees = 10,
                            n_features =  ceiling(ncol(feature.mat)**0.5)){
   
-
+  #lapply parallel or sequencial
+  Lapply <- if(requireNamespace("future.apply")){ 
+    future.apply::future_lapply 
+  }
+  else{ lapply }
+  
   all_trees <- list()
     
   ### create n_trees
-  all_trees <- future_lapply(1 : n_trees, function(x) .random_tree(target.mat, feature.mat, 
+  all_trees <- Lapply(1 : n_trees, function(x) .random_tree(target.mat, feature.mat, 
                   max_depth = max_depth, margin = margin, loss = loss,
                   min_sample = min_sample, n_trees = n_trees,
                   n_features = n_features))
@@ -50,7 +55,7 @@ mmif <- structure(function(target.mat, feature.mat,
   
 }, ex=function(){
   
-  data(neuroblastomaProcessed, package="penaltyLearning")
+  data("neuroblastomaProcessed", package="penaltyLearning", envir=environment())
   feature.mat <- data.frame(neuroblastomaProcessed$feature.mat)[1:45,]
   target.mat <- neuroblastomaProcessed$target.mat[1:45,]
   trees <- mmif(target.mat, feature.mat, max_depth = Inf, margin = 2.0, loss = "hinge", min_sample = 1)
