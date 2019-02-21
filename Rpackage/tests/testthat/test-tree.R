@@ -1,4 +1,5 @@
 library(testthat)
+library(grid)
 context("trivial")
 library(mmit)
 

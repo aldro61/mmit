@@ -1,7 +1,6 @@
 library(testthat)
 context("pruning")
 library(mmit)
-library(grid)
 
 kids <- NULL
 kidskids <- NULL
