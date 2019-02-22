@@ -19,6 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "double_utils.h"
 #include "piecewise_function.h"
+//#include <Rcpp.h>
 
 
 /*
@@ -216,21 +217,21 @@ int PiecewiseFunction::insert_point(double b, Coefficients F, bool is_upper_boun
 
     // Log progress
     if(this->verbose){
-        std::cout << "\n\nINSERTION COMPLETED\n----------------------------" << std::endl;
-        std::cout << "Breakpoint position: " << b << std::endl;
-        std::cout << "Bound type: " << (is_upper_bound ? "upper" : "lower") << std::endl;
-        std::cout << "N pointer moves: " << n_pointer_moves << std::endl;
-        std::cout << "Minimum value: " << this->get_minimum_value() << std::endl;
-        std::cout << "Minimum position: " << this->get_minimum_position() << std::endl;
-        std::cout << "Minimum coefficients: " << this->min_coefficients << std::endl;
-        std::cout << "The minimum pointer points to the breakpoint at " << get_breakpoint_position(this->min_ptr) << std::endl;
-        std::cout << "Current breakpoints: {";
+        /*std::cout << "\n\nINSERTION COMPLETED\n----------------------------" << std::endl;
+      std::cout << "Breakpoint position: " << b << std::endl;
+      std::cout << "Bound type: " << (is_upper_bound ? "upper" : "lower") << std::endl;
+      std::cout << "N pointer moves: " << n_pointer_moves << std::endl;
+      std::cout << "Minimum value: " << this->get_minimum_value() << std::endl;
+      std::cout << "Minimum position: " << this->get_minimum_position() << std::endl;
+      std::cout << "Minimum coefficients: " << this->min_coefficients << std::endl;
+      std::cout << "The minimum pointer points to the breakpoint at " << get_breakpoint_position(this->min_ptr) << std::endl;
+      std::cout << "Current breakpoints: {";
         for(auto bkpt : this->breakpoint_coefficients){
-            std::cout << "(" << bkpt.first << ", " << bkpt.second << "), ";
+          std::cout << "(" << bkpt.first << ", " << bkpt.second << "), ";
         }
         std::cout << "}" << std::endl;
         std::cout << "\n\n" << std::endl;
-        std::cout << "\n\n" << std::endl;
+        std::cout << "\n\n" << std::endl;*/
     }
 
     return n_pointer_moves;
