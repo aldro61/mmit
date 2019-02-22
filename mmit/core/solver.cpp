@@ -20,79 +20,87 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "solver.h"
 #include "piecewise_function.h"
 
-
 inline Coefficients get_coefficients(const double y, const double margin, const bool is_upper_limit,
-                                     const FunctionType loss_type){
+                                     const FunctionType loss_type)
+{
     double s = (is_upper_limit ? 1. : -1.);
 
     Coefficients F, Fs;
-    if(loss_type == linear_hinge){
+    if (loss_type == linear_hinge)
+    {
         F = Coefficients(0, s, margin - s * y);
     }
-    else if(loss_type == squared_hinge){
+    else if (loss_type == squared_hinge)
+    {
         F = Coefficients(1, 2 * margin * s - 2 * y, -2 * margin * s * y + y * y + margin * margin);
     }
 
     return F;
 }
 
-inline double get_breakpoint(const double y, const double margin, const bool is_upper_limit){
+inline double get_breakpoint(const double y, const double margin, const bool is_upper_limit)
+{
     return y - (is_upper_limit ? 1. : -1.) * margin;
 }
 
-
 // return int is an error status code
 int compute_optimal_costs(
-//inputs
-        int n_data,
-        double *lower_vec, // array[n_data] of output lower limits (can be -INFINITY)
-        double *upper_vec, // array[n_data] of output upper limits (can be INFINITY)
-        double margin,
-        int loss, //0=linear_hinge, 1=squared_hinge
-// outputs
-        int *moves_vec, //array[n_data] of number of pointer moves
-        double *pred_vec, //array[n_data] of optimal predicted values
-        double *cost_vec // array[n_data] of optimal cost
-){
+    //inputs
+    int n_data,
+    double *lower_vec, // array[n_data] of output lower limits (can be -INFINITY)
+    double *upper_vec, // array[n_data] of output upper limits (can be INFINITY)
+    double margin,
+    int loss,         //0=linear_hinge, 1=squared_hinge
+                      // outputs
+    int *moves_vec,   //array[n_data] of number of pointer moves
+    double *pred_vec, //array[n_data] of optimal predicted values
+    double *cost_vec  // array[n_data] of optimal cost
+)
+{
     double weights[n_data];
     for (int i = 0; i < n_data; ++i)
     {
         weights[i] = 1;
     }
 
-    compute_optimal_cost(n_data, lower_vec, upper_vec, weights, margin, loss, moves_vec, pred_vec, cost_vec);
+    return compute_optimal_cost(n_data, lower_vec, upper_vec, weights, margin, loss, moves_vec, pred_vec, cost_vec);
 }
 
 // return int is an error status code
 int compute_optimal_cost(
-//inputs
-        int n_data,
-        double *lower_vec, // array[n_data] of output lower limits (can be -INFINITY)
-        double *upper_vec, // array[n_data] of output upper limits (can be INFINITY)
-        double *weights, // array[n_data] of weights assigned to each interval
-        double margin,
-        int loss, //0=linear_hinge, 1=squared_hinge
-// outputs
-        int *moves_vec, //array[n_data] of number of pointer moves
-        double *pred_vec, //array[n_data] of optimal predicted values
-        double *cost_vec // array[n_data] of optimal cost
-) {
+    //inputs
+    int n_data,
+    double *lower_vec, // array[n_data] of output lower limits (can be -INFINITY)
+    double *upper_vec, // array[n_data] of output upper limits (can be INFINITY)
+    double *weights,   // array[n_data] of weights assigned to each interval
+    double margin,
+    int loss,         //0=linear_hinge, 1=squared_hinge
+                      // outputs
+    int *moves_vec,   //array[n_data] of number of pointer moves
+    double *pred_vec, //array[n_data] of optimal predicted values
+    double *cost_vec  // array[n_data] of optimal cost
+)
+{
     PiecewiseFunction function;
     FunctionType loss_type = (loss == 0 ? linear_hinge : squared_hinge);
 
     // Compute the optimal solution for each interval
-    for(int i = 0; i < n_data; i++){
+    for (int i = 0; i < n_data; i++)
+    {
 
         moves_vec[i] = 0;
 
-        if (less(weights[i], 0)){
+        if (less(weights[i], 0))
+        {
             std::cerr << "Solver error: Interval weights must be positive, but received " << weights[i] << std::endl;
             return 1;
         }
 
         // Uncensored output
-        if(equal(lower_vec[i], upper_vec[i])) {
-            if (!isinf(lower_vec[i])){
+        if (equal(lower_vec[i], upper_vec[i]))
+        {
+            if (!isinf(lower_vec[i]))
+            {
                 Coefficients F1 = get_coefficients(lower_vec[i], 0., false, loss_type) * weights[i];
                 Coefficients F2 = get_coefficients(upper_vec[i], 0., true, loss_type) * weights[i];
                 moves_vec[i] += function.insert_point(lower_vec[i], F1, false);
@@ -101,16 +109,19 @@ int compute_optimal_cost(
         }
 
         // Censored output
-        else {
+        else
+        {
             // Add the lower bound
-            if (!isinf(lower_vec[i])){
+            if (!isinf(lower_vec[i]))
+            {
                 Coefficients F = get_coefficients(lower_vec[i], margin, false, loss_type) * weights[i];
                 double b = get_breakpoint(lower_vec[i], margin, false);
                 moves_vec[i] += function.insert_point(b, F, false);
             }
 
             // Add the upper bound
-            if (!isinf(upper_vec[i])){
+            if (!isinf(upper_vec[i]))
+            {
                 Coefficients F = get_coefficients(upper_vec[i], margin, true, loss_type) * weights[i];
                 double b = get_breakpoint(upper_vec[i], margin, true);
                 moves_vec[i] += function.insert_point(b, F, true);
@@ -122,6 +133,3 @@ int compute_optimal_cost(
     }
     return 0;
 }
-
-
-
