@@ -70,8 +70,6 @@ mmitboost <- structure(function(target.mat, feature.mat,
     weights <- weights*exp(alpha*scores)
     final_scores <- final_scores + alpha*prediction
   }
-  #plot(tree)
-  #View(cbind(prediction, scores))
   return(trees)
 }, ex=function(){
   
