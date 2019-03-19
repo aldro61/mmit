@@ -20,7 +20,8 @@
   ### if node is root.
   if(is.null(side)){
     ### calculate root node cost (as no split thus leftcost + rightcost = 0 + cost )
-    node_info_print <- compute_optimal_costs(target.mat, margin, loss)
+    node_info_print <- compute_optimal_costs(target.mat, margin, loss, weights)
+    
     node_info_print <- cbind(node_info_print[[2]], node_info_print[[3]])
     node_info_print <- node_info_print[nrow(node_info_print),]
     node_info_print <- data.frame(node_info_print[1], node_info_print[2], row.names = "")

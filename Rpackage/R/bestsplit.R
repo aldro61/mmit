@@ -15,13 +15,15 @@
   
   ### initialise pred$cost with root node's cost.
   if(is.null(pred)){
-    pred$cost <- as.numeric(tail(compute_optimal_costs(target.mat, margin, loss),1)[3])
+    pred$cost <- as.numeric(tail(compute_optimal_costs(target.mat, margin, loss, weights),1)[3])
     ### as root cost = left + right = left + 0
   }
 
   ### extract response values from data
-  dummy_tar_1 <- rep(target.mat[,1], times = weights)
-  dummy_tar_2 <- rep(target.mat[,2], times = weights)
+  times = as.numeric(weights>0.)
+  weights = weights[weights>0.]
+  dummy_tar_1 <- rep(target.mat[,1], times = times)
+  dummy_tar_2 <- rep(target.mat[,2], times = times)
   target.mat <- cbind(dummy_tar_1,dummy_tar_2)
   
   ### loop for every feature
@@ -29,7 +31,7 @@
     feat <- feature.mat[, index]
     
     ### extract data value as per weight
-    feat <- rep(feat, times = weights)
+    feat <- rep(feat, times = times)
     
     ### sorted
     sorted <- order(feat)
@@ -46,10 +48,10 @@
     if(length(last_idx) == 1){
       next
     }
-
+    
     ### compute cost, prediction
-    leftleaf <- compute_optimal_costs(tar, margin, loss)
-    rightleaf <- compute_optimal_costs(rev_tar, margin, loss)
+    leftleaf <- compute_optimal_costs(tar, margin, loss, weights)
+    rightleaf <- compute_optimal_costs(rev_tar, margin, loss, weights)
 
     ### unique and removing cases where all examples are in one leaf
     leftleaf <- leftleaf[last_idx,]

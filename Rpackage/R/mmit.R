@@ -8,6 +8,7 @@
 #' @param loss The type of loss; (\code{"hinge"}, \code{"square"})
 #' @param max_depth The maximum depth criteia
 #' @param min_sample The minimum number of sample required 
+#' @param weights An importance weight for each learning example, (default = 1)
 #' 
 #' @return The learned regression tree as an object of class party.
 #' 
@@ -32,7 +33,7 @@
 
 mmit <- structure(function(target.mat, feature.mat,  
                            max_depth = Inf, margin=0.0, loss="hinge",
-                           min_sample = 1) {
+                           min_sample = 1, weights = rep(1L, nrow(feature.mat))) {
   ### partynode id and initial depth
   id = 1L
   
@@ -40,15 +41,14 @@ mmit <- structure(function(target.mat, feature.mat,
   feature.mat <- model.frame(data = feature.mat)
   
   ### assigning all weights as 1 in the beginning. weights determine which data is to be considered in which node.
-  weights <- rep(1L, nrow(feature.mat))
-  stopifnot(length(weights) == nrow(feature.mat) & max(abs(weights - floor(weights))) < .Machine$double.eps)
+  stopifnot(length(weights) == nrow(feature.mat))
   
   ### tree
   node<- .growtree(target.mat, feature.mat, max_depth = max_depth, margin = margin, weights = weights)
   
   ### for node == root
   if(is.null(model.response(feature.mat))){
-    response <- tail(compute_optimal_costs(target.mat, margin, loss)$pred, 1)
+    response <- tail(compute_optimal_costs(target.mat, margin, loss, weights)$pred, 1)
     response <- rep(response, nrow(feature.mat))
   }
   else{
