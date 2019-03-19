@@ -7,6 +7,7 @@
 #' @param param_grid the list of paramaters
 #' @param n_folds The number of folds
 #' @param scorer The Loss calculation function 
+#' @param n_cpu The number of cores to register for parallel programing of the code, default value is 1 and n_cpu = -1 to select all cores.
 #' @param pruning Boolean whether pruning is to be done or not.
 #' 
 #' @return The list consist of best score, best tree, best parameters and list of all parameter values with cross validation score . 
@@ -34,9 +35,11 @@
 #' 
 #' result <- mmit.cv(target.mat, feature.mat, param_grid, scorer = mse)
 #' 
+#' @export
 mmit.cv <- structure(function(target.mat, feature.mat, 
                               param_grid, n_folds = 3,
-                              scorer = NULL, pruning = TRUE){
+                              scorer = NULL, n_cpu = 1, 
+                              pruning = TRUE){
   
   ### add default value to parameters
   if(is.null(param_grid[["max_depth"]])) param_grid$max_depth <- Inf
@@ -56,17 +59,22 @@ mmit.cv <- structure(function(target.mat, feature.mat,
   best_result <- NULL
   best_result$best_score <- attr(scorer, "worst")
   
-  #lapply parallel or sequencial
-  Lapply <- if(requireNamespace("future.apply")){ 
-    future.apply::future_lapply 
-  }
-  else{ lapply }
+  ### parallelize using foreach, see all permutation combination of param grid values
+  ### register parallel backend
+  if(n_cpu == -1) n_cpu <- detectCores() 
+  assert_that(detectCores() >= n_cpu)
+  
+  cl <- makeCluster(n_cpu)
+  registerDoParallel(cl)
   
   fitscore_result <- list()
-  fitscore_result <- Lapply(1:nrow(parameters), 
-                    function(x) .fit_and_score(target.mat = target.mat, 
-                    feature.mat = feature.mat, parameters = parameters[x,], 
-                    n_folds = n_folds, scorer = scorer, pruning = pruning, learner = "mmit"))
+  fitscore_result <- foreach(i = 1:nrow(parameters), 
+              .packages = "mmit") %dopar% 
+              fit_and_score(target.mat = target.mat, feature.mat = feature.mat, 
+                                           parameters = parameters[i,], 
+                                           n_folds = n_folds, scorer = scorer,
+                                           pruning = pruning, learner = "mmit")
+  stopCluster(cl)  
   
   for(i in 1:nrow(parameters)){
     cv_results <- rbind(cv_results, fitscore_result[[i]]$cv_results)
@@ -81,7 +89,7 @@ mmit.cv <- structure(function(target.mat, feature.mat,
   
 }, ex=function(){
   
-  data("neuroblastomaProcessed", package="penaltyLearning", envir=environment())
+  data(neuroblastomaProcessed, package="penaltyLearning")
   feature.mat <- data.frame(neuroblastomaProcessed$feature.mat)[1:45,]
   target.mat <- neuroblastomaProcessed$target.mat[1:45,]
   
@@ -91,11 +99,6 @@ mmit.cv <- structure(function(target.mat, feature.mat,
   param_grid$min_sample <- c(2, 5, 10, 20)
   param_grid$loss <- c("hinge", "square")
   
-  if(require(parallel)){
-    cl <- makeCluster(detectCores())
-    registerDoParallel(cl)
-  }
-  if(require(future)){ plan(multiprocess)}
-  result <- mmit.cv(target.mat, feature.mat, param_grid, scorer = mse)
-  if(require(parallel)){ stopCluster(cl)}
+  result <- mmit.cv(target.mat, feature.mat, param_grid, scorer = mse, n_cpu = 4)
+  
 })

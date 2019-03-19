@@ -1,5 +1,4 @@
 library(testthat)
-library(grid)
 context("trivial")
 library(mmit)
 
@@ -17,7 +16,7 @@ colnames(feature.mat) <- c("a", "b", "c")
 feature.mat <- data.frame(feature.mat)
 
 #linear hinge, margin = 0, test best split
-out <- .bestsplit(target.mat, feature.mat, margin=0.0, loss="hinge", weights = weights)
+out <- bestsplit(target.mat, feature.mat, margin=0.0, loss="hinge", weights = weights)
 test_that("finding best split for hinge loss, margin as 0", {
   expect_equal(out$leftpred, 0.5)
   expect_equal(out$rightpred, 2.5)
@@ -28,7 +27,7 @@ test_that("finding best split for hinge loss, margin as 0", {
 })
 
 #square hinge, margin = 0, test best split
-out<-.bestsplit(target.mat, feature.mat, margin=0.0, loss="square", weights = weights)
+out<-bestsplit(target.mat, feature.mat, margin=0.0, loss="square", weights = weights)
 test_that("finding best split for squared loss, margin as 0", {
   expect_equal(out$leftpred, 0.5)
   expect_equal(out$rightpred, 2.5)
@@ -70,19 +69,19 @@ target.mat <- neuroblastomaProcessed$target.mat[1:45,]
 weights <- rep(1L, nrow(feature.mat))
 
 #max_depth = 2 , depth = 0
-tree <- .growtree(target.mat, feature.mat, depth = 0, max_depth = 2, margin = 2.0, weights = weights)
+tree <- growtree(target.mat, feature.mat, depth = 0, max_depth = 2, margin = 2.0, weights = weights)
 test_that("depth check max_depth = 2, depth = 0", {
   expect_equal(depth(tree), 2)
 })
 
 #max_depth = 3 , depth = 1
-tree <- .growtree(target.mat, feature.mat, depth = 1, max_depth = 3, margin = 2.0, weights = weights)
+tree <- growtree(target.mat, feature.mat, depth = 1, max_depth = 3, margin = 2.0, weights = weights)
 test_that("depth check max_depth = 3, depth = 1", {
   expect_equal(depth(tree), 2)
 })
 
 #max_depth = 3 , depth = 0
-tree <- .growtree(target.mat, feature.mat, depth = 0, max_depth = 3, margin = 2.0, weights = weights)
+tree <- growtree(target.mat, feature.mat, depth = 0, max_depth = 3, margin = 2.0, weights = weights)
 test_that("max_depth = 3, depth = 0", {
   expect_equal(depth(tree), 3)
 })

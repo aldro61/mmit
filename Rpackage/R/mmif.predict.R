@@ -24,6 +24,7 @@
 #' forest <- mmif(target.mat, feature.mat)
 #' pred <- mmif.predict(forest, feature.mat)
 #' 
+#' @export
 mmif.predict <- structure(function(forest, test_feature.mat = NULL){
   
   all_pred <- NULL

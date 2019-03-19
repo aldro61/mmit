@@ -10,6 +10,7 @@
 #' @param min_sample The minimum number of samples required to partition a leaf in a tree
 #' @param n_trees The number of trees in the ensemble (forest)
 #' @param n_features The number of features to be used to train each tree
+#' @param n_cpu The number of cores to distribute the training of the trees, default value is 1 and n_cpu = -1 to select all cores.
 #' 
 #' @return List of trees containing each tree in the random forest.
 #' 
@@ -29,46 +30,58 @@
 #' colnames(feature.mat) <- c("a", "b", "c")
 #' feature.mat <- data.frame(feature.mat)
 #' 
-#' trees <- mmif(target.mat, feature.mat, margin = 2.0)
+#' trees <- mmif(target.mat, feature.mat, margin = 2.0, n_cpu = -1)
 #' 
+#' @export
 mmif <- structure(function(target.mat, feature.mat, 
                            max_depth = Inf, margin=0.0, loss="hinge",
                            min_sample = 1, n_trees = 10,
-                           n_features =  ceiling(ncol(feature.mat)**0.5)){
+                           n_features =  ceiling(ncol(feature.mat)**0.5), n_cpu = 1){
   
-  #lapply parallel or sequencial
-  Lapply <- if(requireNamespace("future.apply")){ 
-    future.apply::future_lapply 
-  }
-  else{ lapply }
+  
+  ### parallelize using foreach, see all permutation combination of param grid values
+  ### register parallel backend
+  if(n_cpu == -1) n_cpu <- detectCores() 
+  assert_that(detectCores() >= n_cpu)
   
   all_trees <- list()
+  if(n_cpu > 1){
+    cl <- makeCluster(n_cpu)
+    registerDoParallel(cl)
     
-  ### create n_trees
-  all_trees <- Lapply(1 : n_trees, function(x) .random_tree(target.mat, feature.mat, 
+    ### create n_trees
+    all_trees <- foreach(i = 1 : n_trees, .packages = "mmit") %dopar% 
+      random_tree(target.mat, feature.mat, 
                   max_depth = max_depth, margin = margin, loss = loss,
                   min_sample = min_sample, n_trees = n_trees,
-                  n_features = n_features))
+                  n_features = n_features)
     
+    
+    stopCluster(cl)
+  }
+  else{
+    for(i in 1 : n_trees) {
+      all_trees[[i]] = random_tree(target.mat, feature.mat, 
+                                   max_depth = max_depth, margin = margin, loss = loss,
+                                   min_sample = min_sample, n_trees = n_trees,
+                                   n_features = n_features)
+    }
+    
+  }
   
   return(all_trees)
   
 }, ex=function(){
   
-  data("neuroblastomaProcessed", package="penaltyLearning", envir=environment())
+  data(neuroblastomaProcessed, package="penaltyLearning")
   feature.mat <- data.frame(neuroblastomaProcessed$feature.mat)[1:45,]
   target.mat <- neuroblastomaProcessed$target.mat[1:45,]
-  if(require(parallel)){
-    cl <- makeCluster(detectCores())
-    registerDoParallel(cl)
-  }
-  if(require(future)){ plan(multiprocess)}
   trees <- mmif(target.mat, feature.mat, max_depth = Inf, margin = 2.0, loss = "hinge", min_sample = 1)
-  if(require(parallel)){ stopCluster(cl)}
+  
 })
 
 
-.random_tree <- function(target.mat, feature.mat, 
+random_tree <- function(target.mat, feature.mat, 
                         max_depth, margin, loss,
                         min_sample, n_trees ,
                         n_features){
