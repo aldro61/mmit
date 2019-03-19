@@ -8,4 +8,4 @@ Description: Fast O(P N log N) algorithm for learning a regression tree
  with interval censored output data.
 Suggests: future.apply, testthat, penaltyLearning
 Imports: partykit, assertthat
-RoxygenNote: 6.0.1
+RoxygenNote: 6.1.1

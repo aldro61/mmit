@@ -4,8 +4,8 @@
 \alias{mmif}
 \title{Random Forest of Max Margin Interval Tree}
 \usage{
-mmif(target.mat, feature.mat, max_depth = Inf, margin = 0, loss = "hinge",
-  min_sample = 1, n_trees = 10,
+mmif(target.mat, feature.mat, max_depth = Inf, margin = 0,
+  loss = "hinge", min_sample = 1, n_trees = 10,
   n_features = ceiling(ncol(feature.mat)^0.5))
 }
 \arguments{

@@ -4,7 +4,8 @@
 \alias{mmif.cv}
 \title{Cross-validation for model selection with Random Forests of Max Margin Interval Trees}
 \usage{
-mmif.cv(target.mat, feature.mat, param_grid, n_folds = 3, scorer = NULL)
+mmif.cv(target.mat, feature.mat, param_grid, n_folds = 3,
+  scorer = NULL)
 }
 \arguments{
 \item{target.mat}{The response variable of the model}

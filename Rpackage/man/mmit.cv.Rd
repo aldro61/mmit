@@ -4,8 +4,8 @@
 \alias{mmit.cv}
 \title{The Cross Validation of Max Margin Interval Tree}
 \usage{
-mmit.cv(target.mat, feature.mat, param_grid, n_folds = 3, scorer = NULL,
-  pruning = TRUE)
+mmit.cv(target.mat, feature.mat, param_grid, n_folds = 3,
+  scorer = NULL, pruning = TRUE)
 }
 \arguments{
 \item{target.mat}{The response variable of the model}
