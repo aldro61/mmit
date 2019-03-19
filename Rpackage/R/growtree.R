@@ -1,4 +1,4 @@
-growtree <- structure(function(target.mat, feature.mat, depth = 0, max_depth = Inf,
+.growtree <- structure(function(target.mat, feature.mat, depth = 0, max_depth = Inf,
                                margin = 0.0, loss="hinge", id = 1L, min_sample = 1,
                                pred=NULL, side = NULL, weights = NULL) {
   
@@ -36,7 +36,7 @@ growtree <- structure(function(target.mat, feature.mat, depth = 0, max_depth = I
   if(sum(weights) <= min_sample) return(partynode(id = id, info = node_info_print))
 
   ### split the tree at the node.
-  sp <- bestsplit(target.mat, feature.mat, weights, margin, loss, node_info_print)
+  sp <- .bestsplit(target.mat, feature.mat, weights, margin, loss, node_info_print)
   splt <- sp
   
   ### if no split, we stop
@@ -67,7 +67,7 @@ growtree <- structure(function(target.mat, feature.mat, depth = 0, max_depth = I
     }
     
     # 1 is left side, 2 is right side 
-    kids[[kidid]] <- growtree(target.mat, feature.mat, pred = splt, side = kidid, depth = depth + 1,
+    kids[[kidid]] <- .growtree(target.mat, feature.mat, pred = splt, side = kidid, depth = depth + 1,
                               max_depth = max_depth, margin = margin, loss = loss, 
                               id = as.integer(myid + 1), min_sample = min_sample, weights = w)
   }

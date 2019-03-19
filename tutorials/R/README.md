@@ -17,11 +17,22 @@
   * [Final Evaluation](#final-evaluation)
 * [Contributions](#contributions)
 * [Future Work](#future-work)
+* [Installation](#installation)
 * [Tutorials](#tutorials)
+  * [mmit](#mmit)
+  * [mmit.predict](#mmitpredict)
+  * [mmit.pruning](#mmitpruning)
+  * [mmit.cv](#mmitcv)
+  * [mmif](#mmif)
+  * [mmif.predict](#mmifpredict)
+  * [mmif.cv](#mmifcv)
+  * [mse](#mse)
+  * [zero_one_loss](#zero_one_loss)
+  
+ -----------------------------------------------------------------------------------------------------
 
- 
- 
 ## Introduction
+
 
 There are few R packages available for interval regression, a machine learning problem 
 which is important in genomics and medicine. Like usual regression, the goal is to learn 
@@ -34,8 +45,8 @@ Max margin interval trees are a new type of nonlinear model for this problem ([D
 This algorithm has previously been implemented in Python and the objective of this Google Summer of Code project was to implement it in R using the *partykit* library.
  
 Specifically, we implemented the following learning algorithms:
-  * Max margin interval trees
-  * Max margin interval random forests
+  * Max margin interval trees (mmit, mmit.predict, mmit.pruning, mmit.cv)
+  * Max margin interval random forests (mmif, mmif.predict, mmif.cv)
   * Max margin interval Adaboost (in progress) 
   
 
@@ -51,8 +62,7 @@ We also created documentation for each of these functions.
  -------------------------------------------------------------------------------------------------
  
 ## Evaluations 
- 
- 
+  
 ### First Evaluation
  
  For the major part of the first coding period, the main aim was to build the maximum margin interval tree (mmit) 
@@ -85,7 +95,7 @@ The links to all the commits are given below:
  
  * Random Forest: [Link](https://github.com/aldro61/mmit/pull/26/commits)
  
- * Adaboost: [Link](https://github.com/aldro61/mmit/pull/28)
+ * Adaboost: [Link](https://github.com/aldro61/mmit/pull/30/)
  
  The links for documentation and benchmark
  
@@ -98,10 +108,22 @@ The links to all the commits are given below:
 
 ## Future Work
 
-The implementation of Adaboost is currently in progress ([link](https://github.com/aldro61/mmit/pull/28)). As future work, we would like to improve the running time of each function and write the vignettes with the objective of submitting to CRAN.
+The implementation of Adaboost is currently in progress ([link](https://github.com/aldro61/mmit/pull/30)). As future work, we would like to improve the running time of each function and write the vignettes with the objective of submitting to CRAN.
 
 -----------------------------------------------------------------------------------------------------------
-  
+
+## Installation
+
+The `mmit` R package can be installed via the following R
+commands.
+
+```
+if(!require(devtools))install.package("devtools")
+devtools::install_github("aldro61/mmit/Rpackage")
+```
+
+----------------------------------------------------------------------------------------------------------
+
 ## Tutorials
   
 Here is a tutorial on how to use the package.
