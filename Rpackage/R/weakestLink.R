@@ -1,4 +1,4 @@
-.weakest_link <- structure(function(tree){
+weakest_link <- structure(function(tree){
   tree <- nodeapply(tree, ids = 1)[[1]]
   
   find_weakest_link <- function(tree){

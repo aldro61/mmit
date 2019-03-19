@@ -4,8 +4,8 @@
 \alias{mmit}
 \title{The Max Margin Interval Tree}
 \usage{
-mmit(target.mat, feature.mat, max_depth = Inf, margin = 0,
-  loss = "hinge", min_sample = 1)
+mmit(target.mat, feature.mat, max_depth = Inf, margin = 0, loss = "hinge",
+  min_sample = 1, weights = rep(1L, nrow(feature.mat)))
 }
 \arguments{
 \item{target.mat}{The response variable of the model}
