@@ -1,4 +1,4 @@
-useDynLib(mmit, .registration = TRUE)
+useDynLib(mmit)
 exportPattern("^[[:alpha:]]")
 import(partykit)
 import(assertthat)
