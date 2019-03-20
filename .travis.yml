@@ -1,8 +1,16 @@
-language: python
+language:
+  matrix:
+    - python
+    - r
 
 python:
   - 2.7
   - 3.6
+  
+r:
+  - oldrel
+  - release
+  - devel
 
 sudo: required
 
