@@ -24,18 +24,12 @@ matrix:
 
 
     - language: r
-      r:
-        - oldrel
-        - release
-        - devel
-      sudo: required
+      sudo: false
+      cache: packages
       before_install:
         - sudo apt-get install -y --no-install-recommends texlive texlive-fonts-extra # fonts-extra needed for compiling R package documentation (inconsolata font)
         - sudo apt-get install texlive-latex-base
-        - curl -OL http://raw.github.com/craigcitro/r-travis/master/scripts/travis-tool.sh
-        - chmod 755 ./travis-tool.sh
-        - ./travis-tool.sh bootstrap
-        - ./travis-tool.sh install_r devtools testthat
+        
       addons:
         apt:
           packages:
@@ -43,7 +37,10 @@ matrix:
             - liblapack-dev
             - gfortran
       install:
+        - ./travis-tool.sh bootstrap
+        - ./travis-tool.sh install_r devtools testthat
         - Rscript -e 'devtools::install_deps("Rpackage", dep=TRUE)' # need dep=TRUE for Suggests
+      cran: http://cran.rstudio.com
       script:
         - make $TEST_SUITE
       env:
