@@ -1,7 +1,8 @@
 language:
   matrix:
-    - python
-    - r
+    include:
+      - python
+      - r
 
 python:
   - 2.7
