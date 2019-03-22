@@ -92,7 +92,7 @@ int compute_optimal_cost(
 
         if (less(weights[i], 0))
         {
-            std::cerr << "Solver error: Interval weights must be positive, but received " << weights[i] << std::endl;
+            //std::cerr << "Solver error: Interval weights must be positive, but received " << weights[i] << std::endl;
             return 1;
         }
 
