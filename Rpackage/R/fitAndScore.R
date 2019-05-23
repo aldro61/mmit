@@ -212,19 +212,5 @@ fit_and_score <- structure(function(target.mat, feature.mat,
   
   return(output)
   
-}, ex=function(){
-  
-  data(neuroblastomaProcessed, package="penaltyLearning")
-  feature.mat <- data.frame(neuroblastomaProcessed$feature.mat)[1:45,]
-  target.mat <- neuroblastomaProcessed$target.mat[1:45,]
-
-  parameters <- list()
-  parameters$max_depth <- Inf
-  parameters$margin <- 2
-  parameters$min_sample <- 2
-  parameters$loss <- c("hinge")
-  
-  result <- fit_and_score(target.mat, feature.mat, parameters, learner = "mmit", scorer = mse, pruning = TRUE)
-  
 })
     

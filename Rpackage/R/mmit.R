@@ -62,14 +62,6 @@ mmit <- structure(function(target.mat, feature.mat,
                                                           check.names = FALSE), terms = terms(feature.mat))
 
   return(tree)
-}, ex=function(){
-  
-  data(neuroblastomaProcessed, package="penaltyLearning")
-  feature.mat <- data.frame(neuroblastomaProcessed$feature.mat)[1:45,]
-  target.mat <- neuroblastomaProcessed$target.mat[1:45,]
-  tree <- mmit(target.mat, feature.mat, max_depth = Inf, margin = 2.0)
-  plot(tree)
-  
-})
+} )
 
 

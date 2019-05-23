@@ -90,21 +90,5 @@ mmif.cv <- structure(function(target.mat, feature.mat,
   
   return(best_result)
   
-}, ex=function(){
-  
-  data(neuroblastomaProcessed, package="penaltyLearning")
-  feature.mat <- data.frame(neuroblastomaProcessed$feature.mat)[1:45,]
-  target.mat <- neuroblastomaProcessed$target.mat[1:45,]
-  
-  param_grid <- NULL
-  param_grid$max_depth <- c(4, 3)
-  param_grid$margin <- c(2, 3)
-  param_grid$min_sample <- c(5, 20)
-  param_grid$loss <- c("hinge", "square")
-  param_grid$n_trees <- c(10)
-  param_grid$n_features <- c(as.integer(ncol(feature.mat)**0.5))
-  
-  result <- mmif.cv(target.mat, feature.mat, param_grid, scorer = mse, n_cpu = 4)
-  
 })
 

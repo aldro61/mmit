@@ -46,12 +46,4 @@ compute_optimal_costs <- structure(function
 ### moved for each data point, sum of upper and lower limit moves),
 ### pred (predicted output value that achieves minimum cost), cost
 ### (minimum cost value).
-}, ex=function(){
-  library(mmit)
-  target.mat <- rbind(
-    c(-1, Inf),
-    c(-2, 3),
-    c(-Inf, 1))
-  compute_optimal_costs(target.mat, 0)
-  compute_optimal_costs(target.mat, 2)
 })
