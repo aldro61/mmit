@@ -9,6 +9,7 @@ fit_and_score <- structure(function(target.mat, feature.mat,
   }
   
   ### shuffle the data 
+  set.seed(1)
   rand <- sample(nrow(target.mat))
   target.mat <- target.mat[rand,]
   feature.mat <- feature.mat[rand,]

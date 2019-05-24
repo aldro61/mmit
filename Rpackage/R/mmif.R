@@ -80,6 +80,7 @@ random_tree <- function(target.mat, feature.mat,
                         n_features){
   
   ### sample n_examlple elements of dataset
+  set.seed(1)
   x <- sample(nrow(feature.mat), nrow(feature.mat), replace = TRUE)
   new_feature.mat <- feature.mat[x, ]
   new_target.mat <- target.mat[x,]
