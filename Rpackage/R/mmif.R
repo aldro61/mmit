@@ -91,6 +91,7 @@ random_tree <- function(target.mat, feature.mat,
   assert_that(ncol(feature.mat) >= n_features)
   
   ### sample features
+  set.seed(1)
   y <- sample(ncol(feature.mat), n_features)
   new_feature.mat <- new_feature.mat[, y]
   colnames(new_feature.mat) <- c(names(feature.mat)[y])
