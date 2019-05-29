@@ -1,4 +1,4 @@
-growtree <- structure(function(target.mat, feature.mat, depth = 0, max_depth = Inf,
+.growtree <- structure(function(target.mat, feature.mat, depth = 0, max_depth = Inf,
                                margin = 0.0, loss="hinge", id = 1L, min_sample = 1,
                                pred=NULL, side = NULL, weights = NULL) {
   
@@ -20,7 +20,8 @@ growtree <- structure(function(target.mat, feature.mat, depth = 0, max_depth = I
   ### if node is root.
   if(is.null(side)){
     ### calculate root node cost (as no split thus leftcost + rightcost = 0 + cost )
-    node_info_print <- compute_optimal_costs(target.mat, margin, loss)
+    node_info_print <- compute_optimal_costs(target.mat, margin, loss, weights)
+    
     node_info_print <- cbind(node_info_print[[2]], node_info_print[[3]])
     node_info_print <- node_info_print[nrow(node_info_print),]
     node_info_print <- data.frame(node_info_print[1], node_info_print[2], row.names = "")
@@ -35,7 +36,7 @@ growtree <- structure(function(target.mat, feature.mat, depth = 0, max_depth = I
   if(sum(weights) <= min_sample) return(partynode(id = id, info = node_info_print))
 
   ### split the tree at the node.
-  sp <- bestsplit(target.mat, feature.mat, weights, margin, loss, node_info_print)
+  sp <- .bestsplit(target.mat, feature.mat, weights, margin, loss, node_info_print)
   splt <- sp
   
   ### if no split, we stop
@@ -66,7 +67,7 @@ growtree <- structure(function(target.mat, feature.mat, depth = 0, max_depth = I
     }
     
     # 1 is left side, 2 is right side 
-    kids[[kidid]] <- growtree(target.mat, feature.mat, pred = splt, side = kidid, depth = depth + 1,
+    kids[[kidid]] <- .growtree(target.mat, feature.mat, pred = splt, side = kidid, depth = depth + 1,
                               max_depth = max_depth, margin = margin, loss = loss, 
                               id = as.integer(myid + 1), min_sample = min_sample, weights = w)
   }

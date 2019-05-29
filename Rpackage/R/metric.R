@@ -19,7 +19,6 @@
 #' 
 #'out <- zero_one_loss(y_true, y_pred)
 #'
-#'@export
 ## zero if inside the interval, 1 if outside
 zero_one_loss <- structure(function(y_true, y_pred){
   error <- 0.0
@@ -56,7 +55,6 @@ worst = Inf)
 #' 
 #'out <- mse(y_true, y_pred)
 #' 
-#' @export
 ### mean square error
 mse <- structure(function(y_true, y_pred){
   error <- 0.0

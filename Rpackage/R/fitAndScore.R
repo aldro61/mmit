@@ -1,4 +1,4 @@
-fit_and_score <- structure(function(target.mat, feature.mat, 
+.fit_and_score <- structure(function(target.mat, feature.mat, 
                                     parameters, n_folds = 3, scorer = NULL, 
                                     learner = NULL, pruning = TRUE){
   learner.predict = paste(learner, ".predict", sep = "")
@@ -214,7 +214,8 @@ fit_and_score <- structure(function(target.mat, feature.mat,
   
 }, ex=function(){
   
-  data(neuroblastomaProcessed, package="penaltyLearning")
+  
+  data("neuroblastomaProcessed", package="penaltyLearning", envir=environment())
   feature.mat <- data.frame(neuroblastomaProcessed$feature.mat)[1:45,]
   target.mat <- neuroblastomaProcessed$target.mat[1:45,]
 

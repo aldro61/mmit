@@ -249,26 +249,17 @@ n_cpu = 1, pruning = TRUE)`
   
 ```R
 library(mmit)
-target.mat <- rbind(
-  c(0,1), c(0,1), c(0,1),
-  c(2,3), c(2,3), c(2,3))
-
-feature.mat <- rbind(
-  c(1,0,0), c(1,1,0), c(1,2,0),
-  c(1,3,0), c(1,4,0), c(1,5,0))
-
-colnames(feature.mat) <- c("a", "b", "c")
-feature.mat <- data.frame(feature.mat)
-
+data(neuroblastomaProcessed, package="penaltyLearning")
+feature.mat <- data.frame(neuroblastomaProcessed$feature.mat)[1:45,]
+target.mat <- neuroblastomaProcessed$target.mat[1:45,]
+  
 param_grid <- NULL
-param_grid$max_depth <- c(Inf, 4, 3)
+param_grid$max_depth <- c(Inf, 4, 3, 2, 1, 0)
 param_grid$margin <- c(2, 3, 5)
-param_grid$min_sample <- c(2, 5, 10)
-param_grid$loss <- c("hinge")
-
-result <- mmit.cv(target.mat, feature.mat, param_grid, scorer = mse)
-plot(result$best_estimator)
-print(result$cv_results)
+param_grid$min_sample <- c(2, 5, 10, 20)
+param_grid$loss <- c("hinge", "square")
+ 
+result <- mmit.cv(target.mat, feature.mat, param_grid, scorer = mse, n_cpu = 4)
 ```
 
 #### Output:
@@ -277,7 +268,9 @@ Best parameters :
 
 max_depth | margin |min_sample | loss |alpha |
 | ---- |:------: | ---------:|---: |---: |
-3         |5       |          10|  hinge|      Inf|
+2        |2       |          2|  square|      Inf|
+
+Best Score: 0.02883928
 
 ### mmif()
   
@@ -306,10 +299,12 @@ The collection of trees are :
 ![alt text](./Selection_017.png "Random Forest")
 ![alt text](./Selection_018.png "Random Forest")
 
+*<b> Warning </b> : The model and predictions may vary from the example due to random sampling*
+
 ### mmif.predict()
   
 Predictions with random forests of Max Margin Interval Trees
-  
+
 #### Usage:
 
 `mmif.predict(forest, test_feature.mat = NULL)`
@@ -339,6 +334,8 @@ print(pred)
 
 pred : 0.75 0.95 1.95 2.15 2.15 2.15
 
+*<b> Warning </b> : The model and predictions may vary from the example due to random sampling*
+
 ### mmif.cv()
   
 Performing grid search to select the best hyperparameters of mmif via cross-validation.
@@ -353,26 +350,19 @@ n_cpu = 1)`
 ```R
 library(mmit)
 
-target.mat <- rbind(
-  c(0,1), c(0,1), c(0,1),
-  c(2,3), c(2,3), c(2,3))
-
-feature.mat <- rbind(
-  c(1,0,0), c(1,1,0), c(1,2,0),
-  c(1,3,0), c(1,4,0), c(1,5,0))
-
-colnames(feature.mat) <- c("a", "b", "c")
-feature.mat <- data.frame(feature.mat)
-
+data(neuroblastomaProcessed, package="penaltyLearning")
+feature.mat <- data.frame(neuroblastomaProcessed$feature.mat)[1:45,]
+target.mat <- neuroblastomaProcessed$target.mat[1:45,]
+ 
 param_grid <- NULL
-param_grid$max_depth <- c(Inf, 4, 3)
-param_grid$margin <- c(2, 3, 5)
-param_grid$min_sample <- c(2, 5, 10)
-param_grid$loss <- c("hinge")
-param_grid$n_trees <- c(10, 20, 30)
-param_grid$n_features <- c(ceiling(ncol(feature.mat)**0.5))
-
-result <- mmif.cv(target.mat, feature.mat, param_grid, scorer = mse, n_cpu = -1)
+param_grid$max_depth <- c(4, 3)
+param_grid$margin <- c(2, 3)
+param_grid$min_sample <- c(5, 20)
+param_grid$loss <- c("hinge", "square")
+param_grid$n_trees <- c(10)
+param_grid$n_features <- c(as.integer(ncol(feature.mat)**0.5))
+  
+result <- mmif.cv(target.mat, feature.mat, param_grid, scorer = mse, n_cpu = 4)
 ```
 
 #### Output:
@@ -381,7 +371,9 @@ Best parameters :
 
 max_depth | margin |min_sample | loss |n_trees |n_features|
 | ---- |:------: | ---------:|---: |---: |---: |
-3         |5       |          2|  hinge|      10|          2|
+3         |2       |          5|  square |      10|          10|
+
+*<b> Warning </b> : The model and predictions may vary from the example due to random sampling*
 
 ### mse()
   
