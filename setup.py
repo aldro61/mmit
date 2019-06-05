@@ -22,8 +22,10 @@ from setuptools.command.build_ext import build_ext as _build_ext
 # Configure the compiler based on the OS
 if get_os_name().lower() == "darwin":
     os_compile_flags = ["-mmacosx-version-min=10.9"]
+    os_link_flags = ["-stdlib=libc++", "-mmacosx-version-min=10.9"]
 else:
     os_compile_flags = []
+    os_link_flags = []
 
 # Required for the automatic installation of numpy
 class build_ext(_build_ext):
@@ -40,7 +42,8 @@ solver_module = Extension('mmit.core.solver',
                                    'mmit/core/solver.cpp',
                                    'mmit/core/piecewise_function.cpp',
                                    'mmit/core/coefficients.cpp'],
-                          extra_compile_args=["-std=c++0x"] + os_compile_flags)
+                          extra_compile_args=["-std=c++0x"] + os_compile_flags,
+                          extra_link_args=os_link_flags)
 
 dependencies = ["joblib", "numpy", "scikit-learn", "six", "future"]
 
@@ -65,7 +68,7 @@ setup(
     url = "https://github.com/aldro61/mmit",
 
     ext_modules = [solver_module],
-    
+
     test_suite='nose.collector',
     tests_require=['nose']
 )

@@ -4,8 +4,9 @@ compute_optimal_costs <- structure(function
 ### n x 2 matrix of limits.
  margin,
 ### numeric scalar, margin size parameter.
- loss="hinge"
+ loss="hinge",
 ### character scalar, hinge or square.
+weight = rep(1, nrow(target.mat))
 ){
   fun.vec <- c(hinge=0L, square=1L)
   if(!(is.character(loss) & length(loss)==1 & loss %in% names(fun.vec))){
@@ -31,6 +32,7 @@ compute_optimal_costs <- structure(function
     n_data=nrow(target.mat),
     lower_vec=as.double(lower.vec),
     upper_vec=as.double(upper.vec),
+    weights=as.double(weight),
     margin=as.double(margin),
     loss=as.integer(fun.vec[[loss]]),
     moves_vec=as.integer(neg.vec),
@@ -42,6 +44,7 @@ compute_optimal_costs <- structure(function
     moves=moves_vec,
     pred=pred_vec,
     cost=cost_vec))
+
 ### data.frame with columns moves (number of times the pointer was
 ### moved for each data point, sum of upper and lower limit moves),
 ### pred (predicted output value that achieves minimum cost), cost

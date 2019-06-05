@@ -27,7 +27,6 @@
 #' 
 #' pred <- mmit.predict(tree)
 #' 
-#' @export
 mmit.predict <- structure(function(tree, newdata = NULL, perm = NULL){
     
   fit <- predict(tree, newdata, perm)

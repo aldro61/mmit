@@ -4,8 +4,9 @@
 \alias{mmit}
 \title{The Max Margin Interval Tree}
 \usage{
-mmit(target.mat, feature.mat, max_depth = Inf, margin = 0, loss = "hinge",
-  min_sample = 1)
+mmit(target.mat, feature.mat, max_depth = Inf, margin = 0,
+  loss = "hinge", min_sample = 1, weights = rep(1L,
+  nrow(feature.mat)))
 }
 \arguments{
 \item{target.mat}{The response variable of the model}
@@ -19,6 +20,8 @@ mmit(target.mat, feature.mat, max_depth = Inf, margin = 0, loss = "hinge",
 \item{loss}{The type of loss; (\code{"hinge"}, \code{"square"})}
 
 \item{min_sample}{The minimum number of sample required}
+
+\item{weights}{An importance weight for each learning example, (default = 1)}
 }
 \value{
 The learned regression tree as an object of class party.
