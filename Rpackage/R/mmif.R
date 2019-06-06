@@ -10,6 +10,7 @@
 #' @param min_sample The minimum number of samples required to partition a leaf in a tree
 #' @param n_trees The number of trees in the ensemble (forest)
 #' @param n_features The number of features to be used to train each tree
+#' @param seed Value of seed for random sampling of training data 
 #' 
 #' @return List of trees containing each tree in the random forest.
 #' 
@@ -34,7 +35,7 @@
 mmif <- structure(function(target.mat, feature.mat, 
                            max_depth = Inf, margin=0.0, loss="hinge",
                            min_sample = 1, n_trees = 10,
-                           n_features =  ceiling(ncol(feature.mat)**0.5)){
+                           n_features =  ceiling(ncol(feature.mat)**0.5), seed = NULL){
   
   #lapply parallel or sequencial
   Lapply <- if(requireNamespace("future.apply")){ 
@@ -48,7 +49,7 @@ mmif <- structure(function(target.mat, feature.mat,
   all_trees <- Lapply(1 : n_trees, function(x) .random_tree(target.mat, feature.mat, 
                   max_depth = max_depth, margin = margin, loss = loss,
                   min_sample = min_sample, n_trees = n_trees,
-                  n_features = n_features))
+                  n_features = n_features, seed = seed))
     
   
   return(all_trees)
@@ -59,10 +60,12 @@ mmif <- structure(function(target.mat, feature.mat,
 .random_tree <- function(target.mat, feature.mat, 
                         max_depth, margin, loss,
                         min_sample, n_trees ,
-                        n_features){
+                        n_features, seed = NULL){
   
   ### sample n_examlple elements of dataset
-  set.seed(1)
+  if(is.null(seed)){
+    set.seed(seed)
+  }
   x <- sample(nrow(feature.mat), nrow(feature.mat), replace = TRUE)
   new_feature.mat <- feature.mat[x, ]
   new_target.mat <- target.mat[x,]
@@ -73,7 +76,9 @@ mmif <- structure(function(target.mat, feature.mat,
   assert_that(ncol(feature.mat) >= n_features)
   
   ### sample features
-  set.seed(1)
+  if(is.null(seed)){
+    set.seed(seed)
+  }
   y <- sample(ncol(feature.mat), n_features)
   new_feature.mat <- new_feature.mat[, y]
   colnames(new_feature.mat) <- c(names(feature.mat)[y])
