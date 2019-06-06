@@ -1,4 +1,4 @@
-compute_optimal_costs <- structure(function
+compute_optimal_costs <- function
 ### Compute vector of optimal prediction and cost.
 (target.mat,
 ### n x 2 matrix of limits.
@@ -49,4 +49,4 @@ weight = rep(1, nrow(target.mat))
 ### moved for each data point, sum of upper and lower limit moves),
 ### pred (predicted output value that achieves minimum cost), cost
 ### (minimum cost value).
-})
+}

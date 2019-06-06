@@ -32,7 +32,7 @@
 #' 
 #' trees <- mmif(target.mat, feature.mat, margin = 2.0)
 #' 
-mmif <- structure(function(target.mat, feature.mat, 
+mmif <- function(target.mat, feature.mat, 
                            max_depth = Inf, margin=0.0, loss="hinge",
                            min_sample = 1, n_trees = 10,
                            n_features =  ceiling(ncol(feature.mat)**0.5), seed = NULL){
@@ -54,7 +54,7 @@ mmif <- structure(function(target.mat, feature.mat,
   
   return(all_trees)
   
-})
+}
 
 
 .random_tree <- function(target.mat, feature.mat, 

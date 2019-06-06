@@ -1,4 +1,4 @@
-.fit_and_score <- structure(function(target.mat, feature.mat, 
+.fit_and_score <- function(target.mat, feature.mat, 
                                     parameters, n_folds = 3, scorer = NULL, 
                                     learner = NULL, pruning = TRUE, seed = NULL){
   learner.predict = paste(learner, ".predict", sep = "")
@@ -215,5 +215,5 @@
   
   return(output)
   
-})
+}
     

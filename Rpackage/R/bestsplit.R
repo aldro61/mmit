@@ -1,4 +1,4 @@
-.bestsplit <- structure(function
+.bestsplit <- function
 ### Compute vector of optimal prediction and cost.
 ### We have the feature and target value of the data that is to be splitted.
 (target.mat, feature.mat, weights, margin=0.0, loss="hinge",pred = NULL){
@@ -90,4 +90,4 @@
     return(NULL)
   }
   return(best_split)
-})
+}

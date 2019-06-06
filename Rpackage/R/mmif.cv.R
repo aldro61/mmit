@@ -37,7 +37,7 @@
 #' 
 #' result <- mmif.cv(target.mat, feature.mat, param_grid, scorer = mse)
 #' 
-mmif.cv <- structure(function(target.mat, feature.mat, 
+mmif.cv <- function(target.mat, feature.mat, 
                               param_grid, n_folds = 3,
                               scorer = NULL, seed = NULL){
   
@@ -86,5 +86,5 @@ mmif.cv <- structure(function(target.mat, feature.mat,
   
   return(best_result)
   
-})
+}
 

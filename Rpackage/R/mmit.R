@@ -31,7 +31,7 @@
 #' out <- mmit(target.mat, feature.mat)
 #' 
 
-mmit <- structure(function(target.mat, feature.mat,  
+mmit <- function(target.mat, feature.mat,  
                            max_depth = Inf, margin=0.0, loss="hinge",
                            min_sample = 1, weights = rep(1L, nrow(feature.mat))) {
   ### partynode id and initial depth
@@ -63,7 +63,7 @@ mmit <- structure(function(target.mat, feature.mat,
 
   return(tree)
   
-} )
+}
 
 
 

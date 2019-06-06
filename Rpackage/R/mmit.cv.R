@@ -35,7 +35,7 @@
 #' 
 #' result <- mmit.cv(target.mat, feature.mat, param_grid, scorer = mse)
 #' 
-mmit.cv <- structure(function(target.mat, feature.mat, 
+mmit.cv <- function(target.mat, feature.mat, 
                               param_grid, n_folds = 3,
                               scorer = NULL, pruning = TRUE, seed = NULL){
   
@@ -80,4 +80,4 @@ mmit.cv <- structure(function(target.mat, feature.mat,
   
   return(best_result)
   
-})
+}

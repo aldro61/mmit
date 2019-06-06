@@ -27,7 +27,7 @@
 #' pruned_tree <- mmit.pruning(tree)
 #' 
 
-mmit.pruning <- structure(function(tree){
+mmit.pruning <- function(tree){
   ### T1 is the tree after initital pruning of Tmax
   T1 <- .init_pruning(tree)
   alpha_trees <- list()
@@ -72,5 +72,5 @@ mmit.pruning <- structure(function(tree){
     return(alpha_trees)
   }
   
-})
+}
 
