@@ -35,17 +35,38 @@
 mmitboost <- structure(function(target.mat, feature.mat,   
                                 max_depth = Inf, margin=0.0, loss="hinge", min_sample = 1, 
                                 weights = rep(1L, nrow(feature.mat))/seq(1L, nrow(feature.mat),1),
-                                M = 10) {
+                                n_estimators = 100) {
   final_scores <- rep(0., times = nrow(target.mat))
   trees <- list()
-  for(i in 1:M){
+  for(i in 1:n_estimators){
+    ### probability pi
+    p <- weights / sum(weights)
+    
+    ## sample n_examlple elements of dataset using p as probability of occurance
+    x <- sample(nrow(feature.mat), nrow(feature.mat), prob = p, replace = TRUE)
+    new_feature.mat <- feature.mat[x, ]
+    new_target.mat <- target.mat[x,]
+    new_target.mat <- data.matrix(new_target.mat)
+    weights <- weights[x]
+    
     ### regression tree
     tree <- mmit(target.mat, feature.mat, max_depth, margin, loss, min_sample, weights)
     trees[[i]] <- tree
+    
     ### predictions of the model
     prediction <- mmit.predict(tree, feature.mat)
     if(i==1){
       final_scores <- prediction
+    }
+    
+    ### average loss
+    cost <- .compute_loss(target.mat, prediction, margin, loss)
+    L <- sum(cost * p)
+    ### measure of confidance
+    B = L / (1 - L)
+    
+    if(L < 0.5){
+      break
     }
     
     ###error calc
@@ -79,3 +100,10 @@ mmitboost <- structure(function(target.mat, feature.mat,
   pred <- mmitboost(target.mat, feature.mat, max_depth = Inf, margin = 2.0, weights = rep(1L, nrow(feature.mat)))
   
 })
+
+.compute_loss <- function(target.mat, prediction, margin, loss){
+  if(loss == 'hinge'){
+    cost <- (target.mat-prediction)/target.mat
+  }
+  return(cost)
+}
