@@ -1,33 +1,26 @@
 ---
-title: "Tutorial"
-author: "Parismita Das"
-date: "10 April 2019"
-output: html_document
+date: "`r Sys.Date()`"
+title: "Maximum Margin Interval Trees"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Maximum Margin Interval Trees}
+  %\VignetteEngine{knitr::rmarkdown}
+  \usepackage[utf8]{inputenc}
 ---
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-# Google Summer of Code, 2018: MMIT
-
 #### Summary of the Maximum Margin Interval Trees (MMIT) project under the R project for statistical computing.
 
-*Student: Parismita Das*
-
-*Mentors : Alexandre Drouin, Torsten Hothorn and Toby Dylan Hocking*
+*Authors: Parismita Das, Alexandre Drouin, Torsten Hothorn and Toby Dylan Hocking*
 
 ---------------------------------------------------------------
 
 ## Table of contents
 
 * [Introduction](#introduction)
-* [Evaluations](#evaluations)
-  * [First Evaluation](#first-evaluation)
-  * [Second Evaluation](#second-evaluation)
-  * [Final Evaluation](#final-evaluation)
-* [Contributions](#contributions)
-* [Future Work](#future-work)
 * [Installation](#installation)
 * [Tutorials](#tutorials)
   * [mmit](#mmit)
@@ -52,10 +45,10 @@ Unlike usual regression, each response in the training set is an interval of acc
 values (rather than one value). In the terminology of the survival analysis literature, 
 this is regression with “left, right, and interval censored” output/response data.
 
-Max margin interval trees are a new type of nonlinear model for this problem ([Drouin et al., 2017](https://papers.nips.cc/paper/7080-maximum-margin-interval-trees)). 
-This algorithm has previously been implemented in Python and the objective of this Google Summer of Code project was to implement it in R using the *partykit* library.
+Max margin interval trees are a new type of nonlinear model for this problem ([Drouin et al., 2017](https://papers.nips.cc/paper/7080-maximum-margin-interval-trees)). A dynamic programming algorithm is used for computing the optimal solution inlog-linear time. We show empirically that this algorithm achieves state-of-the-art speed and prediction accuracy in a benchmark of several data sets.
+This algorithm was implemented using the *partykit* library for creation of tree structure and better visualization.
  
-Specifically, we implemented the following learning algorithms:
+Specifically, the following learning algorithms are implemented in the mmit package:
   * Max margin interval trees (mmit, mmit.predict, mmit.pruning, mmit.cv)
   * Max margin interval random forests (mmif, mmif.predict, mmif.cv)
   * Max margin interval Adaboost (in progress) 
@@ -67,60 +60,6 @@ For each algorithm, we implemented the following:
 * Prediction: input examples represented by their features and output predictions
 * Minimum cost-complexity pruning (for MMIT only): reduce the size of trees by cutting branches
  
-We also created documentation for each of these functions.
-
- 
- -------------------------------------------------------------------------------------------------
- 
-## Evaluations 
-  
-### First Evaluation
- 
- For the major part of the first coding period, the main aim was to build the maximum margin interval tree (mmit) 
- along with its k-fold cross validation and minimum cost-complexity pruning functions. 
- The tree model was build using partykit which made it very easy to visualize the tree structure 
- and get its prediction values. The tree model and pruning was done to a large extent including 
- appropriate documentation and unit tests which helped later on in the project. 
- Although the implementation of cross validation took longer than expected.
-  
-### Second Evaluation
-
-After building the MMIT model, most of the second coding phase was spent on bug fixing and building unit tests and examples, along with completing the cross validation for the MMIT. The cross validation function consist of 
-option for enabling and disabling the pruning of MMIT. It does Grid search on all the parameters and gives the best parameters 
-along with the list of CV results for all parameters.
-To validate the work, a benchmark was created to compare the mmit and pruning model to the python results. The results were similar for larger datasets (variability is expected for small datasets), thus we believe that the implementation is correct.
-
-### Final Evaluation
-
-The final phase work consisted of implementing the Random forest and Adaboost algorithms based on MMIT, along with their cross validation and prediction functions. Since the ultimate goal of GSoC is to build a working package, testing, bug fixing and documentation were completed before adding more features to the package. Getting the code to work proved to be suprisingly (and notoriously) more complicated than imagined, as the main code used for cross validation is common for all modules of the package and had to designed to allow the easy incorporation of new features. Thus it took a lot of time to debug the code to perfection.
-
-----------------------------------------------------------------------------------------------------------
-
-## Contributions
-
-The links to all the commits are given below:
-
- * MMIT: [Link](https://github.com/aldro61/mmit/pull/24/commits)
- 
- * Pruning and Cross-Validation: [Link](https://github.com/aldro61/mmit/pull/25/commits)
- 
- * Random Forest: [Link](https://github.com/aldro61/mmit/pull/26/commits)
- 
- * Adaboost: [Link](https://github.com/aldro61/mmit/pull/30/)
- 
- The links for documentation and benchmark
- 
- * Documentation: [Link](https://github.com/aldro61/mmit/tree/master/Rpackage/man)
- 
- * Benchmark: [Link](https://github.com/aldro61/mmit/blob/master/benchmark/pred_score.md)
-  
-  -------------------------------------------------------------------------------------------------------
-
-
-## Future Work
-
-The implementation of Adaboost is currently in progress ([link](https://github.com/aldro61/mmit/pull/30)). As future work, we would like to improve the running time of each function and write the vignettes with the objective of submitting to CRAN.
-
 -----------------------------------------------------------------------------------------------------------
 
 ## Installation
@@ -328,8 +267,8 @@ param_grid$min_sample <- c(2, 5, 10, 20)
 param_grid$loss <- c("hinge", "square")
 if(require(future)){ plan(multiprocess)}
 result <- mmit.cv(target.mat, feature.mat, param_grid, scorer = mse)
-print("result: ")
-print(result)
+#print("result: ")
+#print(result)
 ```
 ### mmif()
   
