@@ -5,7 +5,7 @@
 \title{The Cross Validation of Max Margin Interval Tree}
 \usage{
 mmit.cv(target.mat, feature.mat, param_grid, n_folds = 3,
-  scorer = NULL, pruning = TRUE)
+  scorer = NULL, pruning = TRUE, seed = NULL)
 }
 \arguments{
 \item{target.mat}{The response variable of the model}
@@ -19,6 +19,8 @@ mmit.cv(target.mat, feature.mat, param_grid, n_folds = 3,
 \item{scorer}{The Loss calculation function}
 
 \item{pruning}{Boolean whether pruning is to be done or not.}
+
+\item{seed}{Value of seed for random sampling of training data}
 }
 \value{
 The list consist of best score, best tree, best parameters and list of all parameter values with cross validation score .

@@ -6,7 +6,7 @@
 \usage{
 mmif(target.mat, feature.mat, max_depth = Inf, margin = 0,
   loss = "hinge", min_sample = 1, n_trees = 10,
-  n_features = ceiling(ncol(feature.mat)^0.5))
+  n_features = ceiling(ncol(feature.mat)^0.5), seed = NULL)
 }
 \arguments{
 \item{target.mat}{The response variable of the model}
@@ -24,6 +24,8 @@ mmif(target.mat, feature.mat, max_depth = Inf, margin = 0,
 \item{n_trees}{The number of trees in the ensemble (forest)}
 
 \item{n_features}{The number of features to be used to train each tree}
+
+\item{seed}{Value of seed for random sampling of training data}
 }
 \value{
 List of trees containing each tree in the random forest.
