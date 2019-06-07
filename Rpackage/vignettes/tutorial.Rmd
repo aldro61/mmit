@@ -32,33 +32,47 @@ Max margin interval trees are a new type of nonlinear model for this problem ([D
 This algorithm was implemented using the *partykit* library for creation of tree structure and better visualization.
  
 Specifically, the following learning algorithms are implemented in the mmit package:
+
   * Max margin interval trees (mmit, mmit.predict, mmit.pruning, mmit.cv)
   * Max margin interval random forests (mmif, mmif.predict, mmif.cv)
   * Max margin interval Adaboost (in progress) 
   
 
 For each algorithm, we implemented the following:
+
 * Learning: input examples represented by their features and interval label and output a model (single party object or list of party objects)
 * Cross-validation: grid seach k-fold cross-validation to select the hyperparameters
 * Prediction: input examples represented by their features and output predictions
 * Minimum cost-complexity pruning (for MMIT only): reduce the size of trees by cutting branches
+
+This document is an short overview of the functionalities of the mmit package.
  
 -----------------------------------------------------------------------------------------------------------
 
 ## Table of contents
 
 * [Installation](#installation)
-* [Tutorials](#tutorials)
-  * [mmit](#mmit)
-  * [mmit.predict](#mmitpredict)
-  * [mmit.pruning](#mmitpruning)
-  * [mmit.cv](#mmitcv)
-  * [mmif](#mmif)
-  * [mmif.predict](#mmifpredict)
-  * [mmif.cv](#mmifcv)
-  * [mse](#mse)
-  * [zero_one_loss](#zero_one_loss)
+
+* [Building the tree]
+    * [Splitting algorithm]
+    * [mmit](#mmit)
+    * [Prediction](#prediction)
+    
+* [Pruning]
+    * [mmit.pruning](#mmit.pruning)
   
+* [K-fold Cross Validation]
+    * [mmit.cv](#mmit.cv)
+  
+* [Random Forest]
+    * [mmif](#mmif)
+    * [mmif.predict](#mmif.predict)
+    * [mmif.cv](#mmif.cv)
+  
+* [Other Functions]
+    * [mse](#mse)
+    * [zero_one_loss](#zero_one_loss)
+
 -----------------------------------------------------------------------------------------------------
 ## Installation
 
@@ -72,9 +86,12 @@ devtools::install_github("aldro61/mmit/Rpackage")
 
 ----------------------------------------------------------------------------------------------------------
 
-## Tutorials
+## Building the tree
   
-Here is a tutorial on how to use the package.
+As Breiman's CART algorithm is widely used for creation of decision trees, random forest and boosted decision trees. In the CARTS algorithm, trees are grown by recursive partitioning of leaves, each time maximizing some task-specific criterion. It has the ability to learn non-linear models from both numerical and categoricaldata of various scales, and also has a relatively low training time complexity. Hence we will be using the same concept in building maximum margin interval trees.
+
+### Splitting algorithm
+As proposed in the paper, the splitting is done using a margin-based hinge loss, which yields a sequence of convex optimization problems. A dynamic programming algorithm is used to compute the optimal solution to all of these problems in log-linear time. Hence obtaining the optimal splitting value.
 
 ### mmit()
   
@@ -124,9 +141,9 @@ out <- mmit(target.mat, feature.mat)
 plot(out)
 ```
 
-### mmit.predict()
+### Prediction
   
-  Fits the new data into the MMIT model to give prediction values
+The prediction is done using mmit.predict(). It fits the new data into the MMIT model to give prediction values
   
 #### Usage:
   
@@ -171,9 +188,13 @@ pred <- mmit.predict(tree)
 print(pred)
 ```
 
+## Pruning
+
+The pruning of the tree is done using mmit.pruning() where minimum cost complexity pruning is implemented.
+
 ### mmit.pruning()
   
-Pruning the regression tree for censored data to give all the alpha values and trees as output.
+Pruning the regression tree for censored data to give all the alpha (regularization parameter) values and trees as output.
   
 #### Usage:
 
@@ -225,10 +246,12 @@ print("pruned tree for alpha = 3")
 plot(pruned_tree[[2]]$tree)
 ```
 
-### mmit.cv()
-  
+## K-fold Cross Validation 
+
 Performing grid search to select the best parameters via cross validation on the a regression tree for censored data.
-It outputs all the CV results, the best model and best parameters.
+It outputs all the CV results, the best model and best parameters. It is done using the mmit.cv() function.
+
+### mmit.cv()
   
 #### Usage:
   
@@ -263,11 +286,18 @@ param_grid$max_depth <- c(Inf, 2)
 param_grid$margin <- c(2, 3)
 param_grid$min_sample <- c(10, 20)
 param_grid$loss <- c("hinge", "square")
-if(require(future)){ plan(multiprocess)}
-result <- mmit.cv(target.mat, feature.mat, param_grid, scorer = mse, seed = 1)
-print("result: ")
-print(result)
+result <- mmit.cv(target.mat, feature.mat, param_grid, scorer = mse,)# seed = 1)
+print('result: ')
+print(result$best_params)
+print("best estimator: ")
+plot(result$best_estimator)
 ```
+
+## Random Forest
+
+The random forest implemented in the mmit package uses the concept of random forest described by Brietman.
+The mmif function is used for creating the collection of trees by random sampling training examples with replacement and features without replacement. The mmif.predict() function is used to calculate the average prediction done by the random forest algorithm and mmif.cv() function is the implementaiton of k-fold cross validaiton for the random forest model.
+
 ### mmif()
   
 Learning a random forest of Max Margin Interval Tree and giving list of trees as output.
@@ -291,16 +321,17 @@ library(mmit)
 ```
 
 #### Output:
-```{r mmif, echo=FALSE}
+```{r mmif, fig.width=6, fig.height=4, echo=FALSE}
 library(mmit)
 
   data(neuroblastomaProcessed, package="penaltyLearning")
   feature.mat <- data.frame(neuroblastomaProcessed$feature.mat)[1:45,]
   target.mat <- neuroblastomaProcessed$target.mat[1:45,]
   if(require(future)){ plan(multiprocess)}
-  trees <- mmif(target.mat, feature.mat, max_depth = Inf, margin = 2.0, loss = "hinge", min_sample = 1, seed = 1)
-  lapply(trees, plot)
+  trees <- mmif(target.mat, feature.mat, max_depth = Inf, margin = 2.0, loss = "hinge", min_sample = 1)#, seed = 1)
+for(i in trees){plot(i)}
 ```
+
 ### mmif.predict()
   
 Predictions with random forests of Max Margin Interval Trees
@@ -378,7 +409,7 @@ result <- mmif.cv(target.mat, feature.mat, param_grid, scorer = mse, seed = 1)
 ```
 
 #### Output:
-```{r mmif.cv, echo=FALSE}
+```{r mmif.cv, fig.width=6, fig.height=4, echo=FALSE}
 library(mmit)
 
 data(neuroblastomaProcessed, package="penaltyLearning")
@@ -393,9 +424,16 @@ param_grid$loss <- c("hinge", "square")
 param_grid$n_trees <- c(10)
 param_grid$n_features <- c(as.integer(ncol(feature.mat)**0.5))
 if(require(future)){ plan(multiprocess)}
-result <- mmif.cv(target.mat, feature.mat, param_grid, scorer = mse, seed = 1)
-print(result)
+result <- mmif.cv(target.mat, feature.mat, param_grid, scorer = mse)#, seed = 1)
+print('result: ')
+print("best estimators: ")
+#lapply(result$best_estimator, plot)
+for(i in result$best_estimator){
+  plot(i)
+}
 ```
+
+## Other Functions
 
 ### mse()
   
