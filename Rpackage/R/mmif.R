@@ -76,8 +76,8 @@ mmif <- structure(function(target.mat, feature.mat,
   data(neuroblastomaProcessed, package="penaltyLearning")
   feature.mat <- data.frame(neuroblastomaProcessed$feature.mat)[1:45,]
   target.mat <- neuroblastomaProcessed$target.mat[1:45,]
+  if(require(future)){ plan(multiprocess)}
   trees <- mmif(target.mat, feature.mat, max_depth = Inf, margin = 2.0, loss = "hinge", min_sample = 1)
-  
 })
 
 

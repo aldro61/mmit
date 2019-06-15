@@ -1,36 +1,74 @@
-language: python
+matrix:
+  include:
+    - language: python
+      python:
+        - 2.7
+      sudo: required
+      before_install:
+        - sudo apt-get install -y --no-install-recommends python-numpy-dev texlive texlive-fonts-extra # fonts-extra needed for compiling R package documentation (inconsolata font)
+        - sudo apt-get install texlive-latex-base
+      addons:
+        apt:
+          packages:
+            - libblas-dev
+            - liblapack-dev
+            - gfortran
+      install:
+        - pip install -U pip pip-tools
+        - pip install numpy scipy scikit-learn
+      script:
+        - make $TEST_SUITE
+      env:
+        - TEST_SUITE=test_python.out
+        
+    - language: python
+      python:
+        - 3.6
+      sudo: required
+      before_install:
+        - sudo apt-get install -y --no-install-recommends python-numpy-dev texlive texlive-fonts-extra # fonts-extra needed for compiling R package documentation (inconsolata font)
+        - sudo apt-get install texlive-latex-base
+      addons:
+        apt:
+          packages:
+            - libblas-dev
+            - liblapack-dev
+            - gfortran
+      install:
+        - pip install -U pip pip-tools
+        - pip install numpy scipy scikit-learn
+      script:
+        - make $TEST_SUITE
+      env:
+        - TEST_SUITE=test_python.out
 
-python:
-  - 2.7
-  - 3.6
 
-sudo: required
-
-before_install:
-  - sudo apt-get install -y --no-install-recommends python-numpy-dev texlive texlive-fonts-extra # fonts-extra needed for compiling R package documentation (inconsolata font)
-  - sudo apt-get install texlive-latex-base
-  - curl -OL http://raw.github.com/craigcitro/r-travis/master/scripts/travis-tool.sh
-  - chmod 755 ./travis-tool.sh
-  - ./travis-tool.sh bootstrap
-  - ./travis-tool.sh install_r devtools testthat
-
-addons:
-  apt:
-    packages:
-      - libblas-dev
-      - liblapack-dev
-      - gfortran
-
-install:
-  - Rscript -e 'devtools::install_deps("Rpackage", dep=TRUE)' # need dep=TRUE for Suggests
-  - pip install -U pip pip-tools
-  - pip install numpy scipy scikit-learn
-
-script:
-  - make $TEST_SUITE
-
-after_failure:
-  - ./travis-tool.sh dump_logs
+    - language: r
+      r:
+        - 3.5
+      sudo: required
+      before_install:
+        - sudo apt-get install -y --no-install-recommends texlive texlive-fonts-extra # fonts-extra needed for compiling R package documentation (inconsolata font)
+        - sudo apt-get install texlive-latex-base
+        - curl -OLs https://eddelbuettel.github.io/r-travis/run.sh && chmod 0755 run.sh
+        - sudo add-apt-repository -y ppa:edd/r-3.5
+        - ./run.sh bootstrap
+        - ./run.sh install_r devtools testthat
+      addons:
+        apt:
+          packages:
+            - libblas-dev
+            - liblapack-dev
+            - gfortran
+      install:
+        - Rscript -e 'devtools::install_deps("Rpackage", dep=TRUE)' # need dep=TRUE for Suggests
+      script:
+        - make $TEST_SUITE
+      env:
+        - TEST_SUITE=test_R.out
+      after_failure:
+        - ./run.sh dump_logs
+      
 
 notifications:
   email:
@@ -39,8 +77,4 @@ notifications:
   slack: 
     graal-slack:IYu0NiR9pbqud64UpsZe1pQS
 
-env:
-  matrix:
-    - TEST_SUITE=test_R.out
-    - TEST_SUITE=test_python.out
     

@@ -99,6 +99,6 @@ mmit.cv <- structure(function(target.mat, feature.mat,
   param_grid$min_sample <- c(2, 5, 10, 20)
   param_grid$loss <- c("hinge", "square")
   
-  result <- mmit.cv(target.mat, feature.mat, param_grid, scorer = mse, n_cpu = 4)
-  
+  if(require(future)){ plan(multiprocess)}
+  result <- mmit.cv(target.mat, feature.mat, param_grid, scorer = mse)
 })
