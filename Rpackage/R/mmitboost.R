@@ -37,7 +37,7 @@ mmitboost <- structure(function(target.mat, feature.mat,
                                 weights = rep(1L, nrow(feature.mat))/seq(1L, nrow(feature.mat),1),
                                 n_estimators = 100) {
   final_scores <- rep(0., times = nrow(target.mat))
-  trees <- list()
+  result <- list()
   for(i in 1:n_estimators){
     ### probability pi
     p <- weights / sum(weights)
@@ -51,59 +51,37 @@ mmitboost <- structure(function(target.mat, feature.mat,
     
     ### regression tree
     tree <- mmit(target.mat, feature.mat, max_depth, margin, loss, min_sample, weights)
-    trees[[i]] <- tree
+    result$trees[[i]] <- tree
     
     ### predictions of the model
     prediction <- mmit.predict(tree, feature.mat)
-    if(i==1){
-      final_scores <- prediction
-    }
+    result$pred[[i]] <- prediction
     
     ### average loss
     cost <- .compute_loss(target.mat, prediction, margin, loss)
     L <- sum(cost * p)
     ### measure of confidance
     B = L / (1 - L)
+    weights <- weights*B**(1-cost)
+    result$B[[i]] <- B
     
     if(L < 0.5){
       break
     }
-    
-    ###error calc
-    scores <- 0.0
-    for(i in 1 : length(prediction)){
-      
-      if(target.mat[i,1] > prediction[i]){
-        scores[i] <- (target.mat[i,1] - prediction[i])**2
-      }
-      else if(target.mat[i,2] <= prediction[i]){
-        scores[i] <- (target.mat[i,2] - prediction[i])**2
-      }
-      else{
-        scores[i] <- 0.0
-      }
-    }
-    if(all(scores == 0)){
-      break
-    }
-    error <- sum(weights*scores)/sum(weights)
-    alpha <- 0.5 * log( (1. - error) /error)
-    weights <- weights*exp(alpha*scores)
-    final_scores <- final_scores + alpha*prediction
   }
-  return(trees)
-}, ex=function(){
-  
-  data(neuroblastomaProcessed, package="penaltyLearning")
-  feature.mat <- data.frame(neuroblastomaProcessed$feature.mat)[1:45,]
-  target.mat <- neuroblastomaProcessed$target.mat[1:45,]
-  pred <- mmitboost(target.mat, feature.mat, max_depth = Inf, margin = 2.0, weights = rep(1L, nrow(feature.mat)))
-  
+  return(result)
 })
 
 .compute_loss <- function(target.mat, prediction, margin, loss){
+  lower = target.mat[,0]-prediction+margin
+  lower[lower<0] <- 0
+  upper = prediction - target.mat[,1]+margin
+  upper[upper<0] <- 0
   if(loss == 'hinge'){
-    cost <- (target.mat-prediction)/target.mat
+    cost = lower+upper
+  }
+  else if(loss == 'square'){
+    cost = (lower+upper)**2
   }
   return(cost)
 }
