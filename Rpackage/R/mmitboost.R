@@ -70,6 +70,13 @@ mmitboost <- structure(function(target.mat, feature.mat,
     }
   }
   return(result)
+}, ex=function(){
+  
+  data(neuroblastomaProcessed, package="penaltyLearning")
+  feature.mat <- data.frame(neuroblastomaProcessed$feature.mat)[1:45,]
+  target.mat <- neuroblastomaProcessed$target.mat[1:45,]
+  pred <- mmitboost(target.mat, feature.mat, max_depth = Inf, margin = 2.0, weights = rep(1L, nrow(feature.mat)))
+  
 })
 
 .compute_loss <- function(target.mat, prediction, margin, loss){
