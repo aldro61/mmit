@@ -3,7 +3,7 @@
 #' Learning adaptive boosting for the Max Margin Interval Tree
 #'
 #' @param trees Ensemble of MMITboost trees
-#' @param test_feature.mat A data frame containing the features of the examples for which predictions must be computed.
+#' @param target.mat A data frame containing the features of the examples for which predictions must be computed.
 #' 
 #' @return Predictions after adaboost
 #' 
@@ -27,7 +27,7 @@
 #' pred <- mmitboost.predict(trees, feature.mat)
 #' 
 #' @export
-mmitboost.predict <- structure(function(trees, test_feature.mat = NULL, weights, target.mat) {
+mmitboost.predict <- structure(function(target.mat, mmitboost_results) {
   final_scores <- rep(0., times = nrow(test_feature.mat))
   for(i in 1:length(trees)){
 
