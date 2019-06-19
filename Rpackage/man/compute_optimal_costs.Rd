@@ -2,7 +2,10 @@
 \alias{compute_optimal_costs}
 \title{compute optimal costs}
 \description{Compute vector of optimal prediction and cost.}
-\usage{compute_optimal_costs(target.mat, margin, loss = "hinge",  weight = rep(1, nrow(target.mat)))}
+\usage{
+compute_optimal_costs(target.mat, margin, loss = "hinge", 
+  weight = rep(1, nrow(target.mat)))
+}
 \arguments{
   \item{target.mat}{n x 2 matrix of limits.}
   \item{margin}{numeric scalar, margin size parameter.}

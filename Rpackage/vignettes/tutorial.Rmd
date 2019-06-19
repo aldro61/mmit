@@ -87,8 +87,23 @@ devtools::install_github("aldro61/mmit/Rpackage")
   
 As Breiman's CART algorithm is widely used for creation of decision trees, random forest and boosted decision trees. In the CARTS algorithm, trees are grown by recursive partitioning of leaves, each time maximizing some task-specific criterion. It has the ability to learn non-linear models from both numerical and categoricaldata of various scales, and also has a relatively low training time complexity. Hence we will be using the same concept in building maximum margin interval trees.
 
+###### The Learning Setting
+The training data is a set of labelled examples, where the target values are intervals indicating a range of acceptable values:
+$$S = {(x_1,y_1), (x_2,y_2)... (x_n,y_n)}$$
+where $x \epsilon R^n$ is the feature variable of the model and $y = [\underline{y},\bar{y}]$ is the intervaled target data.
+
+###### The Loss Function
+We consider two types of losses, hinge and squared. As our target data is interval type, hence the loss inside the interval is zero and outside follow the linear or quadratic function. We aim to minimise the convex objective function for model $h$ and $\epsilon$ as the margin $$\phi_l(\underline{y_i}-h(x_i)+\epsilon) + \phi_l(h(x_i)-\bar{y_i}+\epsilon)$$ where $l$ is a convex function and $\phi_l(x) = l[(x)+]$ is the loss, where $(x)_+$ is the positive part of the function.
+
+Linear hinge loss: $l(x) = x$
+
+Squared hinge loss: $l(x) = x^2$
+
+
 ### Splitting algorithm
-As proposed in the paper, the splitting is done using a margin-based hinge loss, which yields a sequence of convex optimization problems. A dynamic programming algorithm is used to compute the optimal solution to all of these problems in log-linear time. Hence obtaining the optimal splitting value.
+As proposed in the paper, the splitting is done using margin-based loss function, which yields a sequence of convex optimization problems. A dynamic programming algorithm is used to compute the optimal solution to all of these problems in log-linear time. Hence obtaining the optimal splitting value.
+
+
 
 ### mmit()
   
@@ -283,11 +298,11 @@ param_grid$max_depth <- c(Inf, 2)
 param_grid$margin <- c(2, 3)
 param_grid$min_sample <- c(10, 20)
 param_grid$loss <- c("hinge", "square")
-result <- mmit.cv(target.mat, feature.mat, param_grid, scorer = mse, seed = 1)
-print('result: ')
-print(result$best_params)
-print("best estimator: ")
-plot(result$best_estimator)
+#result <- mmit.cv(target.mat, feature.mat, param_grid, scorer = mse, seed = 1)
+#print('result: ')
+#print(result$best_params)
+#print("best estimator: ")
+#plot(result$best_estimator)
 ```
 
 ## Random Forest
@@ -325,8 +340,8 @@ library(mmit)
   feature.mat <- data.frame(neuroblastomaProcessed$feature.mat)[1:45,]
   target.mat <- neuroblastomaProcessed$target.mat[1:45,]
   if(require(future)){ plan(multiprocess)}
-  trees <- mmif(target.mat, feature.mat, max_depth = Inf, margin = 2.0, loss = "hinge", min_sample = 1, seed = 1)
-for(i in trees){plot(i)}
+  #trees <- mmif(target.mat, feature.mat, max_depth = Inf, margin = 2.0, loss = "hinge", min_sample = 1, seed = 1)
+#for(i in trees){plot(i)}
 ```
 
 ### mmif.predict()
@@ -421,13 +436,13 @@ param_grid$loss <- c("hinge", "square")
 param_grid$n_trees <- c(10)
 param_grid$n_features <- c(as.integer(ncol(feature.mat)**0.5))
 if(require(future)){ plan(multiprocess)}
-result <- mmif.cv(target.mat, feature.mat, param_grid, scorer = mse, seed = 1)
-print('result: ')
-print("best estimators: ")
+#result <- mmif.cv(target.mat, feature.mat, param_grid, scorer = mse, seed = 1)
+#print('result: ')
+#print("best estimators: ")
 #lapply(result$best_estimator, plot)
-for(i in result$best_estimator){
-  plot(i)
-}
+#for(i in result$best_estimator){
+#  plot(i)
+#}
 ```
 
 ## Other Functions
