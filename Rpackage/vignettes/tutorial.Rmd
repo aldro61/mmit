@@ -93,7 +93,7 @@ $$S = {(x_1,y_1), (x_2,y_2)... (x_n,y_n)}$$
 where $x \epsilon R^n$ is the feature variable of the model and $y = [\underline{y},\bar{y}]$ is the intervaled target data.
 
 ###### The Loss Function
-We consider two types of losses, hinge and squared. As our target data is interval type, hence the loss inside the interval is zero and outside follow the linear or quadratic function. We aim to minimise the convex objective function for model $h$ and $\epsilon$ as the margin $$\phi_l(\underline{y_i}-h(x_i)+\epsilon) + \phi_l(h(x_i)-\bar{y_i}+\epsilon)$$ where $l$ is a convex function and $\phi_l(x) = l[(x)+]$ is the loss, where $(x)_+$ is the positive part of the function.
+We consider two types of losses, hinge and squared. As our target data is interval type, hence the loss inside the interval is zero and outside follow the linear or quadratic function. We aim to minimise the convex objective function for model $h$ $$\phi_l(\underline{y_i}-h(x_i)+\epsilon) + \phi_l(h(x_i)-\bar{y_i}+\epsilon)$$ where $l$ is a convex function and $\phi_l(x) = l[(x)+]$ is the loss, where $(x)_+$ is the positive part of the function and $\epsilon$ as the margin hyperparameter with regularizing effect.
 
 Linear hinge loss: $l(x) = x$
 
@@ -101,9 +101,39 @@ Squared hinge loss: $l(x) = x^2$
 
 
 ### Splitting algorithm
-As proposed in the paper, the splitting is done using margin-based loss function, which yields a sequence of convex optimization problems. A dynamic programming algorithm is used to compute the optimal solution to all of these problems in log-linear time. Hence obtaining the optimal splitting value.
+As proposed in the paper, the splitting is done using margin-based loss function, which yields a sequence of convex optimization problems. A dynamic programming algorithm is used to compute the optimal solution to all of these problems in log-linear time. Hence obtaining the optimal splitting value. 
 
 
+###### Partitioning Leaf
+
+The partitioning of the tree into left and right leaf is done using 2 convex minimization problem and considering the splitting index based on minimum cost of sum of cost of left and right leaves.
+
+```{r, out.width = "700px", echo=FALSE}
+knitr::include_graphics("plots/Selection_079.png")
+```
+
+
+###### Dynamic programing
+
+The dynamic programing algorithm is used to calculate the total loss of the optimal prediction. The sum of above mentioned hinge losses is a convex piecewise function $Pt(\mu)$. 
+
+```{r, out.width = "400px", echo=FALSE}
+knitr::include_graphics("plots/Selection_080.png")
+```
+
+While tracking the functions minima, the dynamic programming algorithm maintains a pointer on the left-most breakpoint that is to the right of all minima of $Pt(\mu)$.  The optimization step consists in finding the new position of this pointer after a hinge loss is added to the sum.
+
+```{r, out.width = "700px", echo=FALSE}
+knitr::include_graphics("plots/Selection_081.png")
+```
+
+In this Fig, First two steps of the dynamic programming algorithm for the data $y_1= 4, s_1= 1, y_2= 1, s_2=−1$ and margin $\epsilon = 1$, using the linear hinge loss $l(x) = x$. 
+
+* Left: The algorithm begins by creating a first breakpoint at $b_{1,1} = y_1−\epsilon= 3$, with corresponding function $f_{1,1}(\mu) =\mu−3$.  At this time, we have $j_1= 2$ and thus $b_{1,j_1}=∞$.  Note that the cost $p_{1,1}$ before the first breakpoint is not yet stored by the algorithm. 
+
+* Middle: The optimization step is to move the pointer to the minimum ($J_1=j_1−1$) and update the cost function, $M_1(\mu) =p_{1,2}(\mu)−f_{1,1}(\mu)$.
+
+* Right: The algorithm adds the second breakpoint at $b_{2,1}=y_2+\epsilon= 2$ with $f_{2,1}(μ) =μ−2$. The cost at the pointer is not affected by the new data point, so the pointer does not move.
 
 ### mmit()
   
@@ -136,7 +166,7 @@ out <- mmit(target.mat, feature.mat)
 #### Output:
 
 ```{r mmitplot, echo=FALSE}
-library(mmit)
+library(mmit, quietly=TRUE)
 target.mat <- rbind(
   c(0,1), c(0,1), c(0,1),
   c(2,3), c(2,3), c(2,3))
@@ -183,7 +213,7 @@ pred <- mmit.predict(tree)
 #### Output:
 
 ```{r mmit.predictoutput, echo= FALSE}
-library(mmit)
+library(mmit, quietly=TRUE)
 target.mat <- rbind(
   c(0,1), c(0,1), c(0,1),
   c(2,3), c(2,3), c(2,3))
@@ -236,7 +266,7 @@ pruned_tree <- mmit.pruning(tree)
 
 
 ```{r mmit.pruningplot, echo=FALSE}
-library(mmit)
+library(mmit, quietly=TRUE)
 target.mat <- rbind(
   c(0,1), c(0,1), c(0,1),
   c(2,3), c(2,3), c(2,3))
@@ -288,7 +318,7 @@ result <- mmit.cv(target.mat, feature.mat, param_grid, scorer = mse, seed = 1)
 
 #### Output:
 ```{r mmit.cv1, echo= FALSE}
-library(mmit)
+library(mmit, quietly=TRUE)
 data(neuroblastomaProcessed, package="penaltyLearning")
 feature.mat <- data.frame(neuroblastomaProcessed$feature.mat)[1:45,]
 target.mat <- neuroblastomaProcessed$target.mat[1:45,]
@@ -334,7 +364,7 @@ library(mmit)
 
 #### Output:
 ```{r mmif, fig.width=6, fig.height=4, echo=FALSE}
-library(mmit)
+library(mmit, quietly=TRUE)
 
   data(neuroblastomaProcessed, package="penaltyLearning")
   feature.mat <- data.frame(neuroblastomaProcessed$feature.mat)[1:45,]
@@ -374,7 +404,7 @@ pred <- mmif.predict(forest, feature.mat)
 
 #### Output:
 ```{r mmif.predict, echo=FALSE}
-library(mmit)
+library(mmit, quietly=TRUE)
 
 target.mat <- rbind(
   c(0,1), c(0,1), c(0,1),
@@ -422,7 +452,7 @@ result <- mmif.cv(target.mat, feature.mat, param_grid, scorer = mse, seed = 1)
 
 #### Output:
 ```{r mmif.cv, fig.width=6, fig.height=4, echo=FALSE}
-library(mmit)
+library(mmit, quietly=TRUE)
 
 data(neuroblastomaProcessed, package="penaltyLearning")
 feature.mat <- data.frame(neuroblastomaProcessed$feature.mat)[1:45,]
@@ -470,7 +500,7 @@ out <- mse(y_true, y_pred)
 
 #### Output:
 ```{r mse, echo= FALSE}
-library(mmit)
+library(mmit, quietly=TRUE)
 y_true <- rbind(
   c(0,1), c(0,1), c(0,1),
   c(2,3), c(2,3), c(2,3))
@@ -505,7 +535,7 @@ out <- zero_one_loss(y_true, y_pred)
 #### Output:
 
 ```{r zero, echo=FALSE}
-library(mmit)
+library(mmit, quietly=TRUE)
 y_true <- rbind(
   c(0,1), c(0,1), c(0,1),
   c(2,3), c(2,3), c(2,3))
