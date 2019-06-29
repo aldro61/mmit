@@ -87,12 +87,12 @@ devtools::install_github("aldro61/mmit/Rpackage")
   
 As Breiman's CART algorithm is widely used for creation of decision trees, random forest and boosted decision trees. In the CARTS algorithm, trees are grown by recursive partitioning of leaves, each time maximizing some task-specific criterion. It has the ability to learn non-linear models from both numerical and categoricaldata of various scales, and also has a relatively low training time complexity. Hence we will be using the same concept in building maximum margin interval trees.
 
-###### The Learning Setting
+#### The Learning Setting
 The training data is a set of labelled examples, where the target values are intervals indicating a range of acceptable values:
 $$S = {(x_1,y_1), (x_2,y_2)... (x_n,y_n)}$$
 where $x \epsilon R^n$ is the feature variable of the model and $y = [\underline{y},\bar{y}]$ is the intervaled target data.
 
-###### The Loss Function
+#### The Loss Function
 We consider two types of losses, hinge and squared. As our target data is interval type, hence the loss inside the interval is zero and outside follow the linear or quadratic function. We aim to minimise the convex objective function for model $h$ $$\phi_l(\underline{y_i}-h(x_i)+\epsilon) + \phi_l(h(x_i)-\bar{y_i}+\epsilon)$$ where $l$ is a convex function and $\phi_l(x) = l[(x)+]$ is the loss, where $(x)_+$ is the positive part of the function and $\epsilon$ as the margin hyperparameter with regularizing effect.
 
 Linear hinge loss: $l(x) = x$
@@ -104,7 +104,7 @@ Squared hinge loss: $l(x) = x^2$
 As proposed in the paper, the splitting is done using margin-based loss function, which yields a sequence of convex optimization problems. A dynamic programming algorithm is used to compute the optimal solution to all of these problems in log-linear time. Hence obtaining the optimal splitting value. 
 
 
-###### Partitioning Leaf
+#### Partitioning Leaf
 
 The partitioning of the tree into left and right leaf is done using 2 convex minimization problem and considering the splitting index based on minimum cost of sum of cost of left and right leaves.
 
@@ -113,7 +113,7 @@ knitr::include_graphics("plots/Selection_079.png")
 ```
 
 
-###### Dynamic programing
+#### Dynamic programing
 
 The dynamic programing algorithm is used to calculate the total loss of the optimal prediction. The sum of above mentioned hinge losses is a convex piecewise function $Pt(\mu)$. 
 
@@ -232,7 +232,26 @@ print(pred)
 
 ## Pruning
 
-The pruning of the tree is done using mmit.pruning() where minimum cost complexity pruning is implemented.
+Overfitting happens when the learning algorithm continues to develop hypotheses that reduce training set error at the cost of an increased test set error. To prevent overfitting of the decision trees, we implemented post pruning. In post pruning methods, the trees are pruned after they are build. In mmit.pruning() function, we have implemented a bottom-up algorithm of minimum cost complexity pruning.
+
+#### Algorithm
+
+* Initialization
+    * Let $T^1$ be tree obtained with $\alpha^1 = 0$. This is the initial tree with no regularization. Where \alpha is a Regularization parameter
+    * minimize R(T) where R(T) is the training/learning error
+* Step 1 
+    * select node $t \epsilon T^1$ that minimizes the function $$g_1(t) = \frac{R(t) - R(T^1_t)}{|f(T^1_t)|-1}$$ where $f(T)$ is a function that returns the set of leaves of tree T
+    * let $t_1$ be this node
+    * let $α^2=g_1(t_1)$ and $T^2=T^1−T^1_{t_1}$
+* Step i
+    * select node $t \epsilon T^i$ that minimizes the function $$g_i(t) = \frac{R(t) - R(T^i_t)}{|f(T^i_t)|-1}$$ 
+    * let $t_i$ be this node
+    * let $α^{i+1}=g_i(t_i)$ and $T^{i+1}=T^i−T^i_{t_i}$
+    
+#### Output
+
+* a sequence of trees $T_1⊇T_2⊇ ... ⊇T_k⊇ ... ⊇\{root\}$
+* a sequence of parameters $α_1⩽α_2⩽ ... ⩽α_k⩽ ...$
 
 ### mmit.pruning()
   
