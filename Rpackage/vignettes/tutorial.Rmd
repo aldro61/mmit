@@ -42,7 +42,7 @@ For each algorithm, we implemented the following:
 * Prediction: input examples represented by their features and output predictions
 * Minimum cost-complexity pruning (for MMIT only): reduce the size of trees by cutting branches
 
-This document is an short overview of the functionalities of the mmit package.
+This document is an short overview of the functionalities of the mmit package. The overview of the work done as part of Google summer of code is covered [here](https://aldro61.github.io/mmit/tutorials/R/)
  
 -----------------------------------------------------------------------------------------------------------
 
@@ -347,11 +347,11 @@ param_grid$max_depth <- c(Inf, 2)
 param_grid$margin <- c(2, 3)
 param_grid$min_sample <- c(10, 20)
 param_grid$loss <- c("hinge", "square")
-#result <- mmit.cv(target.mat, feature.mat, param_grid, scorer = mse, seed = 1)
-#print('result: ')
-#print(result$best_params)
-#print("best estimator: ")
-#plot(result$best_estimator)
+result <- mmit.cv(target.mat, feature.mat, param_grid, scorer = mse, seed = 1)
+print('result: ')
+print(result$best_params)
+print("best estimator: ")
+plot(result$best_estimator)
 ```
 
 ## Random Forest
@@ -389,8 +389,8 @@ library(mmit, quietly=TRUE)
   feature.mat <- data.frame(neuroblastomaProcessed$feature.mat)[1:45,]
   target.mat <- neuroblastomaProcessed$target.mat[1:45,]
   if(require(future)){ plan(multiprocess)}
-  #trees <- mmif(target.mat, feature.mat, max_depth = Inf, margin = 2.0, loss = "hinge", min_sample = 1, seed = 1)
-#for(i in trees){plot(i)}
+  trees <- mmif(target.mat, feature.mat, max_depth = Inf, margin = 2.0, loss = "hinge", min_sample = 1, seed = 1)
+for(i in trees){plot(i)}
 ```
 
 ### mmif.predict()
@@ -485,13 +485,13 @@ param_grid$loss <- c("hinge", "square")
 param_grid$n_trees <- c(10)
 param_grid$n_features <- c(as.integer(ncol(feature.mat)**0.5))
 if(require(future)){ plan(multiprocess)}
-#result <- mmif.cv(target.mat, feature.mat, param_grid, scorer = mse, seed = 1)
-#print('result: ')
-#print("best estimators: ")
-#lapply(result$best_estimator, plot)
-#for(i in result$best_estimator){
-#  plot(i)
-#}
+result <- mmif.cv(target.mat, feature.mat, param_grid, scorer = mse, seed = 1)
+print('result: ')
+print("best estimators: ")
+lapply(result$best_estimator, plot)
+for(i in result$best_estimator){
+  plot(i)
+}
 ```
 
 ## Other Functions
