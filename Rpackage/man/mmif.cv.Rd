@@ -5,7 +5,7 @@
 \title{Cross-validation for model selection with Random Forests of Max Margin Interval Trees}
 \usage{
 mmif.cv(target.mat, feature.mat, param_grid, n_folds = 3,
-  scorer = NULL, seed = NULL)
+  scorer = NULL)
 }
 \arguments{
 \item{target.mat}{The response variable of the model}
@@ -17,8 +17,6 @@ mmif.cv(target.mat, feature.mat, param_grid, n_folds = 3,
 \item{n_folds}{The number of folds for k-fold cross-validation}
 
 \item{scorer}{The function used to calculate the cross-validation score (e.g., mse, zero_one_loss)}
-
-\item{seed}{Value of seed for random sampling of training data}
 }
 \value{
 The best score, best model (trained with best parameters), best parameters, and list of all parameter values with cross validation score.
@@ -48,6 +46,7 @@ param_grid$loss <- c("hinge")
 param_grid$n_trees <- c(10, 20, 30)
 param_grid$n_features <- c(ceiling(ncol(feature.mat)**0.5))
 
+set.seed(1)
 result <- mmif.cv(target.mat, feature.mat, param_grid, scorer = mse)
 
 }

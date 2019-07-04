@@ -1,6 +1,6 @@
 .fit_and_score <- function(target.mat, feature.mat, 
                                     parameters, n_folds = 3, scorer = NULL, 
-                                    learner = NULL, pruning = TRUE, seed = NULL){
+                                    learner = NULL, pruning = TRUE){
   learner.predict = paste(learner, ".predict", sep = "")
   
   ### if pruning is true then learner should be mmit
@@ -9,9 +9,6 @@
   }
   
   ### shuffle the data 
-  if(is.null(seed)){
-    set.seed(seed)
-  }
   rand <- sample(nrow(target.mat))
   target.mat <- target.mat[rand,]
   feature.mat <- feature.mat[rand,]

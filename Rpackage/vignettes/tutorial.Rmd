@@ -316,7 +316,7 @@ It outputs all the CV results, the best model and best parameters. It is done us
   
 #### Usage:
   
-`mmit.cv(target.mat, feature.mat, param_grid, n_folds = 3, scorer = NULL, pruning = TRUE, seed = NULL)`
+`mmit.cv(target.mat, feature.mat, param_grid, n_folds = 3, scorer = NULL, pruning = TRUE)`
   
 #### Example:
   
@@ -332,7 +332,9 @@ param_grid$margin <- c(2, 3)
 param_grid$min_sample <- c(10, 20)
 param_grid$loss <- c("hinge", "square")
 if(require(future)){ plan(multiprocess)}
-result <- mmit.cv(target.mat, feature.mat, param_grid, scorer = mse, seed = 1)
+RNGkind("L'Ecuyer-CMRG")
+set.seed(1)
+result <- mmit.cv(target.mat, feature.mat, param_grid, scorer = mse)
 ```
 
 #### Output:
@@ -347,7 +349,9 @@ param_grid$max_depth <- c(Inf, 2)
 param_grid$margin <- c(2, 3)
 param_grid$min_sample <- c(10, 20)
 param_grid$loss <- c("hinge", "square")
-result <- mmit.cv(target.mat, feature.mat, param_grid, scorer = mse, seed = 1)
+RNGkind("L'Ecuyer-CMRG")
+set.seed(1)
+result <- mmit.cv(target.mat, feature.mat, param_grid, scorer = mse)
 print('result: ')
 print(result$best_params)
 print("best estimator: ")
@@ -367,7 +371,7 @@ Learning a random forest of Max Margin Interval Tree and giving list of trees as
 
 `mmif(target.mat, feature.mat, max_depth = Inf, margin = 0, loss = "hinge",
 min_sample = 1, n_trees = 10,
-n_features = ceiling(ncol(feature.mat)^0.5), seed = NULL)`
+n_features = ceiling(ncol(feature.mat)^0.5))`
   
 #### Example:
   
@@ -378,7 +382,8 @@ library(mmit)
   feature.mat <- data.frame(neuroblastomaProcessed$feature.mat)[1:45,]
   target.mat <- neuroblastomaProcessed$target.mat[1:45,]
   if(require(future)){ plan(multiprocess)}
-  trees <- mmif(target.mat, feature.mat, max_depth = Inf, margin = 2.0, loss = "hinge", min_sample = 1, seed = 1)
+  set.seed(1)
+  trees <- mmif(target.mat, feature.mat, max_depth = Inf, margin = 2.0, loss = "hinge", min_sample = 1)
 ```
 
 #### Output:
@@ -389,8 +394,9 @@ library(mmit, quietly=TRUE)
   feature.mat <- data.frame(neuroblastomaProcessed$feature.mat)[1:45,]
   target.mat <- neuroblastomaProcessed$target.mat[1:45,]
   if(require(future)){ plan(multiprocess)}
-  trees <- mmif(target.mat, feature.mat, max_depth = Inf, margin = 2.0, loss = "hinge", min_sample = 1, seed = 1)
-for(i in trees){plot(i)}
+  set.seed(1)
+  trees <- mmif(target.mat, feature.mat, max_depth = Inf, margin = 2.0, loss = "hinge", min_sample = 1)
+  for(i in trees){plot(i)}
 ```
 
 ### mmif.predict()
@@ -417,6 +423,7 @@ feature.mat <- rbind(
 colnames(feature.mat) <- c("a", "b", "c")
 feature.mat <- data.frame(feature.mat)
 
+set.seed(1)
 forest <- mmif(target.mat, feature.mat)
 pred <- mmif.predict(forest, feature.mat)
 ```
@@ -436,6 +443,7 @@ feature.mat <- rbind(
 colnames(feature.mat) <- c("a", "b", "c")
 feature.mat <- data.frame(feature.mat)
 
+set.seed(1)
 forest <- mmif(target.mat, feature.mat)
 pred <- mmif.predict(forest, feature.mat)
 print(pred)
@@ -447,7 +455,7 @@ Performing grid search to select the best hyperparameters of mmif via cross-vali
   
 #### Usage:
 
-`mmif.cv(target.mat, feature.mat, param_grid, n_folds = 3, scorer = NULL, seed = NULL)`
+`mmif.cv(target.mat, feature.mat, param_grid, n_folds = 3, scorer = NULL)`
   
 #### Example:
   
@@ -466,7 +474,9 @@ param_grid$loss <- c("hinge", "square")
 param_grid$n_trees <- c(10)
 param_grid$n_features <- c(as.integer(ncol(feature.mat)**0.5))
 if(require(future)){ plan(multiprocess)}
-result <- mmif.cv(target.mat, feature.mat, param_grid, scorer = mse, seed = 1)
+RNGkind("L'Ecuyer-CMRG")
+set.seed(1)
+result <- mmif.cv(target.mat, feature.mat, param_grid, scorer = mse)
 ```
 
 #### Output:
@@ -485,10 +495,11 @@ param_grid$loss <- c("hinge", "square")
 param_grid$n_trees <- c(10)
 param_grid$n_features <- c(as.integer(ncol(feature.mat)**0.5))
 if(require(future)){ plan(multiprocess)}
-result <- mmif.cv(target.mat, feature.mat, param_grid, scorer = mse, seed = 1)
+RNGkind("L'Ecuyer-CMRG")
+set.seed(1)
+result <- mmif.cv(target.mat, feature.mat, param_grid, scorer = mse)
 print('result: ')
 print("best estimators: ")
-lapply(result$best_estimator, plot)
 for(i in result$best_estimator){
   plot(i)
 }
