@@ -8,6 +8,7 @@
 #' @param n_folds The number of folds
 #' @param scorer The Loss calculation function 
 #' @param pruning Boolean whether pruning is to be done or not.
+#' @param future.seed A logical or an integer (of length one or seven), or a list of length(X) with pre-generated random seeds. 
 #' 
 #' @return The list consist of best score, best tree, best parameters and list of all parameter values with cross validation score . 
 #' 
@@ -32,13 +33,12 @@
 #' param_grid$min_sample <- c(2, 5, 10)
 #' param_grid$loss <- c("hinge")
 #' 
-#' RNGkind("L'Ecuyer-CMRG")
 #' set.seed(1)
-#' result <- mmit.cv(target.mat, feature.mat, param_grid, scorer = mse)
+#' result <- mmit.cv(target.mat, feature.mat, param_grid, scorer = mse, future.seed = TRUE)
 #' 
 mmit.cv <- function(target.mat, feature.mat, 
                               param_grid, n_folds = 3,
-                              scorer = NULL, pruning = TRUE){
+                              scorer = NULL, pruning = TRUE, future.seed = FALSE){
   
   ### add default value to parameters
   if(is.null(param_grid[["max_depth"]])) param_grid$max_depth <- Inf
@@ -68,7 +68,7 @@ mmit.cv <- function(target.mat, feature.mat,
   fitscore_result <- Lapply(1:nrow(parameters), 
                     function(x) .fit_and_score(target.mat = target.mat, 
                     feature.mat = feature.mat, parameters = parameters[x,], n_folds = n_folds,
-                    scorer = scorer, pruning = pruning, learner = "mmit"), future.seed = TRUE)
+                    scorer = scorer, pruning = pruning, learner = "mmit"), future.seed = future.seed)
   
   for(i in 1:nrow(parameters)){
     cv_results <- rbind(cv_results, fitscore_result[[i]]$cv_results)
