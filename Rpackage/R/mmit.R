@@ -31,7 +31,7 @@
 #' out <- mmit(target.mat, feature.mat)
 #' 
 
-mmit <- structure(function(target.mat, feature.mat,  
+mmit <- function(target.mat, feature.mat,  
                            max_depth = Inf, margin=0.0, loss="hinge",
                            min_sample = 1, weights = rep(1L, nrow(feature.mat))) {
   ### partynode id and initial depth
@@ -62,14 +62,8 @@ mmit <- structure(function(target.mat, feature.mat,
                                                           check.names = FALSE), terms = terms(feature.mat))
 
   return(tree)
-}, ex=function(){
   
-  data("neuroblastomaProcessed", package="penaltyLearning", envir=environment())
-  feature.mat <- data.frame(neuroblastomaProcessed$feature.mat)[1:45,]
-  target.mat <- neuroblastomaProcessed$target.mat[1:45,]
-  tree <- mmit(target.mat, feature.mat, max_depth = Inf, margin = 2.0)
-  plot(tree)
-  
-})
+}
+
 
 

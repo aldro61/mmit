@@ -5,7 +5,7 @@
 \title{The Cross Validation of Max Margin Interval Tree}
 \usage{
 mmit.cv(target.mat, feature.mat, param_grid, n_folds = 3,
-  scorer = NULL, pruning = TRUE)
+  scorer = NULL, pruning = TRUE, future.seed = FALSE)
 }
 \arguments{
 \item{target.mat}{The response variable of the model}
@@ -19,6 +19,8 @@ mmit.cv(target.mat, feature.mat, param_grid, n_folds = 3,
 \item{scorer}{The Loss calculation function}
 
 \item{pruning}{Boolean whether pruning is to be done or not.}
+
+\item{future.seed}{A logical or an integer (of length one or seven), or a list of length(X) with pre-generated random seeds.}
 }
 \value{
 The list consist of best score, best tree, best parameters and list of all parameter values with cross validation score .
@@ -45,7 +47,8 @@ param_grid$margin <- c(2, 3, 5)
 param_grid$min_sample <- c(2, 5, 10)
 param_grid$loss <- c("hinge")
 
-result <- mmit.cv(target.mat, feature.mat, param_grid, scorer = mse)
+set.seed(1)
+result <- mmit.cv(target.mat, feature.mat, param_grid, scorer = mse, future.seed = TRUE)
 
 }
 \author{

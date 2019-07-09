@@ -24,7 +24,7 @@
 #' forest <- mmif(target.mat, feature.mat)
 #' pred <- mmif.predict(forest, feature.mat)
 #' 
-mmif.predict <- structure(function(forest, test_feature.mat = NULL){
+mmif.predict <- function(forest, test_feature.mat = NULL){
   
   all_pred <- NULL
   for(i in 1 : length(forest)){
@@ -34,4 +34,4 @@ mmif.predict <- structure(function(forest, test_feature.mat = NULL){
   
   return(colMeans(all_pred))
   
-})
+}

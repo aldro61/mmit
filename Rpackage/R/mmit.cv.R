@@ -8,6 +8,7 @@
 #' @param n_folds The number of folds
 #' @param scorer The Loss calculation function 
 #' @param pruning Boolean whether pruning is to be done or not.
+#' @param future.seed A logical or an integer (of length one or seven), or a list of length(X) with pre-generated random seeds. 
 #' 
 #' @return The list consist of best score, best tree, best parameters and list of all parameter values with cross validation score . 
 #' 
@@ -32,11 +33,12 @@
 #' param_grid$min_sample <- c(2, 5, 10)
 #' param_grid$loss <- c("hinge")
 #' 
-#' result <- mmit.cv(target.mat, feature.mat, param_grid, scorer = mse)
+#' set.seed(1)
+#' result <- mmit.cv(target.mat, feature.mat, param_grid, scorer = mse, future.seed = TRUE)
 #' 
-mmit.cv <- structure(function(target.mat, feature.mat, 
+mmit.cv <- function(target.mat, feature.mat, 
                               param_grid, n_folds = 3,
-                              scorer = NULL, pruning = TRUE){
+                              scorer = NULL, pruning = TRUE, future.seed = FALSE){
   
   ### add default value to parameters
   if(is.null(param_grid[["max_depth"]])) param_grid$max_depth <- Inf
@@ -65,8 +67,8 @@ mmit.cv <- structure(function(target.mat, feature.mat,
   fitscore_result <- list()
   fitscore_result <- Lapply(1:nrow(parameters), 
                     function(x) .fit_and_score(target.mat = target.mat, 
-                    feature.mat = feature.mat, parameters = parameters[x,], 
-                    n_folds = n_folds, scorer = scorer, pruning = pruning, learner = "mmit"))
+                    feature.mat = feature.mat, parameters = parameters[x,], n_folds = n_folds,
+                    scorer = scorer, pruning = pruning, learner = "mmit"), future.seed = future.seed)
   
   for(i in 1:nrow(parameters)){
     cv_results <- rbind(cv_results, fitscore_result[[i]]$cv_results)
@@ -79,18 +81,4 @@ mmit.cv <- structure(function(target.mat, feature.mat,
   
   return(best_result)
   
-}, ex=function(){
-  
-  data("neuroblastomaProcessed", package="penaltyLearning", envir=environment())
-  feature.mat <- data.frame(neuroblastomaProcessed$feature.mat)[1:45,]
-  target.mat <- neuroblastomaProcessed$target.mat[1:45,]
-  
-  param_grid <- NULL
-  param_grid$max_depth <- c(Inf, 4, 3, 2, 1, 0)
-  param_grid$margin <- c(2, 3, 5)
-  param_grid$min_sample <- c(2, 5, 10, 20)
-  param_grid$loss <- c("hinge", "square")
-  
-  if(require(future)){ plan(multiprocess)}
-  result <- mmit.cv(target.mat, feature.mat, param_grid, scorer = mse)
-})
+}
