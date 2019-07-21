@@ -28,36 +28,6 @@
 #' 
 #' @export
 mmitboost.predict <- structure(function(target.mat, mmitboost_results) {
-  final_scores <- rep(0., times = nrow(test_feature.mat))
-  for(i in 1:length(trees)){
-
-    ### predictions of the model
-    prediction <- mmit.predict(trees[[i]], test_feature.mat)
-    if(i==1){
-      final_scores <- prediction
-    }
-    
-    ###error calc
-    scores <- 0.0
-    for(i in 1 : length(prediction)){
-      
-      if(target.mat[i,1] > prediction[i]){
-        scores[i] <- (target.mat[i,1] - prediction[i])**2
-      }
-      else if(target.mat[i,2] <= prediction[i]){
-        scores[i] <- (target.mat[i,2] - prediction[i])**2
-      }
-      else{
-        scores[i] <- 0.0
-      }
-    }
-    if(all(scores == 0)){
-      break
-    }
-    error <- sum(weights*scores)/sum(weights)
-    alpha <- 0.5 * log( (1. - error) /error)
-    weights <- weights*exp(alpha*scores)
-    final_scores <- final_scores + alpha*prediction
-  }
+  final_scores <- weighted.mean(mmitboost_results$pred, mmitboost_results$B)
   return(final_scores)
 })
