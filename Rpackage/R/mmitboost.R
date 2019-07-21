@@ -32,7 +32,7 @@
 #' out <- mmitboost(target.mat, feature.mat)
 #' 
 #' @export
-mmitboost <- structure(function(target.mat, feature.mat,   
+mmitboost <- function(target.mat, feature.mat,   
                                 max_depth = Inf, margin=0.0, loss="hinge", min_sample = 1, 
                                 weights = rep(1L, nrow(feature.mat))/seq(1L, nrow(feature.mat),1),
                                 n_estimators = 100) {
@@ -70,25 +70,18 @@ mmitboost <- structure(function(target.mat, feature.mat,
     }
   }
   return(result)
-}, ex=function(){
-  
-  data(neuroblastomaProcessed, package="penaltyLearning")
-  feature.mat <- data.frame(neuroblastomaProcessed$feature.mat)[1:45,]
-  target.mat <- neuroblastomaProcessed$target.mat[1:45,]
-  pred <- mmitboost(target.mat, feature.mat, max_depth = Inf, margin = 2.0, weights = rep(1L, nrow(feature.mat)))
-  
-})
+}
 
 .compute_loss <- function(target.mat, prediction, margin, loss){
-  lower = target.mat[,0]-prediction+margin
-  lower[lower<0] <- 0
-  upper = prediction - target.mat[,1]+margin
-  upper[upper<0] <- 0
+  lower = target.mat[,1] - prediction + margin
+  lower[lower < 0] <- 0
+  upper = prediction - target.mat[,2] + margin
+  upper[upper < 0] <- 0
   if(loss == 'hinge'){
-    cost = lower+upper
+    cost = lower + upper
   }
   else if(loss == 'square'){
-    cost = (lower+upper)**2
+    cost = (lower + upper)**2
   }
   return(cost)
 }
