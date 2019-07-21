@@ -1,4 +1,5 @@
-init_pruning <- structure(function(tree){
+.init_pruning <- function(tree){
+
   
   ### id of inner node
   ter_id <- nodeids(tree, terminal = TRUE)
@@ -43,4 +44,4 @@ init_pruning <- structure(function(tree){
   
   return(tree)
   
-})
+}
