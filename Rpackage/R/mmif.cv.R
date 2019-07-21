@@ -7,7 +7,7 @@
 #' @param param_grid A list with values to try for each hyperparameter (max_depth, margin, min_sample, loss, n_trees, n_features).
 #' @param n_folds The number of folds for k-fold cross-validation
 #' @param scorer The function used to calculate the cross-validation score (e.g., mse, zero_one_loss)
-#' @param n_cpu The number of cores used to explore hyperparameter combinations in parallel, default value is 1 and n_cpu = -1 to select all cores.
+#' @param future.seed A logical or an integer (of length one or seven), or a list of length(X) with pre-generated random seeds. 
 #' 
 #' @return The best score, best model (trained with best parameters), best parameters, and list of all parameter values with cross validation score. 
 #' 
@@ -35,12 +35,12 @@
 #' param_grid$n_trees <- c(10, 20, 30)
 #' param_grid$n_features <- c(ceiling(ncol(feature.mat)**0.5))
 #' 
-#' result <- mmif.cv(target.mat, feature.mat, param_grid, scorer = mse, n_cpu = -1)
+#' set.seed(1)
+#' result <- mmif.cv(target.mat, feature.mat, param_grid, scorer = mse, future.seed = TRUE)
 #' 
-#' @export
-mmif.cv <- structure(function(target.mat, feature.mat, 
+mmif.cv <- function(target.mat, feature.mat, 
                               param_grid, n_folds = 3,
-                              scorer = NULL, n_cpu = 1){
+                              scorer = NULL, future.seed = FALSE){
   
   ### add default value to parameters
   if(is.null(param_grid[["max_depth"]])) param_grid$max_depth <- Inf
@@ -73,11 +73,10 @@ mmif.cv <- structure(function(target.mat, feature.mat,
   registerDoParallel(cl)
   
   fitscore_result <- list()
-  fitscore_result <- foreach(i = 1:nrow(parameters), .packages = "mmit") %dopar% 
-    fit_and_score(target.mat = target.mat, feature.mat = feature.mat, 
-                  parameters = parameters[i,], learner = "mmif", 
-                  n_folds = n_folds, scorer = scorer, pruning = FALSE)
-  stopCluster(cl)  
+  fitscore_result <- Lapply(1:nrow(parameters), 
+                  function(x) .fit_and_score(target.mat = target.mat, feature.mat = feature.mat, 
+                  parameters = parameters[x,], learner = "mmif", 
+                  n_folds = n_folds, scorer = scorer, pruning = FALSE), future.seed = future.seed)
 
   for(i in 1:nrow(parameters)){
     cv_results <- rbind(cv_results, fitscore_result[[i]]$cv_results)
@@ -90,22 +89,5 @@ mmif.cv <- structure(function(target.mat, feature.mat,
   
   return(best_result)
   
-}, ex=function(){
-  
-  data(neuroblastomaProcessed, package="penaltyLearning")
-  feature.mat <- data.frame(neuroblastomaProcessed$feature.mat)[1:45,]
-  target.mat <- neuroblastomaProcessed$target.mat[1:45,]
-  
-  param_grid <- NULL
-  param_grid$max_depth <- c(4, 3)
-  param_grid$margin <- c(2, 3)
-  param_grid$min_sample <- c(5, 20)
-  param_grid$loss <- c("hinge", "square")
-  param_grid$n_trees <- c(10)
-  param_grid$n_features <- c(as.integer(ncol(feature.mat)**0.5))
-  
-  if(require(future)){ plan(multiprocess)}
-  result <- mmif.cv(target.mat, feature.mat, param_grid, scorer = mse)
-  
-})
+}
 

@@ -4,8 +4,8 @@
 \alias{mmif.cv}
 \title{Cross-validation for model selection with Random Forests of Max Margin Interval Trees}
 \usage{
-mmif.cv(target.mat, feature.mat, param_grid, n_folds = 3, scorer = NULL,
-  n_cpu = 1)
+mmif.cv(target.mat, feature.mat, param_grid, n_folds = 3,
+  scorer = NULL, future.seed = FALSE)
 }
 \arguments{
 \item{target.mat}{The response variable of the model}
@@ -18,7 +18,7 @@ mmif.cv(target.mat, feature.mat, param_grid, n_folds = 3, scorer = NULL,
 
 \item{scorer}{The function used to calculate the cross-validation score (e.g., mse, zero_one_loss)}
 
-\item{n_cpu}{The number of cores used to explore hyperparameter combinations in parallel, default value is 1 and n_cpu = -1 to select all cores.}
+\item{future.seed}{A logical or an integer (of length one or seven), or a list of length(X) with pre-generated random seeds.}
 }
 \value{
 The best score, best model (trained with best parameters), best parameters, and list of all parameter values with cross validation score.
@@ -48,7 +48,8 @@ param_grid$loss <- c("hinge")
 param_grid$n_trees <- c(10, 20, 30)
 param_grid$n_features <- c(ceiling(ncol(feature.mat)**0.5))
 
-result <- mmif.cv(target.mat, feature.mat, param_grid, scorer = mse, n_cpu = -1)
+set.seed(1)
+result <- mmif.cv(target.mat, feature.mat, param_grid, scorer = mse, future.seed = TRUE)
 
 }
 \author{
