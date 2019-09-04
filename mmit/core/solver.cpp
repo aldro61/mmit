@@ -12,7 +12,7 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-#include <cmath>
+#include <cmath> // for INFINITY
 #include <iostream>
 #include "coefficients.h"
 #include "double_utils.h"
@@ -99,7 +99,7 @@ int compute_optimal_cost(
         // Uncensored output
         if (equal(lower_vec[i], upper_vec[i]))
         {
-            if (!isinf(lower_vec[i]))
+            if (-INFINITY < lower_vec[i])
             {
                 Coefficients F1 = get_coefficients(lower_vec[i], 0., false, loss_type) * weights[i];
                 Coefficients F2 = get_coefficients(upper_vec[i], 0., true, loss_type) * weights[i];
@@ -112,7 +112,7 @@ int compute_optimal_cost(
         else
         {
             // Add the lower bound
-            if (!isinf(lower_vec[i]))
+            if (-INFINITY < lower_vec[i])
             {
                 Coefficients F = get_coefficients(lower_vec[i], margin, false, loss_type) * weights[i];
                 double b = get_breakpoint(lower_vec[i], margin, false);
@@ -120,7 +120,7 @@ int compute_optimal_cost(
             }
 
             // Add the upper bound
-            if (!isinf(upper_vec[i]))
+            if (upper_vec[i] < INFINITY)
             {
                 Coefficients F = get_coefficients(upper_vec[i], margin, true, loss_type) * weights[i];
                 double b = get_breakpoint(upper_vec[i], margin, true);
