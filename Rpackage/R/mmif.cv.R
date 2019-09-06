@@ -39,7 +39,7 @@
 #' result <- mmif.cv(target.mat, feature.mat, param_grid, scorer = mse, future.seed = TRUE)
 #' 
 mmif.cv <- function(target.mat, feature.mat, 
-                              param_grid, n_folds = 3,
+                              param_grid = NULL, n_folds = 3,
                               scorer = NULL, future.seed = FALSE){
   
   ### add default value to parameters

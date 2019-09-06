@@ -37,7 +37,7 @@
 #' result <- mmit.cv(target.mat, feature.mat, param_grid, scorer = mse, future.seed = TRUE)
 #' 
 mmit.cv <- function(target.mat, feature.mat, 
-                              param_grid, n_folds = 3,
+                              param_grid = NULL, n_folds = 3,
                               scorer = NULL, pruning = TRUE, future.seed = FALSE){
   
   ### add default value to parameters
