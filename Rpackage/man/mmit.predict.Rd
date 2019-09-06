@@ -32,7 +32,7 @@ feature.mat <- rbind(
 colnames(feature.mat) <- c("a", "b", "c")
 feature.mat <- data.frame(feature.mat)
 
-tree <- mmit(target.mat, feature.mat)
+tree <- mmit(feature.mat, target.mat)
 
 pred <- mmit.predict(tree)
 

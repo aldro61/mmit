@@ -1,7 +1,10 @@
-#' Predictions with random forests of Max Margin Interval Trees
-#' 
-#' @param forest Ensemble of MMITs
-#' @param test_feature.mat A data frame containing the features of the examples for which predictions must be computed.
+#' The Predict Function for Cross Validation of Random Forest
+#'
+#' Fits the new data into the mmif.cv model to give prediction values
+#'
+#' @param object Object obtained from \code{"mmif.cv()"}
+#' @param newdata an optional data frame containing the testing data which is to be predicted.
+#' @param perm an optional character vector of variable names. 
 #' 
 #' @return Predictions Average output of each tree in the forest
 #' 
@@ -9,7 +12,6 @@
 #' 
 #' @examples
 #' library(mmit)
-#'
 #' target.mat <- rbind(
 #'   c(0,1), c(0,1), c(0,1),
 #'   c(2,3), c(2,3), c(2,3))
@@ -21,17 +23,18 @@
 #' colnames(feature.mat) <- c("a", "b", "c")
 #' feature.mat <- data.frame(feature.mat)
 #' 
-#' forest <- mmif(feature.mat, target.mat)
-#' pred <- mmif.predict(forest, feature.mat)
+#' fit <- mmif.cv(feature.mat, target.mat)
 #' 
-mmif.predict <- function(forest, test_feature.mat = NULL){
+#' pred <- mmif.cv.predict(fit)
+#' 
+mmit.cv.predict <- function(object, newdata = NULL, perm = NULL){
   
   all_pred <- NULL
+  forest <- object$best_estimator
   for(i in 1 : length(forest)){
     prediction <- mmit.predict(forest[[i]], test_feature.mat)
     all_pred <- rbind(all_pred, prediction)
   }
   
   return(colMeans(all_pred))
-  
 }

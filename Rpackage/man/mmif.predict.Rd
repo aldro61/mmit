@@ -31,7 +31,7 @@ feature.mat <- rbind(
 colnames(feature.mat) <- c("a", "b", "c")
 feature.mat <- data.frame(feature.mat)
 
-forest <- mmif(target.mat, feature.mat)
+forest <- mmif(feature.mat, target.mat)
 pred <- mmif.predict(forest, feature.mat)
 
 }
