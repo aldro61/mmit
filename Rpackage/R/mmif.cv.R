@@ -6,7 +6,7 @@
 #' @param feature.mat A data frame containing the feature variables in the model.
 #' @param param_grid A list with values to try for each hyperparameter (max_depth, margin, min_sample, loss, n_trees, n_features).
 #' @param n_folds The number of folds for k-fold cross-validation
-#' @param scorer The function used to calculate the cross-validation score (e.g., mse, zero_one_loss)
+#' @param scorer The function used to calculate the cross-validation score (default loss function: MSE)
 #' @param future.seed A logical or an integer (of length one or seven), or a list of length(X) with pre-generated random seeds. 
 #' 
 #' @return The best score, best model (trained with best parameters), best parameters, and list of all parameter values with cross validation score. 

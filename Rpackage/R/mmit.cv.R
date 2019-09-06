@@ -6,7 +6,7 @@
 #' @param feature.mat a data frame containing the feature variables in the model.
 #' @param param_grid the list of paramaters
 #' @param n_folds The number of folds
-#' @param scorer The Loss calculation function 
+#' @param scorer The Loss calculation function (default loss function: MSE)
 #' @param pruning Boolean whether pruning is to be done or not.
 #' @param future.seed A logical or an integer (of length one or seven), or a list of length(X) with pre-generated random seeds. 
 #' 
@@ -38,7 +38,7 @@
 #' 
 mmit.cv <- function(target.mat, feature.mat, 
                               param_grid = NULL, n_folds = 3,
-                              scorer = NULL, pruning = TRUE, future.seed = FALSE){
+                              scorer = mse, pruning = TRUE, future.seed = FALSE){
   
   ### add default value to parameters
   if(is.null(param_grid[["max_depth"]])) param_grid$max_depth <- Inf

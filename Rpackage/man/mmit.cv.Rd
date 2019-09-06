@@ -4,8 +4,8 @@
 \alias{mmit.cv}
 \title{The Cross Validation of Max Margin Interval Tree}
 \usage{
-mmit.cv(target.mat, feature.mat, param_grid, n_folds = 3,
-  scorer = NULL, pruning = TRUE, future.seed = FALSE)
+mmit.cv(target.mat, feature.mat, param_grid = NULL, n_folds = 3,
+  scorer = mse, pruning = TRUE, future.seed = FALSE)
 }
 \arguments{
 \item{target.mat}{The response variable of the model}
@@ -16,7 +16,7 @@ mmit.cv(target.mat, feature.mat, param_grid, n_folds = 3,
 
 \item{n_folds}{The number of folds}
 
-\item{scorer}{The Loss calculation function}
+\item{scorer}{The Loss calculation function (default loss function: MSE)}
 
 \item{pruning}{Boolean whether pruning is to be done or not.}
 

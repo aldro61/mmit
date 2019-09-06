@@ -4,8 +4,8 @@
 \alias{mmif.cv}
 \title{Cross-validation for model selection with Random Forests of Max Margin Interval Trees}
 \usage{
-mmif.cv(target.mat, feature.mat, param_grid, n_folds = 3,
-  scorer = NULL, future.seed = FALSE)
+mmif.cv(target.mat, feature.mat, param_grid = NULL, n_folds = 3,
+  scorer = mse, future.seed = FALSE)
 }
 \arguments{
 \item{target.mat}{The response variable of the model}
@@ -16,7 +16,7 @@ mmif.cv(target.mat, feature.mat, param_grid, n_folds = 3,
 
 \item{n_folds}{The number of folds for k-fold cross-validation}
 
-\item{scorer}{The function used to calculate the cross-validation score (e.g., mse, zero_one_loss)}
+\item{scorer}{The function used to calculate the cross-validation score (default loss function: MSE)}
 
 \item{future.seed}{A logical or an integer (of length one or seven), or a list of length(X) with pre-generated random seeds.}
 }
