@@ -2,8 +2,9 @@
 #'
 #' Performing grid search to select the best parameters via cross validation on the  a regression tree for censored data.
 #' 
-#' @param target.mat The response variable of the model
+#' 
 #' @param feature.mat a data frame containing the feature variables in the model.
+#' @param target.mat The response variable of the model
 #' @param param_grid the list of paramaters
 #' @param n_folds The number of folds
 #' @param scorer The Loss calculation function (default loss function: MSE)
@@ -34,9 +35,9 @@
 #' param_grid$loss <- c("hinge")
 #' 
 #' set.seed(1)
-#' result <- mmit.cv(target.mat, feature.mat, param_grid, scorer = mse, future.seed = TRUE)
+#' result <- mmit.cv(feature.mat, target.mat, param_grid, scorer = mse, future.seed = TRUE)
 #' 
-mmit.cv <- function(target.mat, feature.mat, 
+mmit.cv <- function(feature.mat, target.mat, 
                               param_grid = NULL, n_folds = 3,
                               scorer = mse, pruning = TRUE, future.seed = FALSE){
   

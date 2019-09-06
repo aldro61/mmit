@@ -4,14 +4,14 @@
 \alias{mmit}
 \title{The Max Margin Interval Tree}
 \usage{
-mmit(target.mat, feature.mat, max_depth = Inf, margin = 0,
+mmit(feature.mat, target.mat, max_depth = Inf, margin = 0,
   loss = "hinge", min_sample = 1, weights = rep(1L,
   nrow(feature.mat)))
 }
 \arguments{
-\item{target.mat}{The response variable of the model}
-
 \item{feature.mat}{a data frame containing the feature variables in the model.}
+
+\item{target.mat}{The response variable of the model}
 
 \item{max_depth}{The maximum depth criteia}
 
@@ -43,7 +43,7 @@ colnames(feature.mat) <- c("a", "b", "c")
 feature.mat <- data.frame(feature.mat)
 
 
-out <- mmit(target.mat, feature.mat)
+out <- mmit(feature.mat,target.mat)
 
 }
 \author{

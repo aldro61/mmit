@@ -4,13 +4,13 @@
 \alias{mmif.cv}
 \title{Cross-validation for model selection with Random Forests of Max Margin Interval Trees}
 \usage{
-mmif.cv(target.mat, feature.mat, param_grid = NULL, n_folds = 3,
-  scorer = mse, future.seed = FALSE)
+mmif.cv(feature.mat, target.mat, param_grid = NULL, n_folds = 3,
+  scorer = NULL, future.seed = FALSE)
 }
 \arguments{
-\item{target.mat}{The response variable of the model}
-
 \item{feature.mat}{A data frame containing the feature variables in the model.}
+
+\item{target.mat}{The response variable of the model}
 
 \item{param_grid}{A list with values to try for each hyperparameter (max_depth, margin, min_sample, loss, n_trees, n_features).}
 
@@ -49,7 +49,7 @@ param_grid$n_trees <- c(10, 20, 30)
 param_grid$n_features <- c(ceiling(ncol(feature.mat)**0.5))
 
 set.seed(1)
-result <- mmif.cv(target.mat, feature.mat, param_grid, scorer = mse, future.seed = TRUE)
+result <- mmif.cv(feature.mat, target.mat, param_grid, scorer = mse, future.seed = TRUE)
 
 }
 \author{

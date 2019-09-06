@@ -4,13 +4,13 @@
 \alias{mmit.cv}
 \title{The Cross Validation of Max Margin Interval Tree}
 \usage{
-mmit.cv(target.mat, feature.mat, param_grid = NULL, n_folds = 3,
+mmit.cv(feature.mat, target.mat, param_grid = NULL, n_folds = 3,
   scorer = mse, pruning = TRUE, future.seed = FALSE)
 }
 \arguments{
-\item{target.mat}{The response variable of the model}
-
 \item{feature.mat}{a data frame containing the feature variables in the model.}
+
+\item{target.mat}{The response variable of the model}
 
 \item{param_grid}{the list of paramaters}
 
@@ -48,7 +48,7 @@ param_grid$min_sample <- c(2, 5, 10)
 param_grid$loss <- c("hinge")
 
 set.seed(1)
-result <- mmit.cv(target.mat, feature.mat, param_grid, scorer = mse, future.seed = TRUE)
+result <- mmit.cv(feature.mat, target.mat, param_grid, scorer = mse, future.seed = TRUE)
 
 }
 \author{

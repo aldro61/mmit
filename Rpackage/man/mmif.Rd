@@ -4,14 +4,14 @@
 \alias{mmif}
 \title{Random Forest of Max Margin Interval Tree}
 \usage{
-mmif(target.mat, feature.mat, max_depth = Inf, margin = 0,
+mmif(feature.mat, target.mat, max_depth = Inf, margin = 0,
   loss = "hinge", min_sample = 1, n_trees = 10,
   n_features = ceiling(ncol(feature.mat)^0.5), future.seed = FALSE)
 }
 \arguments{
-\item{target.mat}{The response variable of the model}
-
 \item{feature.mat}{a data frame containing the feature variables in the model.}
+
+\item{target.mat}{The response variable of the model}
 
 \item{max_depth}{The maximum depth of each tree}
 
@@ -48,7 +48,7 @@ colnames(feature.mat) <- c("a", "b", "c")
 feature.mat <- data.frame(feature.mat)
 
 set.seed(1)
-trees <- mmif(target.mat, feature.mat, margin = 2.0, future.seed = TRUE)
+trees <- mmif(feature.mat, target.mat, margin = 2.0, future.seed = TRUE)
 
 }
 \author{
