@@ -48,7 +48,7 @@ mmif.cv <- function(feature.mat, target.mat,
   if(is.null(param_grid[["min_sample"]])) param_grid$min_sample <- 0.0
   if(is.null(param_grid[["loss"]])) param_grid$loss <- "hinge"
   if(is.null(param_grid[["n_trees"]])) param_grid$n_trees <- 10
-  if(is.null(param_grid[["n_features"]])) param_grid$n_features <- c(as.integer(ncol(feature.mat)**0.5))
+  if(is.null(param_grid[["n_features"]])) param_grid$n_features <- c(ceiling(ncol(feature.mat)**0.5))
   
   ### check for unwanted parameters
   assert_that(length(param_grid) <= 6, msg = "unexpected parameters as argument")
