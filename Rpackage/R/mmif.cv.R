@@ -40,7 +40,7 @@
 #' 
 mmif.cv <- function(feature.mat, target.mat, 
                               param_grid = NULL, n_folds = 3,
-                              scorer = NULL, future.seed = FALSE){
+                              scorer = mse, future.seed = FALSE){
   
   ### add default value to parameters
   if(is.null(param_grid[["max_depth"]])) param_grid$max_depth <- Inf

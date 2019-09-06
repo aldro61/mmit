@@ -5,7 +5,7 @@
 \title{Cross-validation for model selection with Random Forests of Max Margin Interval Trees}
 \usage{
 mmif.cv(feature.mat, target.mat, param_grid = NULL, n_folds = 3,
-  scorer = NULL, future.seed = FALSE)
+  scorer = mse, future.seed = FALSE)
 }
 \arguments{
 \item{feature.mat}{A data frame containing the feature variables in the model.}

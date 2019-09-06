@@ -27,12 +27,12 @@
 #' 
 #' pred <- mmif.cv.predict(fit)
 #' 
-mmit.cv.predict <- function(object, newdata = NULL, perm = NULL){
+mmif.cv.predict <- function(object, newdata = NULL, perm = NULL){
   
   all_pred <- NULL
   forest <- object$best_estimator
   for(i in 1 : length(forest)){
-    prediction <- mmit.predict(forest[[i]], test_feature.mat)
+    prediction <- mmit.predict(forest[[i]], newdata)
     all_pred <- rbind(all_pred, prediction)
   }
   
