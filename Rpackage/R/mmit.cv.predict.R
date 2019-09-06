@@ -30,7 +30,7 @@
 mmit.cv.predict <- function(object, newdata = NULL, perm = NULL){
   
   fit <- predict(object$best_estimator, newdata, perm)
-  n <- lapply(nodeapply(tree, ids = fit, info_node), function(x) x$prediction)
+  n <- lapply(nodeapply(object$best_estimator, ids = fit, info_node), function(x) x$prediction)
   prediction <- c(matrix(unlist(n), nrow = length(n), byrow = T))
   
   return(prediction)
