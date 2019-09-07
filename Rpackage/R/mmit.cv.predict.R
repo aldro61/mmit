@@ -23,7 +23,7 @@
 #' colnames(feature.mat) <- c("a", "b", "c")
 #' feature.mat <- data.frame(feature.mat)
 #' 
-#' fit <- mmit(feature.mat, target.mat)
+#' fit <- mmit.cv(feature.mat, target.mat)
 #' 
 #' pred <- mmit.cv.predict(fit)
 #' 
