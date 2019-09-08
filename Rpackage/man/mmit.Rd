@@ -43,7 +43,7 @@ colnames(feature.mat) <- c("a", "b", "c")
 feature.mat <- data.frame(feature.mat)
 
 
-out <- mmit(feature.mat,target.mat)
+out <- mmit(feature.mat, target.mat)
 
 }
 \author{

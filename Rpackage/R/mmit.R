@@ -29,7 +29,7 @@
 #' feature.mat <- data.frame(feature.mat)
 #' 
 #' 
-#' out <- mmit(feature.mat,target.mat)
+#' out <- mmit(feature.mat, target.mat)
 #' 
 
 mmit <- function(feature.mat,  target.mat, 
