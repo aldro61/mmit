@@ -15,12 +15,12 @@ y.test <- neuroblastomaProcessed$target.mat[!is.train,]
 
 test_that("mmit.cv(X,y) works", {
   fit <- mmit.cv(X.train, y.train)
-  pred.vec <- mmit.cv.predict(fit, X.test)
+  pred.vec <- predict(fit, X.test)
   expect_equal(length(pred.vec), nrow(y.test))
 })
 
 test_that("mmif.cv(X,y) works", {
   fit <- mmif.cv(X.train, y.train)
-  pred.vec <- mmif.cv.predict(fit, X.test)
+  pred.vec <- predict(fit, X.test)
   expect_equal(length(pred.vec), nrow(y.test))
 })
