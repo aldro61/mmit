@@ -468,7 +468,7 @@ param_grid$margin <- c(2, 3)
 param_grid$min_sample <- c(5, 20)
 param_grid$loss <- c("hinge", "square")
 param_grid$n_trees <- c(10)
-param_grid$n_features <- c(as.integer(ncol(feature.mat)**0.5))
+param_grid$n_features <- c(ceiling(ncol(feature.mat)**0.5))
 if(require(future)){ plan(multiprocess)}
 set.seed(1)
 fit <- mmif.cv(feature.mat, target.mat, param_grid, scorer = mse, future.seed = TRUE)
@@ -490,7 +490,7 @@ param_grid$margin <- c(2, 3)
 param_grid$min_sample <- c(5, 20)
 param_grid$loss <- c("hinge", "square")
 param_grid$n_trees <- c(10)
-param_grid$n_features <- c(as.integer(ncol(feature.mat)**0.5))
+param_grid$n_features <- c(ceiling(ncol(feature.mat)**0.5))
 if(require(future)){ plan(multiprocess)}
 
 set.seed(1)

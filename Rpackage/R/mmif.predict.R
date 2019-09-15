@@ -28,9 +28,7 @@ predict.mmif <- function(forest, test_feature.mat = NULL){
   
   all_pred <- NULL
   for(i in 1 : length(forest)){
-    fit <- predict(forest[[i]], test_feature.mat)
-    n <- lapply(nodeapply(tree, ids = fit, info_node), function(x) x$prediction)
-    prediction <- c(matrix(unlist(n), nrow = length(n), byrow = T))
+    prediction <- predict.mmit(forest[[i]], test_feature.mat)
     all_pred <- rbind(all_pred, prediction)
   }
   

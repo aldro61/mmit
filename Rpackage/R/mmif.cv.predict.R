@@ -4,7 +4,6 @@
 #'
 #' @param object Object obtained from \code{"mmif.cv()"}
 #' @param newdata an optional data frame containing the testing data which is to be predicted.
-#' @param perm an optional character vector of variable names. 
 #' 
 #' @return Predictions Average output of each tree in the forest
 #' 
@@ -27,16 +26,11 @@
 #' 
 #' pred <- predict(fit)
 #' 
-predict.mmif.cv <- function(object, newdata = NULL, perm = NULL){
+predict.mmif.cv <- function(object, newdata = NULL){
   
   all_pred <- NULL
   forest <- object$best_estimator
-  for(i in 1 : length(forest)){
-    fit <- predict(forest[[i]], newdata)
-    n <- lapply(nodeapply(tree, ids = fit, info_node), function(x) x$prediction)
-    prediction <- c(matrix(unlist(n), nrow = length(n), byrow = T))
-    all_pred <- rbind(all_pred, prediction)
-  }
+  prediction <- predict.mmif(forest, newdata)
   
-  return(colMeans(all_pred))
+  return(prediction)
 }
