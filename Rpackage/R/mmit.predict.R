@@ -25,9 +25,9 @@
 #' 
 #' tree <- mmit(feature.mat, target.mat)
 #' 
-#' pred <- mmit.predict(tree)
+#' pred <- predict.mmit(tree)
 #' 
-mmit.predict <- function(tree, newdata = NULL, perm = NULL){
+predict.mmit <- function(tree, newdata = NULL, perm = NULL){
     
   fit <- predict(tree, newdata, perm)
   n <- lapply(nodeapply(tree, ids = fit, info_node), function(x) x$prediction)
