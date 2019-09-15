@@ -22,9 +22,9 @@
 #' feature.mat <- data.frame(feature.mat)
 #' 
 #' forest <- mmif(feature.mat, target.mat)
-#' pred <- mmif.predict(forest, feature.mat)
+#' pred <- predict(forest, feature.mat)
 #' 
-mmif.predict <- function(forest, test_feature.mat = NULL){
+predict.mmif <- function(forest, test_feature.mat = NULL){
   
   all_pred <- NULL
   for(i in 1 : length(forest)){

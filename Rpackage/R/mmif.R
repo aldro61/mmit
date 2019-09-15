@@ -83,5 +83,6 @@ mmif <- function(feature.mat, target.mat,
   ### tree
   tree <- mmit(new_feature.mat, new_target.mat, margin = margin, loss = loss, 
                min_sample = min_sample, max_depth = max_depth)
+  class(trees) <- "mmif"
   return(tree)
 }

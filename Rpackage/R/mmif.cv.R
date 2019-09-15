@@ -37,7 +37,7 @@
 #' 
 #' set.seed(1)
 #' result <- mmif.cv(feature.mat, target.mat, param_grid, scorer = mse, future.seed = TRUE)
-#' 
+#' pred <- predict(result)
 mmif.cv <- function(feature.mat, target.mat, 
                               param_grid = NULL, n_folds = 3,
                               scorer = mse, future.seed = FALSE){
@@ -84,6 +84,7 @@ mmif.cv <- function(feature.mat, target.mat,
   }    
   
   best_result$cv_results <- cv_results
+  class(best_result) <- "mmif.cv" 
   
   return(best_result)
   

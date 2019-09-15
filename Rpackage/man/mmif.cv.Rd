@@ -50,7 +50,7 @@ param_grid$n_features <- c(ceiling(ncol(feature.mat)**0.5))
 
 set.seed(1)
 result <- mmif.cv(feature.mat, target.mat, param_grid, scorer = mse, future.seed = TRUE)
-
+pred <- predict(result)
 }
 \author{
 Toby Dylan Hocking, Alexandre Drouin, Torsten Hothorn, Parismita Das

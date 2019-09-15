@@ -25,14 +25,16 @@
 #' 
 #' fit <- mmif.cv(feature.mat, target.mat)
 #' 
-#' pred <- mmif.cv.predict(fit)
+#' pred <- predict(fit)
 #' 
-mmif.cv.predict <- function(object, newdata = NULL, perm = NULL){
+predict.mmif.cv <- function(object, newdata = NULL, perm = NULL){
   
   all_pred <- NULL
   forest <- object$best_estimator
   for(i in 1 : length(forest)){
-    prediction <- mmit.predict(forest[[i]], newdata)
+    fit <- predict(forest[[i]], newdata)
+    n <- lapply(nodeapply(tree, ids = fit, info_node), function(x) x$prediction)
+    prediction <- c(matrix(unlist(n), nrow = length(n), byrow = T))
     all_pred <- rbind(all_pred, prediction)
   }
   

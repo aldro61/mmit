@@ -79,6 +79,7 @@ mmit.cv <- function(feature.mat, target.mat,
   }    
   
   best_result$cv_results <- cv_results
+  class(best_result) <- "mmit.cv"
   
   return(best_result)
   

@@ -25,9 +25,9 @@
 #' 
 #' fit <- mmit.cv(feature.mat, target.mat)
 #' 
-#' pred <- mmit.cv.predict(fit)
+#' pred <- predict(fit)
 #' 
-mmit.cv.predict <- function(object, newdata = NULL, perm = NULL){
+predict.mmit.cv <- function(object, newdata = NULL, perm = NULL){
   
   fit <- predict(object$best_estimator, newdata, perm)
   n <- lapply(nodeapply(object$best_estimator, ids = fit, info_node), function(x) x$prediction)
