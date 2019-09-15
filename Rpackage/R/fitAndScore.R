@@ -1,7 +1,7 @@
 .fit_and_score <- function(target.mat, feature.mat, 
                                     parameters, n_folds = 3, scorer = NULL, 
                                     learner = NULL, pruning = TRUE){
-  learner.predict = paste(learner, ".predict", sep = "")
+  predict.learner = paste( "predict.", learner, sep = "")
   
   ### if pruning is true then learner should be mmit
   if(pruning==TRUE){
@@ -73,7 +73,7 @@
         node <- fold_prune_models[[i]][[j]]
         
         ### predictions of the model for test data
-        prediction <- do.call(learner.predict, list(node, feature.mat[fold_split_idx$test[i,],]))
+        prediction <- do.call(predict.learner, list(node, feature.mat[fold_split_idx$test[i,],]))
 
         ###error calc
         fold_test_scores <- scorer(target.mat[fold_split_idx$test[i,],], prediction)
@@ -110,7 +110,7 @@
       }
 
       ### calc train score
-      prediction <- do.call(learner.predict, list(master_pruned_models[[i]], feature.mat))
+      prediction <- do.call(predict.learner, list(master_pruned_models[[i]], feature.mat))
       train_score <- scorer(target.mat, prediction)
       
       ### calc cost of all leaves
@@ -154,7 +154,7 @@
     ### For each fold, build a decision model
     fold_test_scores <- NULL
     for(i in 1 : n_folds){
-      prediction <- do.call(learner.predict, list(fold_model[[i]], feature.mat[fold_split_idx$test[i,],]))
+      prediction <- do.call(predict.learner, list(fold_model[[i]], feature.mat[fold_split_idx$test[i,],]))
       fold_test_scores <- c(fold_test_scores, scorer(target.mat, prediction))
     }
       
@@ -165,7 +165,7 @@
     alpha_cv_scores <- c(best_score)
     
     ### calc train score
-    prediction <- do.call(learner.predict, list(master_model, feature.mat))
+    prediction <- do.call(predict.learner, list(master_model, feature.mat))
     alpha_train_scores <- scorer(target.mat, prediction)
     
     ### calc cost of all leaves
