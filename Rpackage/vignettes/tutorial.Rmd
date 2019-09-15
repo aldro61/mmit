@@ -30,8 +30,8 @@ This algorithm was implemented using the *partykit* library for creation of tree
  
 Specifically, the following learning algorithms are implemented in the mmit package:
 
-  * Max margin interval trees (mmit, mmit.predict, mmit.pruning, mmit.cv)
-  * Max margin interval random forests (mmif, mmif.predict, mmif.cv)
+  * Max margin interval trees (mmit, predict.mmit, mmit.pruning, mmit.cv)
+  * Max margin interval random forests (mmif, predict.mmif, mmif.cv)
   * Max margin interval Adaboost (in progress) 
   
 
@@ -63,7 +63,6 @@ This document is an short overview of the functionalities of the mmit package. T
   
 * [Random Forest]
     * [mmif](#mmif)
-    * [mmif.predict](#mmif.predict)
     * [mmif.cv](#mmif.cv)
   
 * [Other Functions]
@@ -185,11 +184,11 @@ plot(out)
 
 ### Prediction
   
-The prediction is done using mmit.predict(). It fits the new data into the MMIT model to give prediction values
+The prediction is done using predict.mmit(). It fits the new data into the MMIT model to give prediction values
   
 #### Usage:
   
-`mmit.predict(tree, newdata = NULL, perm = NULL)`
+`predict.mmit(tree, newdata = NULL, perm = NULL)`
   
 #### Example:
   
@@ -207,7 +206,7 @@ colnames(feature.mat) <- c("a", "b", "c")
 feature.mat <- data.frame(feature.mat)
 
 tree <- mmit(feature.mat, target.mat)
-pred <- mmit.predict(tree)
+pred <- predict.mmit(tree)
 ```
 
 #### Output:
@@ -226,7 +225,7 @@ colnames(feature.mat) <- c("a", "b", "c")
 feature.mat <- data.frame(feature.mat)
 
 tree <- mmit(feature.mat, target.mat)
-pred <- mmit.predict(tree)
+pred <- predict.mmit(tree)
 print(pred)
 ```
 
@@ -325,6 +324,7 @@ library(mmit)
 data(neuroblastomaProcessed, package="penaltyLearning")
 feature.mat <- data.frame(neuroblastomaProcessed$feature.mat)[1:45,]
 target.mat <- neuroblastomaProcessed$target.mat[1:45,]
+new.mat <- data.frame(neuroblastomaProcessed$feature.mat)[46:90,]
   
 param_grid <- NULL
 param_grid$max_depth <- c(Inf, 2)
@@ -333,7 +333,8 @@ param_grid$min_sample <- c(10, 20)
 param_grid$loss <- c("hinge", "square")
 if(require(future)){ plan(multiprocess)}
 set.seed(1)
-result <- mmit.cv(feature.mat, target.mat, param_grid, scorer = mse, future.seed = TRUE)
+fit <- mmit.cv(feature.mat, target.mat, param_grid, scorer = mse, future.seed = TRUE)
+pred <- predict(fit, new.mat)
 ```
 
 #### Output:
@@ -342,7 +343,8 @@ library(mmit, quietly=TRUE)
 data(neuroblastomaProcessed, package="penaltyLearning")
 feature.mat <- data.frame(neuroblastomaProcessed$feature.mat)[1:45,]
 target.mat <- neuroblastomaProcessed$target.mat[1:45,]
-  
+new.mat <- data.frame(neuroblastomaProcessed$feature.mat)[46:90,]
+ 
 param_grid <- NULL
 param_grid$max_depth <- c(Inf, 2)
 param_grid$margin <- c(2, 3)
@@ -354,12 +356,15 @@ print('result: ')
 print(result$best_params)
 print("best estimator: ")
 plot(result$best_estimator)
+print("prediction: ")
+pred<- predict(result)
+print(pred)
 ```
 
 ## Random Forest
 
 The random forest implemented in the mmit package uses the concept of random forest described by Brietman.
-The mmif function is used for creating the collection of trees by random sampling training examples with replacement and features without replacement. The mmif.predict() function is used to calculate the average prediction done by the random forest algorithm and mmif.cv() function is the implementaiton of k-fold cross validaiton for the random forest model.
+The mmif function is used for creating the collection of trees by random sampling training examples with replacement and features without replacement. The predict.mmif() function is used to calculate the average prediction done by the random forest algorithm and mmif.cv() function is the implementaiton of k-fold cross validaiton for the random forest model.
 
 ### mmif()
   
@@ -372,7 +377,7 @@ min_sample = 1, n_trees = 10,
 n_features = ceiling(ncol(feature.mat)^0.5), future.seed = FALSE)`
   
 #### Example:
-  
+
 ```R
 library(mmit)
 
@@ -397,16 +402,10 @@ library(mmit, quietly=TRUE)
   for(i in trees){plot(i)}
 ```
 
-### mmif.predict()
-  
-Predictions with random forests of Max Margin Interval Trees
-
-#### Usage:
-
-`mmif.predict(forest, test_feature.mat = NULL)`
-
 #### Example:
-  
+
+Predictions with random forests of Max Margin Interval Trees. 
+
 ```R
 library(mmit)
 
@@ -422,7 +421,7 @@ colnames(feature.mat) <- c("a", "b", "c")
 feature.mat <- data.frame(feature.mat)
 
 forest <- mmif(feature.mat, target.mat)
-pred <- mmif.predict(forest, feature.mat)
+pred <- predict(forest, feature.mat)
 ```
 
 #### Output:
@@ -441,7 +440,7 @@ colnames(feature.mat) <- c("a", "b", "c")
 feature.mat <- data.frame(feature.mat)
 
 forest <- mmif(feature.mat, target.mat)
-pred <- mmif.predict(forest, feature.mat)
+pred <- predict(forest, feature.mat)
 print(pred)
 ```
 
@@ -461,6 +460,7 @@ library(mmit)
 data(neuroblastomaProcessed, package="penaltyLearning")
 feature.mat <- data.frame(neuroblastomaProcessed$feature.mat)[1:45,]
 target.mat <- neuroblastomaProcessed$target.mat[1:45,]
+test.mat <- data.frame(neuroblastomaProcessed$feature.mat)[46:90,]
  
 param_grid <- NULL
 param_grid$max_depth <- c(4, 3)
@@ -471,7 +471,8 @@ param_grid$n_trees <- c(10)
 param_grid$n_features <- c(as.integer(ncol(feature.mat)**0.5))
 if(require(future)){ plan(multiprocess)}
 set.seed(1)
-result <- mmif.cv(feature.mat, target.mat, param_grid, scorer = mse, future.seed = TRUE)
+fit <- mmif.cv(feature.mat, target.mat, param_grid, scorer = mse, future.seed = TRUE)
+pred <- predict(fit, test.mat)
 ```
 
 #### Output:
@@ -481,6 +482,7 @@ library(mmit, quietly=TRUE)
 data(neuroblastomaProcessed, package="penaltyLearning")
 feature.mat <- data.frame(neuroblastomaProcessed$feature.mat)[1:45,]
 target.mat <- neuroblastomaProcessed$target.mat[1:45,]
+test.mat <- data.frame(neuroblastomaProcessed$feature.mat)[46:90,]
  
 param_grid <- NULL
 param_grid$max_depth <- c(4, 3)
@@ -492,12 +494,15 @@ param_grid$n_features <- c(as.integer(ncol(feature.mat)**0.5))
 if(require(future)){ plan(multiprocess)}
 
 set.seed(1)
-result <- mmif.cv(feature.mat, target.mat, param_grid, scorer = mse, future.seed = TRUE)
+fit <- mmif.cv(feature.mat, target.mat, param_grid, scorer = mse, future.seed = TRUE)
 print('result: ')
 print("best estimators: ")
-for(i in result$best_estimator){
+for(i in fit$best_estimator){
   plot(i)
 }
+print("predictions: ")
+pred <- predict(fit, test.mat)
+print(pred)
 ```
 
 ## Other Functions
