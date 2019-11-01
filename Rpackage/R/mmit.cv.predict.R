@@ -5,6 +5,7 @@
 #' @param object Object obtained from \code{"mmit.cv()"}
 #' @param newdata an optional data frame containing the testing data which is to be predicted.
 #' @param perm an optional character vector of variable names. 
+#' @param \dots ...
 #' 
 #' @return The learned regression tree as an object of class party.
 #' 
@@ -27,7 +28,7 @@
 #' 
 #' pred <- predict(fit)
 #' 
-predict.mmit.cv <- function(object, newdata = NULL, perm = NULL){
+predict.mmit.cv <- function(object, newdata = NULL, perm = NULL, ...){
   
   prediction <- predict.mmit(object$best_estimator, newdata, perm)
   

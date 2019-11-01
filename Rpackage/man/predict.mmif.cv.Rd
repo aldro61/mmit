@@ -4,14 +4,14 @@
 \alias{predict.mmif.cv}
 \title{The Predict Function for Cross Validation of Random Forest}
 \usage{
-\method{predict}{mmif.cv}(object, newdata = NULL, perm = NULL)
+\method{predict}{mmif.cv}(object, newdata = NULL, ...)
 }
 \arguments{
 \item{object}{Object obtained from \code{"mmif.cv()"}}
 
 \item{newdata}{an optional data frame containing the testing data which is to be predicted.}
 
-\item{perm}{an optional character vector of variable names.}
+\item{\dots}{...}
 }
 \value{
 Predictions Average output of each tree in the forest

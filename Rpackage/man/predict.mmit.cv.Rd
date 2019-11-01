@@ -4,7 +4,7 @@
 \alias{predict.mmit.cv}
 \title{The Predict Function for Cross Validation of Max Margin Interval Tree}
 \usage{
-\method{predict}{mmit.cv}(object, newdata = NULL, perm = NULL)
+\method{predict}{mmit.cv}(object, newdata = NULL, perm = NULL, ...)
 }
 \arguments{
 \item{object}{Object obtained from \code{"mmit.cv()"}}
@@ -12,6 +12,8 @@
 \item{newdata}{an optional data frame containing the testing data which is to be predicted.}
 
 \item{perm}{an optional character vector of variable names.}
+
+\item{\dots}{...}
 }
 \value{
 The learned regression tree as an object of class party.

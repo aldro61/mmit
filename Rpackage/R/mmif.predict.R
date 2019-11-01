@@ -1,7 +1,8 @@
 #' Predictions with random forests of Max Margin Interval Trees
 #' 
-#' @param forest Ensemble of MMITs
+#' @param object Ensemble of MMITs
 #' @param test_feature.mat A data frame containing the features of the examples for which predictions must be computed.
+#' @param \dots ...
 #' 
 #' @return Predictions Average output of each tree in the forest
 #' 
@@ -24,11 +25,11 @@
 #' forest <- mmif(feature.mat, target.mat)
 #' pred <- predict(forest, feature.mat)
 #' 
-predict.mmif <- function(forest, test_feature.mat = NULL){
+predict.mmif <- function(object, test_feature.mat = NULL, ...){
   
   all_pred <- NULL
-  for(i in 1 : length(forest)){
-    prediction <- predict.mmit(forest[[i]], test_feature.mat)
+  for(i in 1 : length(object)){
+    prediction <- predict.mmit(object[[i]], test_feature.mat)
     all_pred <- rbind(all_pred, prediction)
   }
   

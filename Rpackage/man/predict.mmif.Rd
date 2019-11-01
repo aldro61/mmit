@@ -4,12 +4,14 @@
 \alias{predict.mmif}
 \title{Predictions with random forests of Max Margin Interval Trees}
 \usage{
-\method{predict}{mmif}(forest, test_feature.mat = NULL)
+\method{predict}{mmif}(object, test_feature.mat = NULL, ...)
 }
 \arguments{
-\item{forest}{Ensemble of MMITs}
+\item{object}{Ensemble of MMITs}
 
 \item{test_feature.mat}{A data frame containing the features of the examples for which predictions must be computed.}
+
+\item{\dots}{...}
 }
 \value{
 Predictions Average output of each tree in the forest

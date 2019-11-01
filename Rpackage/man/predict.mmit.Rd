@@ -4,14 +4,16 @@
 \alias{predict.mmit}
 \title{The Predict Function for Max Margin Interval Tree}
 \usage{
-\method{predict}{mmit}(tree, newdata = NULL, perm = NULL)
+\method{predict}{mmit}(object, newdata = NULL, perm = NULL, ...)
 }
 \arguments{
-\item{tree}{The Max Margin Interval Tree obtained from \code{"mmit()"}}
+\item{object}{The Max Margin Interval Tree obtained from \code{"mmit()"}}
 
 \item{newdata}{an optional data frame containing the testing data which is to be predicted.}
 
 \item{perm}{an optional character vector of variable names.}
+
+\item{\dots}{...}
 }
 \value{
 The learned regression tree as an object of class party.

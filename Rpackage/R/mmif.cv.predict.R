@@ -4,6 +4,8 @@
 #'
 #' @param object Object obtained from \code{"mmif.cv()"}
 #' @param newdata an optional data frame containing the testing data which is to be predicted.
+#' @param \dots ...
+#' 
 #' 
 #' @return Predictions Average output of each tree in the forest
 #' 
@@ -26,7 +28,7 @@
 #' 
 #' pred <- predict(fit)
 #' 
-predict.mmif.cv <- function(object, newdata = NULL){
+predict.mmif.cv <- function(object, newdata = NULL, ...){
   
   all_pred <- NULL
   forest <- object$best_estimator

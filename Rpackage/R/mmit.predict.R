@@ -2,9 +2,10 @@
 #'
 #' Fits the new data into the MMIT model to give prediction values
 #'
-#' @param tree The Max Margin Interval Tree obtained from \code{"mmit()"}
+#' @param object The Max Margin Interval Tree obtained from \code{"mmit()"}
 #' @param newdata an optional data frame containing the testing data which is to be predicted.
 #' @param perm an optional character vector of variable names. 
+#' @param \dots ...
 #' 
 #' @return The learned regression tree as an object of class party.
 #' 
@@ -27,10 +28,10 @@
 #' 
 #' pred <- predict.mmit(tree)
 #' 
-predict.mmit <- function(tree, newdata = NULL, perm = NULL){
+predict.mmit <- function(object, newdata = NULL, perm = NULL, ...){
     
-  fit <- predict(tree, newdata, perm)
-  n <- lapply(nodeapply(tree, ids = fit, info_node), function(x) x$prediction)
+  fit <- predict(object, newdata, perm)
+  n <- lapply(nodeapply(object, ids = fit, info_node), function(x) x$prediction)
   prediction <- c(matrix(unlist(n), nrow = length(n), byrow = T))
   
   return(prediction)
