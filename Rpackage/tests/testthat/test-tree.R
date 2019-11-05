@@ -38,7 +38,7 @@ test_that("finding best split for squared loss, margin as 0", {
 })
 
 #linear hinge, margin = 0, test mmit
-out <- mmit(target.mat, feature.mat)
+out <- mmit(feature.mat, target.mat)
 p <- predict(out)
 test_that("predicting the tree mmit() with hinge loss", {
   expect_equal(nodeapply(out, ids = p[[1]], info_node)[[1]][[1]], 0.5)
@@ -51,7 +51,7 @@ test_that("predicting the tree mmit() with hinge loss", {
 
 
 #square hinge, margin = 0, test mmit
-out <- mmit(target.mat, feature.mat, loss="square")
+out <- mmit(feature.mat, target.mat, loss="square")
 p <- predict(out)
 test_that("predicting the tree mmit() with square loss", {
   expect_equal(nodeapply(out, ids = p[[1]], info_node)[[1]][[1]], 0.5)

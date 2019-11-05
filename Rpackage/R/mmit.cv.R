@@ -2,12 +2,12 @@
 #'
 #' Performing grid search to select the best parameters via cross validation on the  a regression tree for censored data.
 #' 
-#' @param target.mat The response variable of the model
+#' 
 #' @param feature.mat a data frame containing the feature variables in the model.
+#' @param target.mat The response variable of the model
 #' @param param_grid the list of paramaters
 #' @param n_folds The number of folds
-#' @param scorer The Loss calculation function 
-#' @param n_cpu The number of cores to register for parallel programing of the code, default value is 1 and n_cpu = -1 to select all cores.
+#' @param scorer The Loss calculation function (default loss function: MSE)
 #' @param pruning Boolean whether pruning is to be done or not.
 #' @param future.seed A logical or an integer (of length one or seven), or a list of length(X) with pre-generated random seeds. 
 #' 
@@ -35,11 +35,11 @@
 #' param_grid$loss <- c("hinge")
 #' 
 #' set.seed(1)
-#' result <- mmit.cv(target.mat, feature.mat, param_grid, scorer = mse, future.seed = TRUE)
+#' result <- mmit.cv(feature.mat, target.mat, param_grid, scorer = mse, future.seed = TRUE)
 #' 
-mmit.cv <- function(target.mat, feature.mat, 
-                              param_grid, n_folds = 3,
-                              scorer = NULL, pruning = TRUE, future.seed = FALSE){
+mmit.cv <- function(feature.mat, target.mat, 
+                              param_grid = NULL, n_folds = 3,
+                              scorer = mse, pruning = TRUE, future.seed = FALSE){
   
   ### add default value to parameters
   if(is.null(param_grid[["max_depth"]])) param_grid$max_depth <- Inf
@@ -81,6 +81,7 @@ mmit.cv <- function(target.mat, feature.mat,
   }    
   
   best_result$cv_results <- cv_results
+  class(best_result) <- "mmit.cv"
   
   return(best_result)
   
