@@ -22,7 +22,7 @@
 #' feature.mat <- data.frame(feature.mat)
 #' 
 #' 
-#' tree <- mmit(target.mat, feature.mat)
+#' tree <- mmit(feature.mat, target.mat)
 #' 
 #' pruned_tree <- mmit.pruning(tree)
 #' 

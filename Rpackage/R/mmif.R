@@ -2,8 +2,9 @@
 #'
 #' Learning a random forest of Max Margin Interval Tree.
 #' 
-#' @param target.mat The response variable of the model
+#' 
 #' @param feature.mat a data frame containing the feature variables in the model.
+#' @param target.mat The response variable of the model
 #' @param margin margin hyperparameter
 #' @param loss The type of loss; (\code{"hinge"}, \code{"square"})
 #' @param max_depth The maximum depth of each tree
@@ -31,9 +32,9 @@
 #' feature.mat <- data.frame(feature.mat)
 #' 
 #' set.seed(1)
-#' trees <- mmif(target.mat, feature.mat, margin = 2.0, future.seed = TRUE)
+#' trees <- mmif(feature.mat, target.mat, margin = 2.0, future.seed = TRUE)
 #' 
-mmif <- function(target.mat, feature.mat, 
+mmif <- function(feature.mat, target.mat, 
                            max_depth = Inf, margin=0.0, loss="hinge",
                            min_sample = 1, n_trees = 10,
                            n_features =  ceiling(ncol(feature.mat)**0.5), future.seed = FALSE){
@@ -52,7 +53,7 @@ mmif <- function(target.mat, feature.mat,
                   min_sample = min_sample, n_trees = n_trees,
                   n_features = n_features), future.seed = future.seed)
     
-  
+  class(all_trees) <- "mmif"
   return(all_trees)
   
 }
@@ -80,7 +81,8 @@ mmif <- function(target.mat, feature.mat,
   new_feature.mat <- data.frame(new_feature.mat)
   
   ### tree
-  tree <- mmit(new_target.mat, new_feature.mat, margin = margin, loss = loss, 
+  tree <- mmit(new_feature.mat, new_target.mat, margin = margin, loss = loss, 
                min_sample = min_sample, max_depth = max_depth)
+
   return(tree)
 }

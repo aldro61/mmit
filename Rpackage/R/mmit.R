@@ -2,8 +2,9 @@
 #'
 #' Learning a regression tree for censored data.
 #'
-#' @param target.mat The response variable of the model
+#' 
 #' @param feature.mat a data frame containing the feature variables in the model.
+#' @param target.mat The response variable of the model
 #' @param margin margin paramaters 
 #' @param loss The type of loss; (\code{"hinge"}, \code{"square"})
 #' @param max_depth The maximum depth criteia
@@ -28,10 +29,10 @@
 #' feature.mat <- data.frame(feature.mat)
 #' 
 #' 
-#' out <- mmit(target.mat, feature.mat)
+#' out <- mmit(feature.mat, target.mat)
 #' 
 
-mmit <- function(target.mat, feature.mat,  
+mmit <- function(feature.mat,  target.mat, 
                            max_depth = Inf, margin=0.0, loss="hinge",
                            min_sample = 1, weights = rep(1L, nrow(feature.mat))) {
   ### partynode id and initial depth

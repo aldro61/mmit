@@ -1,8 +1,8 @@
-#' The Predict Function for Max Margin Interval Tree
+#' The Predict Function for Cross Validation of Max Margin Interval Tree
 #'
-#' Fits the new data into the MMIT model to give prediction values
+#' Fits the new data into the mmit.cv model to give prediction values
 #'
-#' @param object The Max Margin Interval Tree obtained from \code{"mmit()"}
+#' @param object Object obtained from \code{"mmit.cv()"}
 #' @param newdata an optional data frame containing the testing data which is to be predicted.
 #' @param perm an optional character vector of variable names. 
 #' @param \dots ...
@@ -24,15 +24,13 @@
 #' colnames(feature.mat) <- c("a", "b", "c")
 #' feature.mat <- data.frame(feature.mat)
 #' 
-#' tree <- mmit(feature.mat, target.mat)
+#' fit <- mmit.cv(feature.mat, target.mat)
 #' 
-#' pred <- predict.mmit(tree)
+#' pred <- predict(fit)
 #' 
-predict.mmit <- function(object, newdata = NULL, perm = NULL, ...){
-    
-  fit <- predict(object, newdata, perm)
-  n <- lapply(nodeapply(object, ids = fit, info_node), function(x) x$prediction)
-  prediction <- c(matrix(unlist(n), nrow = length(n), byrow = T))
+predict.mmit.cv <- function(object, newdata = NULL, perm = NULL, ...){
+  
+  prediction <- predict.mmit(object$best_estimator, newdata, perm)
   
   return(prediction)
 }

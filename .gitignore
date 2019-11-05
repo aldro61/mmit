@@ -1,5 +1,6 @@
 *~
 *.so
+*.dll
 *.o
 symbols.rds
 *.Rcheck

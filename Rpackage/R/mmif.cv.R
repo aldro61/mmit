@@ -2,11 +2,11 @@
 #'
 #' Performing grid search to select the best hyperparameters of mmif via cross-validation.
 #' 
-#' @param target.mat The response variable of the model
 #' @param feature.mat A data frame containing the feature variables in the model.
+#' @param target.mat The response variable of the model
 #' @param param_grid A list with values to try for each hyperparameter (max_depth, margin, min_sample, loss, n_trees, n_features).
 #' @param n_folds The number of folds for k-fold cross-validation
-#' @param scorer The function used to calculate the cross-validation score (e.g., mse, zero_one_loss)
+#' @param scorer The function used to calculate the cross-validation score (default loss function: MSE)
 #' @param future.seed A logical or an integer (of length one or seven), or a list of length(X) with pre-generated random seeds. 
 #' 
 #' @return The best score, best model (trained with best parameters), best parameters, and list of all parameter values with cross validation score. 
@@ -36,11 +36,11 @@
 #' param_grid$n_features <- c(ceiling(ncol(feature.mat)**0.5))
 #' 
 #' set.seed(1)
-#' result <- mmif.cv(target.mat, feature.mat, param_grid, scorer = mse, future.seed = TRUE)
-#' 
-mmif.cv <- function(target.mat, feature.mat, 
-                              param_grid, n_folds = 3,
-                              scorer = NULL, future.seed = FALSE){
+#' result <- mmif.cv(feature.mat, target.mat, param_grid, scorer = mse, future.seed = TRUE)
+#' pred <- predict(result)
+mmif.cv <- function(feature.mat, target.mat, 
+                              param_grid = NULL, n_folds = 3,
+                              scorer = mse, future.seed = FALSE){
   
   ### add default value to parameters
   if(is.null(param_grid[["max_depth"]])) param_grid$max_depth <- Inf
@@ -48,7 +48,7 @@ mmif.cv <- function(target.mat, feature.mat,
   if(is.null(param_grid[["min_sample"]])) param_grid$min_sample <- 0.0
   if(is.null(param_grid[["loss"]])) param_grid$loss <- "hinge"
   if(is.null(param_grid[["n_trees"]])) param_grid$n_trees <- 10
-  if(is.null(param_grid[["n_features"]])) param_grid$n_features <- c(as.integer(ncol(feature.mat)**0.5))
+  if(is.null(param_grid[["n_features"]])) param_grid$n_features <- c(ceiling(ncol(feature.mat)**0.5))
   
   ### check for unwanted parameters
   assert_that(length(param_grid) <= 6, msg = "unexpected parameters as argument")
@@ -84,6 +84,7 @@ mmif.cv <- function(target.mat, feature.mat,
   }    
   
   best_result$cv_results <- cv_results
+  class(best_result) <- "mmif.cv" 
   
   return(best_result)
   
