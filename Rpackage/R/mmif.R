@@ -12,6 +12,7 @@
 #' @param n_trees The number of trees in the ensemble (forest)
 #' @param n_features The number of features to be used to train each tree
 #' @param future.seed A logical or an integer (of length one or seven), or a list of length(X) with pre-generated random seeds. 
+
 #' 
 #' @return List of trees containing each tree in the random forest.
 #' 
@@ -39,27 +40,32 @@ mmif <- function(feature.mat, target.mat,
                            min_sample = 1, n_trees = 10,
                            n_features =  ceiling(ncol(feature.mat)**0.5), future.seed = FALSE){
   
-  #lapply parallel or sequencial
-  Lapply <- if(requireNamespace("future.apply")){ 
-    future.apply::future_lapply 
-  }
-  else{ lapply }
+  
+  ### parallelize using foreach, see all permutation combination of param grid values
+  ### register parallel backend
+  if(n_cpu == -1) n_cpu <- detectCores() 
+  assert_that(detectCores() >= n_cpu)
   
   all_trees <- list()
+  if(n_cpu > 1){
+    cl <- makeCluster(n_cpu)
+    registerDoParallel(cl)
     
-  ### create n_trees
-  all_trees <- Lapply(1 : n_trees, function(x) .random_tree(target.mat, feature.mat, 
+    ### create n_trees
+    all_trees <- foreach(i = 1 : n_trees, .packages = "mmit") %dopar% 
+      random_tree(target.mat, feature.mat, 
                   max_depth = max_depth, margin = margin, loss = loss,
                   min_sample = min_sample, n_trees = n_trees,
                   n_features = n_features), future.seed = future.seed)
     
+
   class(all_trees) <- "mmif"
   return(all_trees)
   
 }
 
 
-.random_tree <- function(target.mat, feature.mat, 
+random_tree <- function(target.mat, feature.mat, 
                         max_depth, margin, loss,
                         min_sample, n_trees ,
                         n_features){

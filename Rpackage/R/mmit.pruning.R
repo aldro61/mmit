@@ -26,15 +26,22 @@
 #' 
 #' pruned_tree <- mmit.pruning(tree)
 #' 
+#' @export
+
+
+
+#### needs work...eturn type
+
+
 
 mmit.pruning <- function(tree){
   ### T1 is the tree after initital pruning of Tmax
-  T1 <- .init_pruning(tree)
+  T1 <- init_pruning(tree)
   alpha_trees <- list()
   
   sequential_prune <- function(tree){
     ### find weakest links
-    wlink <- .weakest_link(tree)
+    wlink <- weakest_link(tree)
     
     ### min_gt is same for all weakest links
     min_gt <- wlink[1, 1]

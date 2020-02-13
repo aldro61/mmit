@@ -32,3 +32,4 @@ target.mat <- rbind(
 compute_optimal_costs(target.mat, 0)
 compute_optimal_costs(target.mat, 2)
 }
+

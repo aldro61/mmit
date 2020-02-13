@@ -59,11 +59,13 @@ mmit.cv <- function(feature.mat, target.mat,
   best_result <- NULL
   best_result$best_score <- attr(scorer, "worst")
   
-  #lapply parallel or sequencial
-  Lapply <- if(requireNamespace("future.apply")){ 
-    future.apply::future_lapply 
-  }
-  else{ lapply }
+  ### parallelize using foreach, see all permutation combination of param grid values
+  ### register parallel backend
+  if(n_cpu == -1) n_cpu <- detectCores() 
+  assert_that(detectCores() >= n_cpu)
+  
+  cl <- makeCluster(n_cpu)
+  registerDoParallel(cl)
   
   fitscore_result <- list()
   fitscore_result <- Lapply(1:nrow(parameters), 

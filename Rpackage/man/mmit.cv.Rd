@@ -18,6 +18,8 @@ mmit.cv(feature.mat, target.mat, param_grid = NULL, n_folds = 3,
 
 \item{scorer}{The Loss calculation function (default loss function: MSE)}
 
+\item{n_cpu}{The number of cores to register for parallel programing of the code, default value is 1 and n_cpu = -1 to select all cores.}
+
 \item{pruning}{Boolean whether pruning is to be done or not.}
 
 \item{future.seed}{A logical or an integer (of length one or seven), or a list of length(X) with pre-generated random seeds.}

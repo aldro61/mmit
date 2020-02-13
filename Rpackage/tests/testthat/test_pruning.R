@@ -50,7 +50,7 @@ colnames(info_print) <- c("prediction", "cost")
 split <- partysplit(varid = as.integer(1), breaks = 2)
 root <- partynode(1, split = split, kids = kids, info = info_print)
 
-output <- .weakest_link(root)
+output <- weakest_link(root)
 test_that("finding weakest link", {
   expect_equal(output[[2]], 1)
 })

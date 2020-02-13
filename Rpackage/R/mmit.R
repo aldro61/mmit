@@ -32,6 +32,7 @@
 #' out <- mmit(feature.mat, target.mat)
 #' 
 
+
 mmit <- function(feature.mat,  target.mat, 
                            max_depth = Inf, margin=0.0, loss="hinge",
                            min_sample = 1, weights = rep(1L, nrow(feature.mat))) {
@@ -45,7 +46,7 @@ mmit <- function(feature.mat,  target.mat,
   stopifnot(length(weights) == nrow(feature.mat))
   
   ### tree
-  node<- .growtree(target.mat, feature.mat, max_depth = max_depth, margin = margin, weights = weights)
+  node<- growtree(target.mat, feature.mat, max_depth = max_depth, margin = margin, weights = weights)
   
   ### for node == root
   if(is.null(model.response(feature.mat))){
@@ -65,6 +66,5 @@ mmit <- function(feature.mat,  target.mat,
   return(tree)
   
 }
-
 
 

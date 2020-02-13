@@ -1,6 +1,7 @@
 useDynLib(mmit)
 exportPattern("^[[:alpha:]]")
 import(partykit)
+import(penaltyLearning)
 import(assertthat)
 importFrom("stats", "model.frame", "model.response", "na.omit", "terms", "predict")
 importFrom("utils", "tail")
@@ -8,3 +9,4 @@ S3method(predict, mmit)
 S3method(predict, mmif)
 S3method(predict, mmif.cv)
 S3method(predict, mmit.cv)
+

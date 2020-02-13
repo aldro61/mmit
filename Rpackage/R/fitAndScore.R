@@ -1,4 +1,5 @@
 .fit_and_score <- function(target.mat, feature.mat, 
+
                                     parameters, n_folds = 3, scorer = NULL, 
                                     learner = NULL, pruning = TRUE){
   predict.learner = paste( "predict.", learner, sep = "")
